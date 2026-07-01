@@ -1,39 +1,57 @@
 using System.Security.Cryptography;
-using System.Text;
 
 namespace HealthcareCRM.Helpers
 {
+    /// <summary>
+    /// Provides PBKDF2-based password hashing and verification using SHA-256.
+    /// </summary>
     public class PasswordHasher
     {
-        private const int SaltSize = 16;
-        private const int KeySize = 32;
-        private const int Iterations = 10000;
+        private const int SALT_SIZE  = 16;  // bytes
+        private const int KEY_SIZE   = 32;  // bytes
+        private const int ITERATIONS = 100_000;
 
+        /// <summary>
+        /// Hashes a plain-text password using PBKDF2-SHA256 with a random salt.
+        /// </summary>
+        /// <param name="password">The plain-text password to hash.</param>
+        /// <returns>Base64-encoded string of salt + hash bytes.</returns>
         public string HashPassword(string password)
         {
-            using var algorithm = new Rfc2898DeriveBytes(password, SaltSize, Iterations, HashAlgorithmName.SHA256);
-            var key = algorithm.GetBytes(KeySize);
-            var salt = algorithm.Salt;
-            return Convert.ToBase64String(Combine(salt, key));
+            var salt = RandomNumberGenerator.GetBytes(SALT_SIZE);
+            var hash = Rfc2898DeriveBytes.Pbkdf2(
+                password,
+                salt,
+                ITERATIONS,
+                HashAlgorithmName.SHA256,
+                KEY_SIZE);
+
+            var combined = new byte[SALT_SIZE + KEY_SIZE];
+            Buffer.BlockCopy(salt, 0, combined, 0,         SALT_SIZE);
+            Buffer.BlockCopy(hash, 0, combined, SALT_SIZE, KEY_SIZE);
+            return Convert.ToBase64String(combined);
         }
 
+        /// <summary>
+        /// Verifies a plain-text password against a stored PBKDF2 hash.
+        /// </summary>
+        /// <param name="hashedPassword">Stored Base64-encoded salt + hash.</param>
+        /// <param name="password">The plain-text password to verify.</param>
+        /// <returns><c>true</c> if the password matches; <c>false</c> otherwise.</returns>
         public bool VerifyPassword(string hashedPassword, string password)
         {
-            var value = Convert.FromBase64String(hashedPassword);
-            var salt = value[..SaltSize];
-            var key = value[SaltSize..];
+            var combined = Convert.FromBase64String(hashedPassword);
+            var salt     = combined[..SALT_SIZE];
+            var storedHash = combined[SALT_SIZE..];
 
-            using var algorithm = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256);
-            var keyToCheck = algorithm.GetBytes(KeySize);
-            return keyToCheck.SequenceEqual(key);
-        }
+            var derivedHash = Rfc2898DeriveBytes.Pbkdf2(
+                password,
+                salt,
+                ITERATIONS,
+                HashAlgorithmName.SHA256,
+                KEY_SIZE);
 
-        private static byte[] Combine(byte[] first, byte[] second)
-        {
-            var ret = new byte[first.Length + second.Length];
-            Buffer.BlockCopy(first, 0, ret, 0, first.Length);
-            Buffer.BlockCopy(second, 0, ret, first.Length, second.Length);
-            return ret;
+            return CryptographicOperations.FixedTimeEquals(derivedHash, storedHash);
         }
     }
 }

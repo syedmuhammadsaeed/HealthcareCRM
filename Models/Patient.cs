@@ -1,33 +1,44 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace HealthcareCRM.Models
 {
-    [Table("Patient")]
+    /// <summary>
+    /// Represents a patient record stored in the Patients MongoDB collection.
+    /// </summary>
     public class Patient
     {
-        [Key]
-        public int PatientId { get; set; }
+        /// <summary>Gets or sets the unique MongoDB ObjectId.</summary>
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(150)]
+        /// <summary>Gets or sets the patient's full name.</summary>
+        [BsonElement("name")]
         public string Name { get; set; } = string.Empty;
 
-        [Range(0, 120)]
+        /// <summary>Gets or sets the patient's age (0–120).</summary>
+        [BsonElement("age")]
         public int Age { get; set; }
 
-        [Required]
-        [StringLength(20)]
+        /// <summary>Gets or sets the patient's gender.</summary>
+        [BsonElement("gender")]
         public string Gender { get; set; } = string.Empty;
 
-        [Required]
-        [Phone]
+        /// <summary>Gets or sets the patient's phone number.</summary>
+        [BsonElement("phone")]
         public string Phone { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(250)]
+        /// <summary>Gets or sets the patient's address.</summary>
+        [BsonElement("address")]
         public string Address { get; set; } = string.Empty;
 
+        /// <summary>Gets or sets the patient's status.</summary>
+        [BsonElement("status")]
+        public string Status { get; set; } = "active";
+
+        /// <summary>Gets or sets the UTC date this record was created.</summary>
+        [BsonElement("createdDate")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

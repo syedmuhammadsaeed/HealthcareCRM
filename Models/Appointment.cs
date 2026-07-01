@@ -1,21 +1,35 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace HealthcareCRM.Models
 {
-    [Table("Appointment")]
+    /// <summary>
+    /// Represents an appointment record — included for the ERD.
+    /// Appointment CRUD is NOT implemented in Week 1.
+    /// </summary>
     public class Appointment
     {
-        [Key]
-        public int AppointmentId { get; set; }
+        /// <summary>Gets or sets the unique MongoDB ObjectId.</summary>
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = string.Empty;
 
-        public int UserId { get; set; }
+        /// <summary>Gets or sets the ID of the user who created the appointment.</summary>
+        [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string UserId { get; set; } = string.Empty;
 
-        public int PatientId { get; set; }
+        /// <summary>Gets or sets the ID of the associated patient.</summary>
+        [BsonElement("patientId")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string PatientId { get; set; } = string.Empty;
 
+        /// <summary>Gets or sets the scheduled UTC date and time.</summary>
+        [BsonElement("scheduledAt")]
         public DateTime ScheduledAt { get; set; }
 
-        [StringLength(500)]
+        /// <summary>Gets or sets optional clinical notes for the appointment.</summary>
+        [BsonElement("notes")]
         public string? Notes { get; set; }
     }
 }

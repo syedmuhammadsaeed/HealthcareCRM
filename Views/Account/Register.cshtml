@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+@section Styles {
+    <link href="~/css/register.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<main class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-eyebrow"><span>✛</span> Clinician registration</div>
+
+    <h1>Create your account</h1>
+    <p class="sub">Join HealthcareCRM to manage patients, schedules, and records in one place.</p>
+
+    <div class="steps" aria-hidden="true">
+      <div class="step done"></div><div class="step"></div><div class="step"></div>
+    </div>
+
+    <div id="alert-container" role="alert" aria-live="polite"></div>
+
+    <form id="register-form" novalidate>
+      <div class="field">
+        <label for="fullName">Full name</label>
+        <div class="input-shell">
+          <input type="text" id="fullName" name="fullName" placeholder="Dr. John Doe" autocomplete="name" required />
+          <span class="check-ok" aria-hidden="true">✓</span>
+        </div>
+        <span class="helper">Used on patient records and appointment confirmations.</span>
+        <span class="error-msg" id="fullName-error" role="alert">Full name is required (minimum 2 characters).</span>
+      </div>
+
+      <div class="field">
+        <label for="email">Email address</label>
+        <div class="input-shell">
+          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+          <span class="check-ok" aria-hidden="true">✓</span>
+        </div>
+        <span class="error-msg" id="email-error" role="alert">Please enter a valid email address.</span>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-shell">
+          <input type="password" id="password" name="password" placeholder="Create a strong password" autocomplete="new-password" aria-describedby="pw-requirements" required />
+          <button type="button" class="toggle-pw" aria-label="Show password" aria-pressed="false">Show</button>
+        </div>
+
+        <div class="pw-strength-label">
+          <span>Password strength</span>
+          <span id="pw-strength-text">Too weak</span>
+        </div>
+        <div class="pw-meter" aria-hidden="true">
+          <div class="bar" data-bar="1"></div>
+          <div class="bar" data-bar="2"></div>
+          <div class="bar" data-bar="3"></div>
+          <div class="bar" data-bar="4"></div>
+        </div>
+
+        <ul class="req-list" id="pw-requirements">
+          <li data-req="len"><span class="dot"></span> Min 8 characters</li>
+          <li data-req="upper"><span class="dot"></span> Uppercase letter</li>
+          <li data-req="lower"><span class="dot"></span> Lowercase letter</li>
+          <li data-req="num"><span class="dot"></span> Number</li>
+          <li data-req="special"><span class="dot"></span> Special character</li>
+        </ul>
+      </div>
+
+      <div class="field">
+        <label for="confirm">Confirm password</label>
+        <div class="input-shell">
+          <input type="password" id="confirm" name="confirm" placeholder="Repeat your password" autocomplete="new-password" required />
+          <span class="check-ok" aria-hidden="true">✓</span>
+        </div>
+        <span class="error-msg" id="confirm-error" role="alert">Passwords do not match.</span>
+      </div>
+
+      <label class="terms">
+        <input type="checkbox" name="terms" id="terms" required />
+        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>, including HIPAA-compliant handling of patient data.</span>
+      </label>
+      <span class="error-msg" id="terms-error" role="alert">You must agree to the terms to continue.</span>
+
+      <button type="submit" class="btn-primary" id="register-btn">
+        <span class="spinner" id="register-spinner" aria-hidden="true"></span>
+        <span id="register-btn-text">Create account</span>
+      </button>
+    </form>
+
+    <p class="footer-note">Already have an account? <a href="/Account/Login">Sign in</a></p>
+  </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/register.js" asp-append-version="true"></script>
+}

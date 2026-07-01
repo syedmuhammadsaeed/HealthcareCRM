@@ -1,37 +1,45 @@
 using HealthcareCRM.Data;
 using HealthcareCRM.Interfaces;
 using HealthcareCRM.Models;
-using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace HealthcareCRM.Repositories
 {
+    /// <summary>
+    /// MongoDB implementation of <see cref="IUserRepository"/>.
+    /// </summary>
     public class UserRepository : IUserRepository
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IMongoCollection<User> _users;
 
-        public UserRepository(AppDbContext dbContext)
+        /// <summary>
+        /// Resolves the Users collection from the shared <see cref="MongoDbContext"/>.
+        /// </summary>
+        public UserRepository(MongoDbContext context)
         {
-            _dbContext = dbContext;
+            _users = context.Users;
         }
 
+        /// <inheritdoc/>
         public async Task AddAsync(User user)
         {
-            await _dbContext.Users.AddAsync(user);
+            await _users.InsertOneAsync(user);
         }
 
+        /// <inheritdoc/>
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _dbContext.Users.SingleOrDefaultAsync(x => x.Email == email);
+            return await _users
+                .Find(u => u.Email == email)
+                .FirstOrDefaultAsync();
         }
 
-        public async Task<User?> GetByIdAsync(int userId)
+        /// <inheritdoc/>
+        public async Task<User?> GetByIdAsync(string userId)
         {
-            return await _dbContext.Users.FindAsync(userId);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _dbContext.SaveChangesAsync();
+            return await _users
+                .Find(u => u.Id == userId)
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -1,0 +1,125 @@
+@{
+    var patientId = ViewBag.PatientId as string ?? string.Empty;
+    var isEdit    = !string.IsNullOrEmpty(patientId);
+    ViewData["Title"] = isEdit ? "Edit Patient" : "Add Patient";
+}
+
+<div class="pm-form-page">
+
+    <div class="pm-breadcrumb">
+        <a href="/Patient">Patients</a>
+        <span class="pm-sep">/</span>
+        <span class="pm-current">@(isEdit ? "Edit Patient" : "Add Patient")</span>
+    </div>
+
+    <div class="pm-page-head">
+        <h1>@(isEdit ? "Edit patient record" : "New patient record")</h1>
+        <p>@(isEdit ? "Update the patient's information below." : "Fill in the patient's details to create a new record.")</p>
+    </div>
+
+    <div class="pm-form-card">
+
+        <div class="pm-avatar-preview">
+            <div class="pm-circle" id="avatar-initial">?</div>
+            <div class="pm-txt">A profile initial is generated automatically from the patient's name — <b>no photo upload needed.</b></div>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="patient-form" novalidate>
+            <input type="hidden" id="patient-id" value="@patientId" />
+
+            <div class="pm-section-label">Basic information</div>
+
+            <div class="pm-field-row single">
+                <div class="pm-field" id="field-name">
+                    <label for="name">Full name <span class="pm-req">*</span></label>
+                    <input type="text" id="name" placeholder="e.g. Ahmed Khan" autocomplete="off" required>
+                    <span class="pm-hint">As it appears on the patient's ID.</span>
+                    <span class="pm-error-text">Full name is required.</span>
+                </div>
+            </div>
+
+            <div class="pm-field-row">
+                <div class="pm-field" id="field-age">
+                    <label for="age">Age <span class="pm-req">*</span></label>
+                    <input type="number" id="age" min="0" max="120" placeholder="e.g. 35" required>
+                    <span class="pm-hint">Enter age in years.</span>
+                    <span class="pm-error-text">Age must be between 0 and 120.</span>
+                </div>
+                <div class="pm-field" id="field-gender">
+                    <label for="gender">Gender <span class="pm-req">*</span></label>
+                    <select id="gender" required>
+                        <option value="" selected disabled>Select gender…</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="pm-hint">Used for record matching only.</span>
+                    <span class="pm-error-text">Please select a gender.</span>
+                </div>
+            </div>
+
+            <div class="pm-field-row single">
+                <div class="pm-field" id="field-status">
+                    <label for="status">Status <span class="pm-req">*</span></label>
+                    <select id="status" required>
+                        <option value="active" selected>Active</option>
+                        <option value="followup">Follow-up</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                    <span class="pm-hint">Current clinical status of the patient.</span>
+                    <span class="pm-error-text">Please select a status.</span>
+                </div>
+            </div>
+
+            <div class="pm-divider-full"></div>
+
+            <div class="pm-section-label">Contact details</div>
+
+            <div class="pm-field-row single">
+                <div class="pm-field" id="field-phone">
+                    <label for="phone">Phone number <span class="pm-req">*</span></label>
+                    <input type="tel" id="phone" placeholder="e.g. +92 300 1234567" required>
+                    <span class="pm-hint">Used for appointment reminders.</span>
+                    <span class="pm-error-text">Please enter a valid phone number.</span>
+                </div>
+            </div>
+
+            <div class="pm-field-row single">
+                <div class="pm-field" id="field-address">
+                    <label for="address">Address <span class="pm-req">*</span></label>
+                    <textarea id="address" placeholder="Street, City, Country" required></textarea>
+                    <span class="pm-hint">Full residential address.</span>
+                    <span class="pm-error-text">Address is required.</span>
+                </div>
+            </div>
+
+            <div class="pm-divider-full"></div>
+
+            <div class="pm-form-actions">
+                <button type="submit" class="pm-btn-save" id="submit-btn">
+                    <span id="submit-btn-text">@(isEdit ? "Update patient" : "Save patient")</span>
+                </button>
+                <a href="/Patient" class="pm-btn-cancel">Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/patient.js" asp-append-version="true"></script>
+    <script>
+        // Simple avatar generator based on name input
+        const nameInput = document.getElementById('name');
+        const avatarInitial = document.getElementById('avatar-initial');
+        if (nameInput && avatarInitial) {
+            nameInput.addEventListener('input', function(e) {
+                const val = e.target.value.trim();
+                avatarInitial.textContent = val ? val.charAt(0).toUpperCase() : '?';
+            });
+        }
+    </script>
+}

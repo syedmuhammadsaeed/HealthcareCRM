@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "Patients";
+}
+
+<!-- Hero Section -->
+<div class="pm-hero">
+    <div class="pm-hero-text">
+        <h1>Patient roster</h1>
+        <p id="hero-subtitle">Loading patient data...</p>
+    </div>
+    <a href="/Patient/Create" class="btn-add">
+        <span aria-hidden="true">+</span> Add patient
+    </a>
+</div>
+
+<!-- Search & Filter Row -->
+<div class="pm-search-row">
+    <div class="pm-search-wrapper">
+        <input type="text"
+               id="search-input"
+               class="pm-search-input"
+               placeholder="Search by name, phone, or city&hellip;"
+               autocomplete="off" />
+    </div>
+    <div class="pm-chip-filter" id="filter-chips">
+        <span class="pm-chip on" data-filter="all">All</span>
+        <span class="pm-chip" data-filter="active">Active</span>
+        <span class="pm-chip" data-filter="followup">Follow-up</span>
+        <span class="pm-chip" data-filter="critical">Critical</span>
+    </div>
+</div>
+
+<!-- Grid Layout -->
+<div class="pm-grid" id="patient-grid">
+    <!-- Skeletons (rendered initially) -->
+    <div class="pm-skeleton-card">
+        <div class="pm-card-top">
+            <div class="pm-skeleton-box sk-avatar"></div>
+            <div class="pm-skeleton-box" style="width:60px; height:22px; border-radius:999px;"></div>
+        </div>
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-meta"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-card-actions" style="border:none">
+            <div class="pm-skeleton-box sk-btn"></div>
+            <div class="pm-skeleton-box sk-btn"></div>
+        </div>
+    </div>
+    <div class="pm-skeleton-card">
+        <div class="pm-card-top">
+            <div class="pm-skeleton-box sk-avatar"></div>
+            <div class="pm-skeleton-box" style="width:60px; height:22px; border-radius:999px;"></div>
+        </div>
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-meta"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-card-actions" style="border:none">
+            <div class="pm-skeleton-box sk-btn"></div>
+            <div class="pm-skeleton-box sk-btn"></div>
+        </div>
+    </div>
+    <div class="pm-skeleton-card">
+        <div class="pm-card-top">
+            <div class="pm-skeleton-box sk-avatar"></div>
+            <div class="pm-skeleton-box" style="width:60px; height:22px; border-radius:999px;"></div>
+        </div>
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-meta"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-card-actions" style="border:none">
+            <div class="pm-skeleton-box sk-btn"></div>
+            <div class="pm-skeleton-box sk-btn"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/patient.js" asp-append-version="true"></script>
+}
