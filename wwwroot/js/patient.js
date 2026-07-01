@@ -66,11 +66,8 @@ async function loadPatients() {
         if (body.success) {
             pm.all = body.data || [];
 
-            // Temporarily randomly assign statuses for demo purposes
-            // since the API doesn't have a status field yet
-            var statuses = ['active', 'active', 'active', 'followup', 'critical'];
             pm.all.forEach(function(p, i) {
-                p.status = statuses[i % statuses.length];
+                p.status = p.status || 'active';
                 p.city = p.address ? p.address.split(',')[0] : 'Unknown';
             });
 
@@ -196,10 +193,38 @@ function initFormPage() {
 
     if (isEdit) loadForEdit(patientId);
 
-    document.getElementById('patient-form').addEventListener('submit', function (e) {
+    var form = document.getElementById('patient-form');
+    
+    // Clear validation on input
+    form.addEventListener('input', function(e) {
+        var field = e.target.closest('.pm-field');
+        if (field) field.classList.remove('invalid');
+    });
+
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
+        if (!validateForm()) return;
         submitForm(patientId);
     });
+}
+
+function validateForm() {
+    var isValid = true;
+    var fields = ['name', 'age', 'gender', 'status', 'phone', 'address'];
+    
+    fields.forEach(function(id) {
+        var input = document.getElementById(id);
+        var fieldDiv = document.getElementById('field-' + id);
+        if (input && fieldDiv) {
+            if (!input.checkValidity()) {
+                fieldDiv.classList.add('invalid');
+                isValid = false;
+            } else {
+                fieldDiv.classList.remove('invalid');
+            }
+        }
+    });
+    return isValid;
 }
 
 async function loadForEdit(id) {
@@ -212,6 +237,7 @@ async function loadForEdit(id) {
                 document.getElementById('name').value    = p.name    || '';
                 document.getElementById('age').value     = p.age != null ? p.age : '';
                 document.getElementById('gender').value  = p.gender  || '';
+                document.getElementById('status').value  = p.status  || 'active';
                 document.getElementById('phone').value   = p.phone   || '';
                 document.getElementById('address').value = p.address || '';
             }
@@ -229,6 +255,7 @@ async function submitForm(patientId) {
         name:    document.getElementById('name').value.trim(),
         age:     parseInt(document.getElementById('age').value, 10),
         gender:  document.getElementById('gender').value,
+        status:  document.getElementById('status').value,
         phone:   document.getElementById('phone').value.trim(),
         address: document.getElementById('address').value.trim()
     };

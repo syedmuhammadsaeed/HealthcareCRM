@@ -2,42 +2,86 @@
     ViewData["Title"] = "Sign In";
 }
 
-<div class="auth-wrapper">
+@section Styles {
+    <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
+}
+
+<main class="auth-wrap">
     <div class="auth-card">
-        <div class="auth-header">
-            <span class="auth-logo" aria-hidden="true">&#9877;&#65039;</span>
-            <h1 class="auth-title">Welcome Back</h1>
-            <p class="auth-subtitle">Sign in to your HealthcareCRM account</p>
-        </div>
+
+        <div class="auth-eyebrow"><span class="icon">✛</span> Secure clinician access</div>
+
+        <h1>Welcome back</h1>
+        <p class="sub">Sign in to your HealthcareCRM account to manage patients, appointments, and records.</p>
 
         <div id="alert-container" role="alert" aria-live="polite"></div>
 
         <form id="login-form" novalidate>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email"
-                       placeholder="you@example.com" autocomplete="email" required />
-                <div class="invalid-feedback">Please enter a valid email address.</div>
+            <div class="field">
+                <label for="email">Email address</label>
+                <div class="input-shell">
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        aria-invalid="false"
+                        aria-describedby="email-error"
+                        required
+                    />
+                </div>
+                <span class="error-msg" id="email-error" role="alert">Please enter a valid email address.</span>
             </div>
-            <div class="mb-4">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password"
-                       placeholder="Enter your password" autocomplete="current-password" required />
-                <div class="invalid-feedback">Password is required.</div>
+
+            <div class="field">
+                <div class="field-row" style="margin-bottom:-1px;">
+                    <label for="password">Password</label>
+                </div>
+                <div class="input-shell">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        aria-invalid="false"
+                        aria-describedby="password-error"
+                        required
+                    />
+                    <button type="button" class="toggle-pw" aria-label="Show password" aria-pressed="false">Show</button>
+                </div>
+                <span class="error-msg" id="password-error" role="alert">Password is required.</span>
             </div>
-            <button type="submit" class="btn btn-primary btn-login w-100" id="login-btn">
-                <span id="login-btn-text">Sign In</span>
-                <span class="spinner-border spinner-border-sm ms-2 d-none"
-                      id="login-spinner" role="status" aria-hidden="true"></span>
+
+            <div class="field-row">
+                <label class="remember">
+                    <input type="checkbox" name="remember" />
+                    Remember me
+                </label>
+                <a class="forgot-link" href="#">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-signin" id="login-btn">
+                <span class="spinner" id="login-spinner" aria-hidden="true"></span>
+                <span id="login-btn-text">Sign in</span>
+            </button>
+
+            <div class="divider">or</div>
+
+            <button type="button" class="btn-alt">
+                Sign in with hospital SSO
             </button>
         </form>
 
-        <p class="auth-footer-text">
-            Don't have an account?
-            <a href="/Account/Register" class="auth-link" id="link-register">Create one</a>
-        </p>
+        <div class="security-note">
+            <span class="lock">🔒</span>
+            <span>Your session is encrypted. For patient safety, accounts lock after 5 failed sign-in attempts.</span>
+        </div>
+
+        <p class="footer-note">Don't have an account? <a href="/Account/Register">Create one</a></p>
     </div>
-</div>
+</main>
 
 @section Scripts {
     <script src="~/js/login.js" asp-append-version="true"></script>

@@ -95,18 +95,60 @@ async function authFetch(url, options) {
     return response;
 }
 
+/**
+ * Parses the payload of a JWT token.
+ */
+function parseJwt(token) {
+    try {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
+
 // ── Navbar Auth State ───────────────────────────────────────────────
 // Toggles authenticated vs guest navigation items on every page load.
 
 document.addEventListener('DOMContentLoaded', function () {
     var navAuthenticated = document.getElementById('nav-authenticated');
+    var navLogout        = document.getElementById('nav-logout-btn');
     var navGuest         = document.getElementById('nav-guest');
 
     if (isAuthenticated()) {
         if (navAuthenticated) navAuthenticated.style.display = 'flex';
+        if (navLogout)        navLogout.style.display        = 'flex';
         if (navGuest)         navGuest.style.display         = 'none';
+
+        var payload = parseJwt(getToken());
+        if (payload && payload.name) {
+            var nameEl = document.getElementById('nav-user-name');
+            var avatarEl = document.getElementById('nav-user-avatar');
+            if (nameEl) nameEl.textContent = payload.name;
+            if (avatarEl) {
+                var parts = payload.name.trim().split(' ');
+                var initials = 'U';
+                if (parts.length > 0) {
+                    var firstWord = parts[0].replace(/[^a-zA-Z]/g, '');
+                    if (firstWord.toLowerCase() === 'dr' && parts.length > 1) {
+                        initials = 'DR';
+                    } else if (parts.length === 1) {
+                        initials = parts[0].substring(0, 2).toUpperCase();
+                    } else {
+                        initials = (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+                    }
+                }
+                avatarEl.textContent = initials;
+            }
+        }
     } else {
         if (navAuthenticated) navAuthenticated.style.display = 'none';
+        if (navLogout)        navLogout.style.display        = 'none';
         if (navGuest)         navGuest.style.display         = '';
     }
 });

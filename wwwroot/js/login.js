@@ -39,23 +39,31 @@
 
     function setLoading(loading) {
         loginBtn.disabled = loading;
-        loginBtnText.textContent = loading ? 'Signing in\u2026' : 'Sign In';
-        spinner.classList.toggle('d-none', !loading);
+        loginBtnText.textContent = loading ? 'Signing in...' : 'Sign in';
+        spinner.style.display = loading ? 'inline-block' : 'none';
     }
 
     function validateForm() {
         var valid = true;
 
-        emailInput.classList.remove('is-invalid');
+        var emailError = document.getElementById('email-error');
         if (!emailInput.value.trim() || !EMAIL_REGEX.test(emailInput.value.trim())) {
-            emailInput.classList.add('is-invalid');
+            emailInput.setAttribute('aria-invalid', 'true');
+            emailError.style.display = 'flex';
             valid = false;
+        } else {
+            emailInput.setAttribute('aria-invalid', 'false');
+            emailError.style.display = 'none';
         }
 
-        passwordInput.classList.remove('is-invalid');
+        var pwError = document.getElementById('password-error');
         if (!passwordInput.value) {
-            passwordInput.classList.add('is-invalid');
+            passwordInput.setAttribute('aria-invalid', 'true');
+            pwError.style.display = 'flex';
             valid = false;
+        } else {
+            passwordInput.setAttribute('aria-invalid', 'false');
+            pwError.style.display = 'none';
         }
 
         return valid;
@@ -92,4 +100,29 @@
             setLoading(false);
         }
     });
+
+    // Inline validation clearance on input (to avoid scolding user while typing)
+    [emailInput, passwordInput].forEach(function(input) {
+        input.addEventListener('input', function() {
+            if (input.getAttribute('aria-invalid') === 'true') {
+                input.setAttribute('aria-invalid', 'false');
+                var err = document.getElementById(input.id + '-error');
+                if (err) err.style.display = 'none';
+            }
+        });
+    });
+
+    // Password visibility toggle
+    var toggleBtn = document.querySelector('.toggle-pw');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            var isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleBtn.textContent = isPassword ? 'Hide' : 'Show';
+            toggleBtn.setAttribute('aria-pressed', String(isPassword));
+            toggleBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+            passwordInput.focus();
+        });
+    }
+
 })();

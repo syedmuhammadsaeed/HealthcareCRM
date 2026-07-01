@@ -25,6 +25,11 @@ namespace HealthcareCRM.ViewModels
         [StringLength(20)]
         public string Gender { get; set; } = string.Empty;
 
+        /// <summary>Gets or sets the patient's status.</summary>
+        [Required(ErrorMessage = "Status is required.")]
+        [StringLength(20)]
+        public string Status { get; set; } = "active";
+
         /// <summary>Gets or sets the patient's phone number.</summary>
         [Required(ErrorMessage = "Phone number is required.")]
         [Phone(ErrorMessage = "Please enter a valid phone number.")]

@@ -5,13 +5,14 @@
 
 :root {
     /* Color Palette */
-    --cream:   #FAF7F1;
-    --forest:  #1B4332;
-    --sage:    #6E9C7D;
-    --coral:   #E76F51;
-    --ink:     #26301F;
-    --muted:   #7C8873;
-    --line:    #E7E0D2;
+    --cream:       #FAF7F1;
+    --forest:      #1B4332;
+    --forest-dark: #122E22;
+    --sage:        #6E9C7D;
+    --coral:       #E76F51;
+    --ink:         #26301F;
+    --muted:       #7C8873;
+    --line:        #E7E0D2;
 
     /* Fonts */
     --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
@@ -27,100 +28,146 @@ body {
     padding: 0;
 }
 
-/* ── Topbar (Layout) ────────────────────────────────────────── */
-.hcrm-topbar {
+/* ── Floating Navbar ────────────────────────────────────────── */
+.hcrm-navbar-wrap {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 40px;
-    border-bottom: 1px solid var(--line);
-    background: var(--cream);
-}
-
-/* Brand */
-.hcrm-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-serif);
-    font-weight: 600;
-    font-size: 19px;
-    color: var(--forest);
-    text-decoration: none;
-    transition: opacity 0.2s;
-}
-.hcrm-brand:hover {
-    color: var(--forest);
-    opacity: 0.85;
-}
-.hcrm-brand-mark {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: var(--forest);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 15px;
-    font-family: var(--font-serif);
+    padding: 24px 20px 0;
 }
 
-/* Tabs */
-.hcrm-tabs {
-    display: flex;
-    gap: 30px;
-}
-.hcrm-tab {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-    padding-bottom: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
-}
-.hcrm-tab:hover {
-    color: var(--forest);
-    text-decoration: none;
-}
-.hcrm-tab.on {
-    color: var(--forest);
-    border-bottom: 2px solid var(--coral);
-}
-
-/* Auth / End Section */
-.hcrm-topbar-end {
+.navbar {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 6px;
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 8px 10px 8px 8px;
+    box-shadow: 
+        0 20px 40px -16px rgba(18,46,34,0.15),
+        0 1px 3px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
 }
-.hcrm-profile-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #DDD3B9;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s;
-    display: none; /* hidden by default, js will show if authed */
+
+.nav-mark {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--sage);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--font-serif); font-weight: 700; font-size: 18px; color: #ffffff;
+    text-decoration: none;
 }
-.hcrm-profile-btn:hover {
-    transform: scale(1.05);
+.nav-mark:hover { color: #ffffff; text-decoration: none; filter: brightness(1.1); }
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+    flex: 1;
 }
-.hcrm-signin-link {
+.nav-links a {
+    position: relative;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 11px 18px;
+    border-radius: 999px;
+    transition: color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+}
+.nav-links a:hover {
+    color: var(--forest);
+    background: rgba(0,0,0,0.05);
+    text-decoration: none;
+}
+.nav-links a.active {
+    color: #ffffff;
+    background: var(--forest-dark);
+}
+.nav-links a:focus-visible {
+    outline: 2px solid var(--coral);
+    outline-offset: 2px;
+}
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 9px 18px 9px 9px;
     font-size: 14px;
     font-weight: 600;
-    color: var(--forest);
-    text-decoration: none;
-    display: none; /* hidden by default, js will show if NOT authed */
+    cursor: pointer;
+    border: none;
+    transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
-.hcrm-signin-link:hover {
-    text-decoration: underline;
+.nav-user:hover { box-shadow: 0 6px 14px -6px rgba(0,0,0,0.25); }
+.nav-user:active { transform: translateY(1px); }
+.nav-user:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
+.nav-user .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--coral);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+
+.nav-guest-link {
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 11px 24px;
+    border-radius: 999px;
+    background: var(--coral);
+    transition: filter 0.15s ease;
+}
+.nav-guest-link:hover {
+    filter: brightness(1.1);
+    color: #fff;
+    text-decoration: none;
 }
 
 @media (max-width: 640px) {
-    .hcrm-tabs { display: none; }
-    .hcrm-topbar { padding: 15px 20px; }
+    .navbar { flex-wrap: nowrap; gap: 2px; padding: 6px; }
+    .nav-links a { padding: 10px 12px; font-size: 13.5px; }
+    .nav-user span.label { display: none; }
+    .nav-user { padding: 6px; }
+}
+
+/* ── Fixed Logout Button ───────────────────────────────────────── */
+.fixed-logout-btn {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 8px 16px;
+    color: #006080;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.fixed-logout-btn i {
+    font-size: 18px;
+    margin-bottom: 4px;
+    color: #006080;
+}
+.fixed-logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }

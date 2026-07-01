@@ -73,6 +73,7 @@ namespace HealthcareCRM.Repositories
                 .Set(p => p.Name,    patient.Name)
                 .Set(p => p.Age,     patient.Age)
                 .Set(p => p.Gender,  patient.Gender)
+                .Set(p => p.Status,  patient.Status)
                 .Set(p => p.Phone,   patient.Phone)
                 .Set(p => p.Address, patient.Address);
 

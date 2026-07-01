@@ -50,6 +50,7 @@ namespace HealthcareCRM.Services
                 Name        = model.Name,
                 Age         = model.Age,
                 Gender      = model.Gender,
+                Status      = model.Status,
                 Phone       = model.Phone,
                 Address     = model.Address,
                 CreatedDate = DateTime.UtcNow
@@ -73,6 +74,7 @@ namespace HealthcareCRM.Services
             patient.Name    = model.Name;
             patient.Age     = model.Age;
             patient.Gender  = model.Gender;
+            patient.Status  = model.Status;
             patient.Phone   = model.Phone;
             patient.Address = model.Address;
 

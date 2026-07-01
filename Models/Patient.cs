@@ -33,6 +33,10 @@ namespace HealthcareCRM.Models
         [BsonElement("address")]
         public string Address { get; set; } = string.Empty;
 
+        /// <summary>Gets or sets the patient's status.</summary>
+        [BsonElement("status")]
+        public string Status { get; set; } = "active";
+
         /// <summary>Gets or sets the UTC date this record was created.</summary>
         [BsonElement("createdDate")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
