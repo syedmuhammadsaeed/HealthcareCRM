@@ -1,6 +1,7 @@
 bin/
 obj/
 .vs/
+.env
 *.user
 *.suo
 *.cache
@@ -12,3 +13,4 @@ wwwroot/lib/
 *.db
 appsettings.Secret.json
 appsettings.*.local.json
+secrets.json

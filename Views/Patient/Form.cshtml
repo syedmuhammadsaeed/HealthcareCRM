@@ -1,0 +1,97 @@
+@{
+    var patientId = ViewBag.PatientId as string ?? string.Empty;
+    var isEdit    = !string.IsNullOrEmpty(patientId);
+    ViewData["Title"] = isEdit ? "Edit Patient" : "Add Patient";
+}
+
+<div class="container-fluid py-4">
+    <div class="page-header mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <a href="/Patient" class="auth-link">Patients</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    @(isEdit ? "Edit Patient" : "Add Patient")
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="patient-form-card">
+        <div class="patient-form-header">
+            <h2>@(isEdit ? "Edit Patient Record" : "New Patient Record")</h2>
+            <p>@(isEdit ? "Update the patient's information below." : "Fill in the patient's details to create a new record.")</p>
+        </div>
+
+        <div id="alert-container" role="alert" aria-live="polite"></div>
+
+        <form id="patient-form" novalidate>
+            <input type="hidden" id="patient-id" value="@patientId" />
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="name" class="form-label">
+                        Full Name <span class="text-danger" aria-hidden="true">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="name"
+                           placeholder="e.g. Ahmed Khan" autocomplete="off" required />
+                    <div class="invalid-feedback">Full name is required.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="age" class="form-label">
+                        Age <span class="text-danger" aria-hidden="true">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="age"
+                           min="0" max="120" placeholder="e.g. 35" required />
+                    <div class="invalid-feedback">Age must be between 0 and 120.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="gender" class="form-label">
+                        Gender <span class="text-danger" aria-hidden="true">*</span>
+                    </label>
+                    <select class="form-select" id="gender" required>
+                        <option value="">Select gender…</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a gender.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">
+                        Phone Number <span class="text-danger" aria-hidden="true">*</span>
+                    </label>
+                    <input type="tel" class="form-control" id="phone"
+                           placeholder="e.g. +92 300 1234567" required />
+                    <div class="invalid-feedback">Please enter a valid phone number.</div>
+                </div>
+
+                <div class="col-12">
+                    <label for="address" class="form-label">
+                        Address <span class="text-danger" aria-hidden="true">*</span>
+                    </label>
+                    <textarea class="form-control" id="address" rows="3"
+                              placeholder="Street, City, Country" required></textarea>
+                    <div class="invalid-feedback">Address is required.</div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-add-patient" id="submit-btn">
+                    <span id="submit-btn-text">@(isEdit ? "Update Patient" : "Save Patient")</span>
+                    <span class="spinner-border spinner-border-sm ms-2 d-none"
+                          id="form-spinner" role="status" aria-hidden="true"></span>
+                </button>
+                <a href="/Patient" class="btn btn-outline-secondary" id="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/js/patient.js" asp-append-version="true"></script>
+}

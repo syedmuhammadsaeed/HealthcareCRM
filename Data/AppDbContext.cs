@@ -1,26 +1,32 @@
+using HealthcareCRM.Helpers;
 using HealthcareCRM.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace HealthcareCRM.Data
 {
-    public class AppDbContext : DbContext
+    /// <summary>
+    /// MongoDB database context that provides typed collection accessors.
+    /// Registered as a singleton — MongoClient is thread-safe by design.
+    /// </summary>
+    public class MongoDbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options)
+        private readonly IMongoDatabase _database;
+
+        /// <summary>
+        /// Initialises the MongoClient and resolves the target database.
+        /// </summary>
+        /// <param name="settings">Bound MongoDbSettings configuration.</param>
+        public MongoDbContext(IOptions<MongoDbSettings> settings)
         {
+            var client = new MongoClient(settings.Value.ConnectionString);
+            _database = client.GetDatabase(settings.Value.DatabaseName);
         }
 
-        public DbSet<User> Users { get; set; } = null!;
-        public DbSet<Patient> Patients { get; set; } = null!;
-        public DbSet<Appointment> Appointments { get; set; } = null!;
+        /// <summary>Gets the Users collection.</summary>
+        public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>().ToTable("User");
-            modelBuilder.Entity<Patient>().ToTable("Patient");
-            modelBuilder.Entity<Appointment>().ToTable("Appointment");
-
-            base.OnModelCreating(modelBuilder);
-        }
+        /// <summary>Gets the Patients collection.</summary>
+        public IMongoCollection<Patient> Patients => _database.GetCollection<Patient>("Patients");
     }
 }

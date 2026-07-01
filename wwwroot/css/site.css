@@ -1,31 +1,126 @@
-html {
-  font-size: 14px;
-}
+/* =============================================================
+   Healthcare CRM — Global Styles v2
+   Theme: Cream, Forest Green, Coral, Fraunces Typography
+   ============================================================= */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+:root {
+    /* Color Palette */
+    --cream:   #FAF7F1;
+    --forest:  #1B4332;
+    --sage:    #6E9C7D;
+    --coral:   #E76F51;
+    --ink:     #26301F;
+    --muted:   #7C8873;
+    --line:    #E7E0D2;
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    /* Fonts */
+    --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+    --font-serif: 'Fraunces', Georgia, serif;
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: var(--font-sans);
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* ── Topbar (Layout) ────────────────────────────────────────── */
+.hcrm-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--line);
+    background: var(--cream);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* Brand */
+.hcrm-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--forest);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+.hcrm-brand:hover {
+    color: var(--forest);
+    opacity: 0.85;
+}
+.hcrm-brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-family: var(--font-serif);
+}
+
+/* Tabs */
+.hcrm-tabs {
+    display: flex;
+    gap: 30px;
+}
+.hcrm-tab {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    padding-bottom: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+.hcrm-tab:hover {
+    color: var(--forest);
+    text-decoration: none;
+}
+.hcrm-tab.on {
+    color: var(--forest);
+    border-bottom: 2px solid var(--coral);
+}
+
+/* Auth / End Section */
+.hcrm-topbar-end {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.hcrm-profile-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #DDD3B9;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: none; /* hidden by default, js will show if authed */
+}
+.hcrm-profile-btn:hover {
+    transform: scale(1.05);
+}
+.hcrm-signin-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--forest);
+    text-decoration: none;
+    display: none; /* hidden by default, js will show if NOT authed */
+}
+.hcrm-signin-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .hcrm-tabs { display: none; }
+    .hcrm-topbar { padding: 15px 20px; }
 }

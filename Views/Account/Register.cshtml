@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="auth-logo" aria-hidden="true">&#9877;&#65039;</span>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join HealthcareCRM to manage your patients</p>
+        </div>
+
+        <div id="alert-container" role="alert" aria-live="polite"></div>
+
+        <form id="register-form" novalidate>
+            <div class="mb-3">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="fullName"
+                       placeholder="Dr. John Doe" autocomplete="name" required />
+                <div class="invalid-feedback">Full name is required (minimum 2 characters).</div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email"
+                       placeholder="you@example.com" autocomplete="email" required />
+                <div class="invalid-feedback">Please enter a valid email address.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password"
+                       placeholder="Create a strong password" autocomplete="new-password" required />
+                <div class="invalid-feedback">
+                    Password must be at least 8 characters and include uppercase,
+                    lowercase, number, and special character.
+                </div>
+                <div class="form-text">
+                    Min 8 chars &middot; Uppercase &middot; Lowercase &middot;
+                    Number &middot; Special character
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword"
+                       placeholder="Repeat your password" autocomplete="new-password" required />
+                <div class="invalid-feedback">Passwords do not match.</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-register w-100" id="register-btn">
+                <span id="register-btn-text">Create Account</span>
+                <span class="spinner-border spinner-border-sm ms-2 d-none"
+                      id="register-spinner" role="status" aria-hidden="true"></span>
+            </button>
+        </form>
+
+        <p class="auth-footer-text">
+            Already have an account?
+            <a href="/Account/Login" class="auth-link" id="link-login">Sign in</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/register.js" asp-append-version="true"></script>
+}
