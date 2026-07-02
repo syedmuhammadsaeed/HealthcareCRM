@@ -1,9 +1,9 @@
 @{
-    ViewData["Title"] = "Sign In";
+ViewData["Title"] = "Sign In";
 }
 
 @section Styles {
-    <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
 }
 
 <main class="auth-wrap">
@@ -21,14 +21,14 @@
                 <label for="email">Email address</label>
                 <div class="input-shell">
                     <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                        aria-invalid="false"
-                        aria-describedby="email-error"
-                        required
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    aria-invalid="false"
+                    aria-describedby="email-error"
+                    required
                     />
                 </div>
                 <span class="error-msg" id="email-error" role="alert">Please enter a valid email address.</span>
@@ -40,14 +40,14 @@
                 </div>
                 <div class="input-shell">
                     <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        autocomplete="current-password"
-                        aria-invalid="false"
-                        aria-describedby="password-error"
-                        required
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    aria-invalid="false"
+                    aria-describedby="password-error"
+                    required
                     />
                     <button type="button" class="toggle-pw" aria-label="Show password" aria-pressed="false">Show</button>
                 </div>
@@ -74,15 +74,10 @@
             </button>
         </form>
 
-        <div class="security-note">
-            <span class="lock">🔒</span>
-            <span>Your session is encrypted. For patient safety, accounts lock after 5 failed sign-in attempts.</span>
-        </div>
-
         <p class="footer-note">Don't have an account? <a href="/Account/Register">Create one</a></p>
     </div>
 </main>
 
 @section Scripts {
-    <script src="~/js/login.js" asp-append-version="true"></script>
+<script src="~/js/login.js" asp-append-version="true"></script>
 }
