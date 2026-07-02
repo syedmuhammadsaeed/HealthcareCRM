@@ -15,7 +15,7 @@
             <p>Here's a snapshot of your patients &mdash; @DateTime.Now.ToString("dddd, MMMM d")</p>
         </div>
         <div class="head-actions">
-            <button class="btn-ghost">Export report</button>
+            <button class="btn-ghost" onclick="window.location.href='/Home/ExportCsv'">Export report</button>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
             <a class="see-all" href="/Patient">View all →</a>
         </div>
         <div class="panel-toolbar">
-            <div class="search-box">🔍 <input placeholder="Search by name, phone, or city…" /></div>
+            <div class="search-box">🔍 <input id="patientSearch" placeholder="Search by name, phone, or city…" /></div>
             <div class="chip-filter">
                 <span class="on">All</span><span>Active</span><span>Follow-up</span><span>Critical</span>
             </div>
@@ -137,32 +137,48 @@
                 } catch(e) {}
             }
 
-            // Client-side filtering for the Patients table
+            // Client-side filtering and search for the Patients table
             const chips = document.querySelectorAll('.chip-filter span');
             const rows = document.querySelectorAll('.pt tbody tr');
-            
+            const searchInput = document.getElementById('patientSearch');
+
+            function applyFilters() {
+                const activeChip = document.querySelector('.chip-filter span.on');
+                const filter = activeChip ? activeChip.textContent.trim().toLowerCase().replace('-', '') : 'all';
+                const term = searchInput ? searchInput.value.toLowerCase() : '';
+
+                rows.forEach(row => {
+                    const tag = row.querySelector('.status-tag');
+                    if (tag) { // Ignore empty state row if it exists
+                        const status = tag.textContent.trim().toLowerCase().replace('-', '');
+                        const name = row.querySelector('.pt-name')?.textContent.toLowerCase() || '';
+                        const phone = row.children[3]?.textContent.toLowerCase() || '';
+                        const city = row.children[4]?.textContent.toLowerCase() || '';
+
+                        const matchesFilter = (filter === 'all' || status === filter);
+                        const matchesSearch = (name.includes(term) || phone.includes(term) || city.includes(term));
+
+                        if (matchesFilter && matchesSearch) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
             chips.forEach(chip => {
                 chip.addEventListener('click', () => {
                     // Update active chip styling
                     chips.forEach(c => c.classList.remove('on'));
                     chip.classList.add('on');
-                    
-                    const filter = chip.textContent.trim().toLowerCase().replace('-', '');
-                    
-                    rows.forEach(row => {
-                        const tag = row.querySelector('.status-tag');
-                        if (tag) { // Ignore empty state row if it exists
-                            const status = tag.textContent.trim().toLowerCase().replace('-', '');
-                            // Check if 'all' or exact match (ignoring hyphens)
-                            if (filter === 'all' || status === filter) {
-                                row.style.display = '';
-                            } else {
-                                row.style.display = 'none';
-                            }
-                        }
-                    });
+                    applyFilters();
                 });
             });
+
+            if (searchInput) {
+                searchInput.addEventListener('input', applyFilters);
+            }
         });
     </script>
 }
