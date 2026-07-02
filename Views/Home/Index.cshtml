@@ -1,13 +1,168 @@
+@model HealthcareCRM.Models.OverviewViewModel
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Overview";
 }
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/overview.css" asp-append-version="true" />
+}
+
+<div class="page">
+    <div class="page-head">
+        <div>
+            <!-- Note: Name could be parsed dynamically on client side like the navbar if desired -->
+            <h1>Good morning</h1>
+            <p>Here's a snapshot of your patients &mdash; @DateTime.Now.ToString("dddd, MMMM d")</p>
+        </div>
+        <div class="head-actions">
+            <button class="btn-ghost">Export report</button>
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat c1">
+            <div class="top-row"><span class="icon">👬</span></div>
+            <div class="num">@Model.TotalPatients</div>
+            <div class="lbl">Total patients</div>
+        </div>
+        <div class="stat c2">
+            <div class="top-row"><span class="icon">🟢</span></div>
+            <div class="num">@Model.ActivePatients</div>
+            <div class="lbl">Active patients</div>
+        </div>
+        <div class="stat c3">
+            <div class="top-row"><span class="icon">⏱</span></div>
+            <div class="num">@Model.FollowUpsDue</div>
+            <div class="lbl">Follow-ups</div>
+        </div>
+        <div class="stat c4">
+            <div class="top-row"><span class="icon">⚠</span></div>
+            <div class="num">@Model.CriticalCases</div>
+            <div class="lbl">Critical cases</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Patients</h3>
+            <a class="see-all" href="/Patient">View all →</a>
+        </div>
+        <div class="panel-toolbar">
+            <div class="search-box">🔍 <input placeholder="Search by name, phone, or city…" /></div>
+            <div class="chip-filter">
+                <span class="on">All</span><span>Active</span><span>Follow-up</span><span>Critical</span>
+            </div>
+        </div>
+        <table class="pt">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var patient in Model.RecentPatients)
+                {
+                    string statusClass = patient.Status?.ToLower() switch
+                    {
+                        "active" => "active",
+                        "follow-up" => "followup",
+                        "critical" => "critical",
+                        _ => "active"
+                    };
+
+                    string initial = string.IsNullOrEmpty(patient.Name) ? "?" : patient.Name.Substring(0, 1).ToUpper();
+                    string shortId = string.IsNullOrEmpty(patient.Id) || patient.Id.Length < 4 ? "NEW" : patient.Id.Substring(patient.Id.Length - 4).ToUpper();
+
+                    <tr>
+                        <td>
+                            <div class="pt-cell">
+                                <div class="pt-avatar">@initial</div>
+                                <div>
+                                    <div class="pt-name">@patient.Name</div>
+                                    <div class="pt-sub">PT-@shortId</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@patient.Age</td>
+                        <td>@patient.Gender</td>
+                        <td>@patient.Phone</td>
+                        <td>@patient.Address</td>
+                        <td><span class="status-tag @statusClass">@(string.IsNullOrEmpty(patient.Status) ? "Active" : char.ToUpper(patient.Status[0]) + patient.Status.Substring(1))</span></td>
+                    </tr>
+                }
+
+                @if (!Model.RecentPatients.Any())
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">
+                            No patients found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            <span>Showing @Model.RecentPatients.Count of @Model.TotalPatients patients</span>
+            <div class="pager">
+                <button class="on">1</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
-<script>
-    // Redirect based on authentication state (JWT in localStorage)
-    if (localStorage.getItem('hcrm_token')) {
-        window.location.replace('/Patient');
-    } else {
-        window.location.replace('/Account/Login');
-    }
-</script>
+    <script>
+        // Redirect to login if unauthenticated on client-side
+        if (!localStorage.getItem('hcrm_token')) {
+            window.location.replace('/Account/Login');
+        }
+
+        // Add client-side name parsing like the layout
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('hcrm_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const name = payload.name || payload.unique_name || "Doctor";
+                    // Try to inject "Good morning, Name"
+                    const h1 = document.querySelector('.page-head h1');
+                    if (h1) {
+                        h1.textContent = `Good morning, ${name}`;
+                    }
+                } catch(e) {}
+            }
+
+            // Client-side filtering for the Patients table
+            const chips = document.querySelectorAll('.chip-filter span');
+            const rows = document.querySelectorAll('.pt tbody tr');
+            
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    // Update active chip styling
+                    chips.forEach(c => c.classList.remove('on'));
+                    chip.classList.add('on');
+                    
+                    const filter = chip.textContent.trim().toLowerCase().replace('-', '');
+                    
+                    rows.forEach(row => {
+                        const tag = row.querySelector('.status-tag');
+                        if (tag) { // Ignore empty state row if it exists
+                            const status = tag.textContent.trim().toLowerCase().replace('-', '');
+                            // Check if 'all' or exact match (ignoring hyphens)
+                            if (filter === 'all' || status === filter) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 }
