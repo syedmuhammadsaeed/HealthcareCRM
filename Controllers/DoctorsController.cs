@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HealthcareCRM.Controllers
 {
+    /// <summary>
+    /// API controller for doctor record management.
+    /// All endpoints require a valid JWT Bearer token.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -17,6 +21,11 @@ namespace HealthcareCRM.Controllers
             _doctorService = doctorService;
         }
 
+        /// <summary>
+        /// Retrieves a list of active doctors.
+        /// </summary>
+        /// <response code="200">Returns the list of active doctors.</response>
+        /// <response code="401">JWT token is missing or invalid.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
