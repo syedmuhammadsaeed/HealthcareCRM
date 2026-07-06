@@ -2,30 +2,69 @@
     ViewData["Title"] = "Doctors";
 }
 
-<!-- Hero Section -->
-<div class="pm-hero">
-    <div class="pm-hero-text">
-        <h1>Doctor roster</h1>
-        <p id="hero-subtitle">Loading active doctors...</p>
-    </div>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/doctor.css" asp-append-version="true" />
+}
 
-<!-- Table Layout -->
-<div class="table-responsive mt-4">
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Name</th>
-                <th>Specialization</th>
-                <th>Phone Number</th>
-                <th>Status</th>
-            </tr>
+<div class="page">
+    <div class="page-head">
+      <div>
+        <h1>Doctors</h1>
+        <p>Directory of active clinical staff</p>
+      </div>
+    </div>
+    <div class="readonly-badge">Read-only — full management arrives in Week 3</div>
+
+    <div class="stat-row">
+      <div class="stat c1">
+        <span class="icon">🩺</span>
+        <div><div class="num" id="stat-total">0</div><div class="lbl">Total doctors</div></div>
+      </div>
+      <div class="stat c2">
+        <span class="icon">🟢</span>
+        <div><div class="num" id="stat-active">0</div><div class="lbl">Active</div></div>
+      </div>
+      <div class="stat c3">
+        <span class="icon">⏸</span>
+        <div><div class="num" id="stat-inactive">0</div><div class="lbl">Inactive</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-toolbar">
+        <div class="search-box">🔍 <input id="search-input" placeholder="Search by name or specialization…" autocomplete="off" /></div>
+        <div class="chip-filter" id="filter-chips">
+          <button class="on" data-filter="all">All</button>
+          <button data-filter="active">Active</button>
+          <button data-filter="inactive">Inactive</button>
+        </div>
+      </div>
+
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Specialization</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody id="doctor-table-body">
-            <!-- Skeletons (rendered initially) -->
-            <tr><td colspan="4" class="text-center">Loading doctors...</td></tr>
+          <tr>
+            <td colspan="5" style="text-align:center; padding: 20px;">Loading doctors...</td>
+          </tr>
         </tbody>
-    </table>
+      </table>
+
+      <div class="panel-footer">
+        <div class="footer-info" id="footer-info">Showing doctors</div>
+
+        <nav class="pagination" aria-label="Pagination" id="pagination-controls">
+          <!-- Pagination rendered by JS -->
+        </nav>
+      </div>
+    </div>
 </div>
 
 @section Scripts {

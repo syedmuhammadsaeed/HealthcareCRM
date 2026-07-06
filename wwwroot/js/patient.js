@@ -77,6 +77,7 @@ async function loadPatients() {
         if (body.success) {
             var data = body.data;
             pm.totalPages = data.totalPages || 1;
+            pm.totalCount = data.totalCount || 0;
             renderTable(data.items || []);
             renderPagination();
         }
@@ -87,9 +88,13 @@ async function loadPatients() {
 }
 
 function renderTable(patients) {
+    var infoText = document.getElementById('footer-info');
+    var pageInfoText = document.getElementById('page-info-text');
+
     if (patients.length === 0) {
-        $.tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No patients found.</td></tr>';
-        $.heroSub.textContent = '0 people under care';
+        $.tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--muted);">No patients found.</td></tr>';
+        if (pageInfoText) pageInfoText.textContent = '0 people under care';
+        if (infoText) infoText.innerHTML = 'Showing <strong>0</strong> patients';
         return;
     }
 
@@ -104,7 +109,15 @@ function renderTable(patients) {
         return true;
     });
 
-    $.heroSub.textContent = 'Page ' + pm.currentPage + ' of ' + pm.totalPages;
+    if (pageInfoText) {
+        pageInfoText.textContent = 'Page ' + pm.currentPage + ' of ' + pm.totalPages;
+    }
+    if (infoText) {
+        var start = (pm.currentPage - 1) * pm.pageSize + 1;
+        var end = start + filtered.length - 1;
+        if (filtered.length === 0) { start = 0; end = 0; }
+        infoText.innerHTML = 'Showing <strong>' + start + '–' + end + '</strong> of <strong>' + (pm.totalCount || filtered.length) + '</strong> patients';
+    }
 
     $.tableBody.innerHTML = filtered.map(renderRow).join('');
 
@@ -119,17 +132,22 @@ function renderTable(patients) {
 }
 
 function renderRow(p) {
-    var dateStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString() : 'Unknown';
+    var dateStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown';
+    var initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
+    var shortId = p.id ? p.id.substring(p.id.length - 4).toUpperCase() : '';
+    
     return (
         '<tr>' +
-            '<td>' + esc(p.name) + '</td>' +
-            '<td>' + esc(p.phone) + '</td>' +
-            '<td>' + dateStr + '</td>' +
+            '<td><div class="pt-cell"><div class="pt-avatar">' + initial + '</div><div><div class="pt-name">' + esc(p.name) + '</div><div class="pt-sub">PT-' + shortId + '</div></div></div></td>' +
+            '<td class="phone">' + esc(p.phone) + '</td>' +
+            '<td class="dob">' + dateStr + '</td>' +
             '<td>' + esc(p.gender) + '</td>' +
-            '<td class="text-end">' +
-                '<a href="/Patient/Details/' + encodeURIComponent(p.id) + '" class="btn btn-sm btn-info me-1">View</a>' +
-                '<a href="/Patient/Edit/' + encodeURIComponent(p.id) + '" class="btn btn-sm btn-primary me-1">Edit</a>' +
-                '<button class="btn btn-sm btn-danger btn-delete-card" data-id="' + esc(p.id) + '">Delete</button>' +
+            '<td>' +
+              '<div class="row-actions">' +
+                '<a href="/Patient/Details/' + encodeURIComponent(p.id) + '">View</a><span class="sep"></span>' +
+                '<a href="/Patient/Edit/' + encodeURIComponent(p.id) + '">Edit</a><span class="sep"></span>' +
+                '<button class="btn-delete btn-delete-card" data-id="' + esc(p.id) + '">Delete</button>' +
+              '</div>' +
             '</td>' +
         '</tr>'
     );
@@ -140,28 +158,40 @@ function renderPagination() {
     
     // Previous
     if (pm.currentPage > 1) {
-        html += '<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + (pm.currentPage - 1) + '); return false;">Previous</a></li>';
+        html += '<button class="page-btn" id="prev-btn" onclick="changePage(' + (pm.currentPage - 1) + '); return false;">‹ Previous</button>';
     } else {
-        html += '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>';
+        html += '<button class="page-btn" id="prev-btn" disabled>‹ Previous</button>';
     }
     
     // Page Numbers
     for (var i = 1; i <= pm.totalPages; i++) {
         if (i === pm.currentPage) {
-            html += '<li class="page-item active" aria-current="page"><a class="page-link" href="#">' + i + '</a></li>';
+            html += '<button class="page-btn current" aria-current="page">' + i + '</button>';
         } else {
-            html += '<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + i + '); return false;">' + i + '</a></li>';
+            html += '<button class="page-btn" onclick="changePage(' + i + '); return false;">' + i + '</button>';
         }
     }
     
     // Next
     if (pm.currentPage < pm.totalPages) {
-        html += '<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + (pm.currentPage + 1) + '); return false;">Next</a></li>';
+        html += '<button class="page-btn" id="next-btn" onclick="changePage(' + (pm.currentPage + 1) + '); return false;">Next ›</button>';
     } else {
-        html += '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>';
+        html += '<button class="page-btn" id="next-btn" disabled>Next ›</button>';
     }
     
     $.pagination.innerHTML = html;
+    
+    // Also bind page-size select if present
+    var pageSizeSelect = document.getElementById('page-size-select');
+    if (pageSizeSelect && !pageSizeSelect.hasAttribute('data-bound')) {
+        pageSizeSelect.value = pm.pageSize.toString();
+        pageSizeSelect.addEventListener('change', function() {
+            pm.pageSize = parseInt(this.value);
+            pm.currentPage = 1;
+            loadPatients();
+        });
+        pageSizeSelect.setAttribute('data-bound', 'true');
+    }
 }
 
 window.changePage = function(page) {
@@ -296,28 +326,62 @@ function initDetailsPage() {
 }
 
 async function loadDetails(id) {
-    var container = document.getElementById('details-container');
     try {
         var resp = await authFetch('/api/patients/' + encodeURIComponent(id));
         var body = await resp.json();
         if (body.success && body.data) {
             var p = body.data;
-            var dateStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString() : 'Unknown';
-            container.innerHTML = 
-                '<div class="mb-3"><strong>Name:</strong> ' + esc(p.name) + '</div>' +
-                '<div class="mb-3"><strong>Date of Birth:</strong> ' + dateStr + '</div>' +
-                '<div class="mb-3"><strong>Gender:</strong> ' + esc(p.gender) + '</div>' +
-                '<div class="mb-3"><strong>Phone Number:</strong> ' + esc(p.phone) + '</div>' +
-                '<div class="mb-3"><strong>Address:</strong> ' + esc(p.address) + '</div>' +
-                '<div class="pm-form-actions mt-4">' +
-                    '<a href="/Patient/Edit/' + encodeURIComponent(p.id) + '" class="btn btn-primary">Edit Patient</a>' +
-                    '<a href="/Patient" class="btn btn-secondary ms-2">Back to List</a>' +
-                '</div>';
+            
+            var profileCard = document.getElementById('patient-profile');
+            var statusTag = document.getElementById('patient-status');
+            if (profileCard) profileCard.style.display = 'block';
+            if (statusTag) statusTag.style.display = 'inline-flex';
+
+            var dateStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown';
+            var initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
+            var shortId = p.id ? p.id.substring(p.id.length - 4).toUpperCase() : '';
+
+            var domName = document.getElementById('patient-name');
+            var domAvatar = document.getElementById('patient-avatar');
+            var domId = document.getElementById('patient-id-display');
+            var domDob = document.getElementById('patient-dob');
+            var domGender = document.getElementById('patient-gender');
+            var domPhone = document.getElementById('patient-phone');
+            var domAddress = document.getElementById('patient-address');
+            
+            if (domName) domName.textContent = p.name || 'Unknown';
+            if (domAvatar) domAvatar.textContent = initial;
+            if (domId) domId.textContent = 'Patient ID · PT-' + shortId;
+            if (domDob) domDob.textContent = dateStr;
+            if (domGender) domGender.textContent = p.gender || 'Unknown';
+            if (domPhone) domPhone.textContent = p.phone || 'Unknown';
+            if (domAddress) domAddress.textContent = p.address || 'Unknown';
+            
+            if (statusTag) {
+                var s = p.status || 'active';
+                statusTag.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+            }
+
+            var btnEdit = document.getElementById('btn-edit-patient');
+            if (btnEdit) btnEdit.href = '/Patient/Edit/' + encodeURIComponent(p.id);
+
+            var btnDel = document.getElementById('btn-delete-patient');
+            if (btnDel) {
+                btnDel.onclick = function() {
+                    if (confirm('Are you sure you want to delete this patient?')) {
+                        deletePatient(p.id).then(function() {
+                            window.location.href = '/Patient';
+                        });
+                    }
+                };
+            }
         } else {
-            container.innerHTML = '<div class="text-danger">Patient not found.</div>';
+            var container = document.getElementById('details-container');
+            if (container) container.innerHTML = '<div style="color:var(--coral); padding:20px;">Patient not found.</div>';
         }
     } catch (err) {
         console.error('[Patient] loadDetails error:', err);
-        container.innerHTML = '<div class="text-danger">Error loading patient details.</div>';
+        var container = document.getElementById('details-container');
+        if (container) container.innerHTML = '<div style="color:var(--coral); padding:20px;">Error loading patient details.</div>';
     }
 }

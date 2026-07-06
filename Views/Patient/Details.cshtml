@@ -3,24 +3,59 @@
     ViewData["Title"] = "Patient Details";
 }
 
-<div class="pm-form-page">
-    <div class="pm-breadcrumb">
-        <a href="/Patient">Patients</a>
-        <span class="pm-sep">/</span>
-        <span class="pm-current">Patient Details</span>
+<div class="page" id="details-container">
+    <div class="breadcrumb">
+      <a href="/Patient">Patients</a>
+      <span class="sep">/</span>
+      <span class="current">Patient Details</span>
     </div>
 
-    <div class="pm-page-head">
-        <h1>Patient Details</h1>
-        <p>Information about the selected patient.</p>
+    <div class="page-head">
+      <div>
+        <h1>Patient details</h1>
+        <p>Information about the selected patient</p>
+      </div>
+      <span class="status-tag active" id="patient-status" style="display:none;">Loading...</span>
     </div>
 
-    <div class="pm-form-card" id="details-container">
-        <!-- Skeleton for loading -->
-        <div class="pm-skeleton-box sk-title"></div>
-        <div class="pm-skeleton-box sk-row"></div>
-        <div class="pm-skeleton-box sk-row"></div>
-        <div class="pm-skeleton-box sk-row"></div>
+    <div class="profile-card" id="patient-profile" style="display:none;">
+      <div class="profile-top">
+        <div class="profile-avatar" id="patient-avatar">?</div>
+        <div>
+          <div class="profile-name" id="patient-name">Loading...</div>
+          <div class="profile-id" id="patient-id-display">Patient ID · Loading...</div>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="k">Date of birth</div>
+          <div class="v mono" id="patient-dob">...</div>
+        </div>
+        <div class="info-item">
+          <div class="k">Gender</div>
+          <div class="v" id="patient-gender">...</div>
+        </div>
+        <div class="info-item">
+          <div class="k">Phone number</div>
+          <div class="v mono" id="patient-phone">...</div>
+        </div>
+        <div class="info-item last-row">
+          <div class="k">Address</div>
+          <div class="v" id="patient-address">...</div>
+        </div>
+      </div>
+
+      <div class="card-actions" id="patient-actions">
+         <a href="#" id="btn-edit-patient" class="btn-primary">✎ Edit patient</a>
+         <a href="/Patient" class="btn-ghost">← Back to list</a>
+         <button id="btn-delete-patient" class="btn-danger-outline">Delete patient</button>
+      </div>
+    </div>
+
+    <div class="side-note">
+      <span class="ic">ℹ</span>
+      <span>This is a summary view. Full medical history, appointments, and lab records for this patient will live on a dedicated Records tab.</span>
     </div>
 </div>
 

@@ -6,6 +6,7 @@ namespace HealthcareCRM.Models
     /// <summary>
     /// Represents a system user stored in the Users MongoDB collection.
     /// </summary>
+    [BsonIgnoreExtraElements]
     public class User
     {
         /// <summary>Gets or sets the unique MongoDB ObjectId.</summary>

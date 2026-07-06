@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace HealthcareCRM.Models
 {
+    [BsonIgnoreExtraElements]
     public class Doctor
     {
         [BsonId]

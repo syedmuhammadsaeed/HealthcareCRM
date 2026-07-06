@@ -6,6 +6,7 @@ namespace HealthcareCRM.Models
     /// <summary>
     /// Represents a patient record stored in the Patients MongoDB collection.
     /// </summary>
+    [BsonIgnoreExtraElements]
     public class Patient
     {
         /// <summary>Gets or sets the unique MongoDB ObjectId.</summary>
