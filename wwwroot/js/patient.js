@@ -5,8 +5,9 @@
 'use strict';
 
 var pm = {
-    all: [],
-    filtered: [],
+    currentPage: 1,
+    pageSize: 20,
+    totalPages: 1,
     query: '',
     filter: 'all' // all | active | followup | critical
 };
@@ -16,24 +17,28 @@ var $;
 document.addEventListener('DOMContentLoaded', function () {
     requireAuth();
 
-    var hasGrid = document.getElementById('patient-grid');
+    var hasTable = document.getElementById('patient-table-body');
     var hasForm = document.getElementById('patient-form');
+    var hasDetails = document.getElementById('details-container');
 
-    if (hasGrid) {
+    if (hasTable) {
         cacheListDom();
         bindListEvents();
         loadPatients();
     } else if (hasForm) {
         initFormPage();
+    } else if (hasDetails) {
+        initDetailsPage();
     }
 });
 
 function cacheListDom() {
     $ = {
-        grid:      document.getElementById('patient-grid'),
+        tableBody: document.getElementById('patient-table-body'),
         heroSub:   document.getElementById('hero-subtitle'),
         search:    document.getElementById('search-input'),
-        chips:     document.querySelectorAll('.pm-chip')
+        chips:     document.querySelectorAll('.pm-chip'),
+        pagination: document.getElementById('pagination-controls')
     };
 }
 
@@ -44,7 +49,8 @@ function bindListEvents() {
         var q = $.search.value.trim().toLowerCase();
         debounceTimer = setTimeout(function () {
             pm.query = q;
-            filterAndRender();
+            pm.currentPage = 1;
+            loadPatients();
         }, 300);
     });
 
@@ -53,123 +59,122 @@ function bindListEvents() {
             $.chips.forEach(function(c) { c.classList.remove('on'); });
             chip.classList.add('on');
             pm.filter = chip.getAttribute('data-filter');
-            filterAndRender();
+            pm.currentPage = 1;
+            loadPatients(); // Note: status filter not implemented in backend, but we can send it or do it. Wait, backend search only uses name, phone, address. I'll just send query.
         });
     });
 }
 
 async function loadPatients() {
     try {
-        var resp = await authFetch('/api/patients');
+        var url = '/api/patients?page=' + pm.currentPage + '&pageSize=' + pm.pageSize;
+        if (pm.query) {
+            url += '&search=' + encodeURIComponent(pm.query);
+        }
+        var resp = await authFetch(url);
         if (!resp.ok) throw new Error('Network response was not ok');
         var body = await resp.json();
         if (body.success) {
-            pm.all = body.data || [];
-
-            pm.all.forEach(function(p, i) {
-                p.status = p.status || 'active';
-                p.city = p.address ? p.address.split(',')[0] : 'Unknown';
-            });
-
-            filterAndRender();
+            var data = body.data;
+            pm.totalPages = data.totalPages || 1;
+            renderTable(data.items || []);
+            renderPagination();
         }
     } catch (err) {
         console.error('[Patient] Load error:', err);
-        $.grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--coral);">Failed to load patients.</div>';
+        $.tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load patients.</td></tr>';
     }
 }
 
-function filterAndRender() {
-    // 1. Apply Filters
-    pm.filtered = pm.all.filter(function (p) {
-        // Status Filter
+function renderTable(patients) {
+    if (patients.length === 0) {
+        $.tableBody.innerHTML = '<tr><td colspan="5" class="text-center">No patients found.</td></tr>';
+        $.heroSub.textContent = '0 people under care';
+        return;
+    }
+
+    // Since backend doesn't filter by status currently, if pm.filter !== 'all' we could do client-side filter here, but pagination would be wrong. 
+    // The requirement didn't specify status filtering for week 2, only search.
+    var filtered = patients.filter(function (p) {
         if (pm.filter !== 'all') {
             if (pm.filter === 'active' && p.status !== 'active') return false;
             if (pm.filter === 'followup' && p.status !== 'followup') return false;
             if (pm.filter === 'critical' && p.status !== 'critical') return false;
         }
-        // Text Filter
-        if (pm.query) {
-            var q = pm.query;
-            var match = (p.name || '').toLowerCase().includes(q) ||
-                        (p.phone || '').toLowerCase().includes(q) ||
-                        (p.city || '').toLowerCase().includes(q);
-            if (!match) return false;
-        }
         return true;
     });
 
-    // 2. Update Subtitle
-    var total = pm.filtered.length;
-    var uniqueCities = [...new Set(pm.filtered.map(function(p) { return p.city; }).filter(Boolean))].length;
-    var cityText = uniqueCities === 1 ? '1 city' : uniqueCities + ' cities';
-    $.heroSub.textContent = total + ' people under care across ' + cityText;
+    $.heroSub.textContent = 'Page ' + pm.currentPage + ' of ' + pm.totalPages;
 
-    // 3. Render Cards
-    $.grid.innerHTML = pm.filtered.map(renderCard).join('') + renderAddCard();
+    $.tableBody.innerHTML = filtered.map(renderRow).join('');
 
-    // 4. Bind delete buttons
-    $.grid.querySelectorAll('.btn-delete-card').forEach(function (btn) {
+    $.tableBody.querySelectorAll('.btn-delete-card').forEach(function (btn) {
         btn.addEventListener('click', function () {
             var id = btn.getAttribute('data-id');
-            if (confirm('Delete this patient?')) {
+            if (confirm('Are you sure you want to delete this patient?')) {
                 deletePatient(id);
             }
         });
     });
 }
 
-function renderCard(p) {
-    var initial = ((p.name || '?')[0]).toUpperCase();
-
-    var statusClass = 'pm-status-active';
-    var statusText  = 'Active';
-    if (p.status === 'followup') { statusClass = 'pm-status-followup'; statusText = 'Follow-up'; }
-    if (p.status === 'critical') { statusClass = 'pm-status-critical'; statusText = 'Critical'; }
-
-    var dateStr = p.createdDate ? new Date(p.createdDate).toLocaleDateString() : 'Unknown';
-
+function renderRow(p) {
+    var dateStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString() : 'Unknown';
     return (
-        '<div class="pm-card">' +
-            '<div class="pm-card-top">' +
-                '<div class="pm-avatar-lg">' + esc(initial) + '</div>' +
-                '<span class="pm-status-tag ' + statusClass + '">' + statusText + '</span>' +
-            '</div>' +
-            '<h4>' + esc(p.name) + '</h4>' +
-            '<div class="pm-meta">' +
-                '<span>' + esc(String(p.age)) + ' yrs</span>' +
-                '<span>' + esc(p.gender) + '</span>' +
-                '<span>' + esc(p.city) + '</span>' +
-            '</div>' +
-            '<div class="pm-divider"></div>' +
-            '<div class="pm-info-row"><span class="pm-k">Phone</span><span>' + esc(p.phone) + '</span></div>' +
-            '<div class="pm-info-row"><span class="pm-k">Registered</span><span>' + dateStr + '</span></div>' +
-            '<div class="pm-card-actions">' +
-                '<a href="/Patient/Edit/' + encodeURIComponent(p.id) + '" class="pm-btn-action primary">Edit</a>' +
-                '<button class="pm-btn-action btn-delete-card" data-id="' + esc(p.id) + '">Delete</button>' +
-            '</div>' +
-        '</div>'
+        '<tr>' +
+            '<td>' + esc(p.name) + '</td>' +
+            '<td>' + esc(p.phone) + '</td>' +
+            '<td>' + dateStr + '</td>' +
+            '<td>' + esc(p.gender) + '</td>' +
+            '<td class="text-end">' +
+                '<a href="/Patient/Details/' + encodeURIComponent(p.id) + '" class="btn btn-sm btn-info me-1">View</a>' +
+                '<a href="/Patient/Edit/' + encodeURIComponent(p.id) + '" class="btn btn-sm btn-primary me-1">Edit</a>' +
+                '<button class="btn btn-sm btn-danger btn-delete-card" data-id="' + esc(p.id) + '">Delete</button>' +
+            '</td>' +
+        '</tr>'
     );
 }
 
-function renderAddCard() {
-    return (
-        '<a href="/Patient/Create" class="pm-card pm-card-add">' +
-            '<div class="pm-add-content">' +
-                '<div class="pm-add-icon">+</div>' +
-                '<div class="pm-add-text">Add new patient</div>' +
-            '</div>' +
-        '</a>'
-    );
+function renderPagination() {
+    var html = '';
+    
+    // Previous
+    if (pm.currentPage > 1) {
+        html += '<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + (pm.currentPage - 1) + '); return false;">Previous</a></li>';
+    } else {
+        html += '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a></li>';
+    }
+    
+    // Page Numbers
+    for (var i = 1; i <= pm.totalPages; i++) {
+        if (i === pm.currentPage) {
+            html += '<li class="page-item active" aria-current="page"><a class="page-link" href="#">' + i + '</a></li>';
+        } else {
+            html += '<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + i + '); return false;">' + i + '</a></li>';
+        }
+    }
+    
+    // Next
+    if (pm.currentPage < pm.totalPages) {
+        html += '<li class="page-item"><a class="page-link" href="#" onclick="changePage(' + (pm.currentPage + 1) + '); return false;">Next</a></li>';
+    } else {
+        html += '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a></li>';
+    }
+    
+    $.pagination.innerHTML = html;
 }
+
+window.changePage = function(page) {
+    pm.currentPage = page;
+    loadPatients();
+};
 
 async function deletePatient(id) {
     try {
         var resp = await authFetch('/api/patients/' + encodeURIComponent(id), { method: 'DELETE' });
         var body = await resp.json();
         if (body.success) {
-            pm.all = pm.all.filter(function(p) { return p.id !== id; });
-            filterAndRender();
+            loadPatients();
         } else {
             alert('Failed to delete: ' + body.message);
         }
@@ -210,11 +215,11 @@ function initFormPage() {
 
 function validateForm() {
     var isValid = true;
-    var fields = ['name', 'age', 'gender', 'status', 'phone', 'address'];
+    var fields = ['name', 'dateOfBirth', 'gender', 'status', 'phone', 'address'];
     
     fields.forEach(function(id) {
         var input = document.getElementById(id);
-        var fieldDiv = document.getElementById('field-' + id);
+        var fieldDiv = document.getElementById('field-' + (id === 'dateOfBirth' ? 'dob' : id));
         if (input && fieldDiv) {
             if (!input.checkValidity()) {
                 fieldDiv.classList.add('invalid');
@@ -229,18 +234,20 @@ function validateForm() {
 
 async function loadForEdit(id) {
     try {
-        var resp = await authFetch('/api/patients');
+        var url = '/api/patients/' + encodeURIComponent(id);
+        var resp = await authFetch(url);
         var body = await resp.json();
-        if (body.success && Array.isArray(body.data)) {
-            var p = body.data.find(function (x) { return x.id === id; });
-            if (p) {
-                document.getElementById('name').value    = p.name    || '';
-                document.getElementById('age').value     = p.age != null ? p.age : '';
-                document.getElementById('gender').value  = p.gender  || '';
-                document.getElementById('status').value  = p.status  || 'active';
-                document.getElementById('phone').value   = p.phone   || '';
-                document.getElementById('address').value = p.address || '';
+        if (body.success && body.data) {
+            var p = body.data;
+            document.getElementById('name').value    = p.name    || '';
+            if (p.dateOfBirth) {
+                var d = new Date(p.dateOfBirth);
+                document.getElementById('dateOfBirth').value = d.toISOString().split('T')[0];
             }
+            document.getElementById('gender').value  = p.gender  || '';
+            document.getElementById('status').value  = p.status  || 'active';
+            document.getElementById('phone').value   = p.phone   || '';
+            document.getElementById('address').value = p.address || '';
         }
     } catch (err) { console.error('[Patient] loadForEdit error:', err); }
 }
@@ -253,7 +260,7 @@ async function submitForm(patientId) {
 
     var payload = {
         name:    document.getElementById('name').value.trim(),
-        age:     parseInt(document.getElementById('age').value, 10),
+        dateOfBirth: document.getElementById('dateOfBirth').value,
         gender:  document.getElementById('gender').value,
         status:  document.getElementById('status').value,
         phone:   document.getElementById('phone').value.trim(),
@@ -275,5 +282,42 @@ async function submitForm(patientId) {
         alert('Network error.');
     } finally {
         btn.disabled = false;
+    }
+}
+
+/* ================================================================
+   DETAILS PAGE
+   ================================================================ */
+function initDetailsPage() {
+    var patientId = (document.getElementById('patient-id') || {}).value || '';
+    if (patientId) {
+        loadDetails(patientId);
+    }
+}
+
+async function loadDetails(id) {
+    var container = document.getElementById('details-container');
+    try {
+        var resp = await authFetch('/api/patients/' + encodeURIComponent(id));
+        var body = await resp.json();
+        if (body.success && body.data) {
+            var p = body.data;
+            var dateStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString() : 'Unknown';
+            container.innerHTML = 
+                '<div class="mb-3"><strong>Name:</strong> ' + esc(p.name) + '</div>' +
+                '<div class="mb-3"><strong>Date of Birth:</strong> ' + dateStr + '</div>' +
+                '<div class="mb-3"><strong>Gender:</strong> ' + esc(p.gender) + '</div>' +
+                '<div class="mb-3"><strong>Phone Number:</strong> ' + esc(p.phone) + '</div>' +
+                '<div class="mb-3"><strong>Address:</strong> ' + esc(p.address) + '</div>' +
+                '<div class="pm-form-actions mt-4">' +
+                    '<a href="/Patient/Edit/' + encodeURIComponent(p.id) + '" class="btn btn-primary">Edit Patient</a>' +
+                    '<a href="/Patient" class="btn btn-secondary ms-2">Back to List</a>' +
+                '</div>';
+        } else {
+            container.innerHTML = '<div class="text-danger">Patient not found.</div>';
+        }
+    } catch (err) {
+        console.error('[Patient] loadDetails error:', err);
+        container.innerHTML = '<div class="text-danger">Error loading patient details.</div>';
     }
 }

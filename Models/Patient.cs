@@ -17,9 +17,9 @@ namespace HealthcareCRM.Models
         [BsonElement("name")]
         public string Name { get; set; } = string.Empty;
 
-        /// <summary>Gets or sets the patient's age (0–120).</summary>
-        [BsonElement("age")]
-        public int Age { get; set; }
+        /// <summary>Gets or sets the patient's date of birth.</summary>
+        [BsonElement("dateOfBirth")]
+        public DateTime DateOfBirth { get; set; }
 
         /// <summary>Gets or sets the patient's gender.</summary>
         [BsonElement("gender")]

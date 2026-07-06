@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Doctors";
+}
+
+<!-- Hero Section -->
+<div class="pm-hero">
+    <div class="pm-hero-text">
+        <h1>Doctor roster</h1>
+        <p id="hero-subtitle">Loading active doctors...</p>
+    </div>
+</div>
+
+<!-- Table Layout -->
+<div class="table-responsive mt-4">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Phone Number</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="doctor-table-body">
+            <!-- Skeletons (rendered initially) -->
+            <tr><td colspan="4" class="text-center">Loading doctors...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/doctor.js" asp-append-version="true"></script>
+}

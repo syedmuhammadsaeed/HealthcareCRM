@@ -25,8 +25,10 @@ builder.Services.Configure<JwtSettings>(
 // ── Repository / Service DI ──────────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PatientService>();
+builder.Services.AddScoped<DoctorService>();
 builder.Services.AddSingleton<PasswordHasher>();
 
 // ── JWT Authentication ───────────────────────────────────────────────

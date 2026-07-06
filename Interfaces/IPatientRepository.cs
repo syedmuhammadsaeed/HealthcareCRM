@@ -7,14 +7,11 @@ namespace HealthcareCRM.Interfaces
     /// </summary>
     public interface IPatientRepository
     {
-        /// <summary>Retrieves all patient records ordered by creation date descending.</summary>
-        Task<IEnumerable<Patient>> GetAllAsync();
+        /// <summary>Retrieves a paginated list of patients, optionally filtered by a search query.</summary>
+        Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize);
 
         /// <summary>Retrieves a patient by their MongoDB ObjectId string.</summary>
         Task<Patient?> GetByIdAsync(string patientId);
-
-        /// <summary>Searches patients by name, phone, or address using a case-insensitive regex.</summary>
-        Task<IEnumerable<Patient>> SearchAsync(string query);
 
         /// <summary>Inserts a new patient document into the Patients collection.</summary>
         Task AddAsync(Patient patient);

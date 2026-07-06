@@ -1,0 +1,31 @@
+@{
+    var patientId = ViewBag.PatientId as string;
+    ViewData["Title"] = "Patient Details";
+}
+
+<div class="pm-form-page">
+    <div class="pm-breadcrumb">
+        <a href="/Patient">Patients</a>
+        <span class="pm-sep">/</span>
+        <span class="pm-current">Patient Details</span>
+    </div>
+
+    <div class="pm-page-head">
+        <h1>Patient Details</h1>
+        <p>Information about the selected patient.</p>
+    </div>
+
+    <div class="pm-form-card" id="details-container">
+        <!-- Skeleton for loading -->
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+    </div>
+</div>
+
+<input type="hidden" id="patient-id" value="@patientId" />
+
+@section Scripts {
+    <script src="~/js/patient.js" asp-append-version="true"></script>
+}

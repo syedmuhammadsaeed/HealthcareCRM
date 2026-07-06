@@ -20,16 +20,19 @@ namespace HealthcareCRM.Services
         }
 
         /// <summary>
-        /// Returns all patients, or filters by a search query if provided.
+        /// Returns a paginated list of patients, or filters by a search query if provided.
         /// </summary>
-        public async Task<IEnumerable<Patient>> GetPatientsAsync(string? query)
+        public async Task<PagedResult<Patient>> GetPatientsAsync(string? query, int page, int pageSize)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            var (items, totalCount) = await _patientRepository.GetPagedAsync(query, page, pageSize);
+            return new PagedResult<Patient>
             {
-                return await _patientRepository.GetAllAsync();
-            }
-
-            return await _patientRepository.SearchAsync(query);
+                Items = items,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                CurrentPage = page,
+                PageSize = pageSize
+            };
         }
 
         /// <summary>
@@ -48,7 +51,7 @@ namespace HealthcareCRM.Services
             var patient = new Patient
             {
                 Name        = model.Name,
-                Age         = model.Age,
+                DateOfBirth = model.DateOfBirth,
                 Gender      = model.Gender,
                 Status      = model.Status,
                 Phone       = model.Phone,
@@ -72,7 +75,7 @@ namespace HealthcareCRM.Services
             }
 
             patient.Name    = model.Name;
-            patient.Age     = model.Age;
+            patient.DateOfBirth = model.DateOfBirth;
             patient.Gender  = model.Gender;
             patient.Status  = model.Status;
             patient.Phone   = model.Phone;

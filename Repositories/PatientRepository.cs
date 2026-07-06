@@ -28,12 +28,30 @@ namespace HealthcareCRM.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Patient>> GetAllAsync()
+        public async Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize)
         {
-            return await _patients
-                .Find(_ => true)
+            FilterDefinition<Patient> filter = Builders<Patient>.Filter.Empty;
+            
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var regexPattern = new BsonRegularExpression(query, "i"); // case-insensitive
+                filter = Builders<Patient>.Filter.Or(
+                    Builders<Patient>.Filter.Regex(p => p.Name,    regexPattern),
+                    Builders<Patient>.Filter.Regex(p => p.Phone,   regexPattern),
+                    Builders<Patient>.Filter.Regex(p => p.Address, regexPattern)
+                );
+            }
+
+            var totalCount = await _patients.CountDocumentsAsync(filter);
+            
+            var items = await _patients
+                .Find(filter)
                 .SortByDescending(p => p.CreatedDate)
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
                 .ToListAsync();
+
+            return (items, (int)totalCount);
         }
 
         /// <inheritdoc/>
@@ -45,33 +63,11 @@ namespace HealthcareCRM.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Patient>> SearchAsync(string query)
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return await GetAllAsync();
-            }
-
-            var regexPattern = new BsonRegularExpression(query, "i"); // case-insensitive
-
-            var filter = Builders<Patient>.Filter.Or(
-                Builders<Patient>.Filter.Regex(p => p.Name,    regexPattern),
-                Builders<Patient>.Filter.Regex(p => p.Phone,   regexPattern),
-                Builders<Patient>.Filter.Regex(p => p.Address, regexPattern)
-            );
-
-            return await _patients
-                .Find(filter)
-                .SortByDescending(p => p.CreatedDate)
-                .ToListAsync();
-        }
-
-        /// <inheritdoc/>
         public async Task UpdateAsync(string id, Patient patient)
         {
             var update = Builders<Patient>.Update
                 .Set(p => p.Name,    patient.Name)
-                .Set(p => p.Age,     patient.Age)
+                .Set(p => p.DateOfBirth, patient.DateOfBirth)
                 .Set(p => p.Gender,  patient.Gender)
                 .Set(p => p.Status,  patient.Status)
                 .Set(p => p.Phone,   patient.Phone)

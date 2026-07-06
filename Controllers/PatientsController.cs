@@ -26,18 +26,35 @@ namespace HealthcareCRM.Controllers
         }
 
         /// <summary>
-        /// Retrieves all patient records, with optional case-insensitive search.
+        /// Retrieves all patient records, with optional case-insensitive search and pagination.
         /// </summary>
         /// <param name="search">Optional search term matched against name, phone, and address.</param>
+        /// <param name="page">Page number (default 1).</param>
+        /// <param name="pageSize">Number of items per page (default 20).</param>
         /// <response code="200">Returns the list of patients.</response>
         /// <response code="401">JWT token is missing or invalid.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Get([FromQuery] string? search)
+        public async Task<IActionResult> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
-            var patients = await _patientService.GetPatientsAsync(search);
+            var patients = await _patientService.GetPatientsAsync(search, page, pageSize);
             return Ok(ApiResponse<object>.CreateSuccess(patients, "Patients retrieved successfully."));
+        }
+
+        /// <summary>
+        /// Retrieves a single patient by ID.
+        /// </summary>
+        /// <param name="id">MongoDB ObjectId string.</param>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(string id)
+        {
+            var patient = await _patientService.GetPatientByIdAsync(id);
+            if (patient == null) return NotFound(ApiResponse<object>.CreateError("Patient not found."));
+            return Ok(ApiResponse<object>.CreateSuccess(patient, "Patient retrieved successfully."));
         }
 
         /// <summary>
