@@ -41,5 +41,24 @@ namespace HealthcareCRM.Repositories
                 .Find(u => u.Id == userId)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task UpdateAsync(User user)
+        {
+            await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
+        }
+
+        public async Task<IEnumerable<User>> GetAllPendingAsync()
+        {
+            return await _users
+                .Find(u => u.Status == "Pending")
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetApprovedDoctorsAsync()
+        {
+            return await _users
+                .Find(u => u.Role == "Doctor" && (u.Status == "Approved" || string.IsNullOrEmpty(u.Status)))
+                .ToListAsync();
+        }
     }
 }

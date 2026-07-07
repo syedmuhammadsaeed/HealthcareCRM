@@ -1,0 +1,179 @@
+@{
+    ViewData["Title"] = "Profile Settings — Super Admin";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@ViewData["Title"]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF7F1;
+    --forest:#1B4332;
+    --forest-dark:#122E22;
+    --sage:#6E9C7D;
+    --sage-light:#E4EFE3;
+    --coral:#E76F51;
+    --coral-light:#FBE3DC;
+    --amber:#B3672B;
+    --amber-light:#FBEADB;
+    --ink:#26301F;
+    --muted:#7C8873;
+    --line:#E7E0D2;
+    --ok:#3E7C4A;
+    --error:#C0392B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 0 24px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--forest);
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--muted);
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active {
+    color: var(--forest);
+  }
+  .main-content {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid var(--line);
+  }
+  h2 { font-family: 'Fraunces', serif; margin-top:0; color:var(--forest); }
+  .form-group { margin-bottom: 20px; }
+  label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px; }
+  input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 15px; }
+  button {
+    background: var(--forest);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+  }
+  .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
+  .alert.success { background: var(--sage-light); color: var(--forest-dark); border: 1px solid var(--sage); }
+  .alert.error { background: var(--coral-light); color: var(--error); border: 1px solid var(--coral); }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="/" class="brand">HealthcareCRM</a>
+    <div class="nav-links">
+      <a href="/SuperAdmin">Approvals</a>
+      <a href="/SuperAdmin/Profile" class="active">Profile</a>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="card">
+      <h2>Change Password</h2>
+      <div id="alertBox" class="alert"></div>
+      
+      <form id="passwordForm">
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" id="currentPassword" required>
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" id="newPassword" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="confirmPassword" required>
+        </div>
+        <button type="submit">Update Password</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="/js/site.js"></script>
+  <script>
+    requireAuth();
+
+    document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const current = document.getElementById('currentPassword').value;
+      const newPass = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      const alertBox = document.getElementById('alertBox');
+
+      if (newPass !== confirm) {
+        alertBox.textContent = "New passwords do not match!";
+        alertBox.className = "alert error";
+        alertBox.style.display = "block";
+        return;
+      }
+
+      try {
+        const res = await authFetch('/api/auth/change-password', {
+          method: 'POST',
+          body: JSON.stringify({ currentPassword: current, newPassword: newPass, confirmPassword: confirm })
+        });
+        const data = await res.json();
+        
+        alertBox.style.display = "block";
+        if (data.success) {
+            alertBox.textContent = data.message;
+            alertBox.className = "alert success";
+            document.getElementById('passwordForm').reset();
+        } else {
+            alertBox.textContent = data.message || "Failed to update password.";
+            alertBox.className = "alert error";
+        }
+      } catch (err) {
+          alertBox.textContent = "A network error occurred.";
+          alertBox.className = "alert error";
+          alertBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

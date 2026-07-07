@@ -15,10 +15,9 @@ namespace HealthcareCRM.ViewModels
         [StringLength(150, ErrorMessage = "Name cannot exceed 150 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        /// <summary>Gets or sets the patient's age.</summary>
-        [Required(ErrorMessage = "Age is required.")]
-        [Range(0, 120, ErrorMessage = "Age must be between 0 and 120.")]
-        public int Age { get; set; }
+        /// <summary>Gets or sets the patient's date of birth.</summary>
+        [Required(ErrorMessage = "Date of Birth is required.")]
+        public DateTime DateOfBirth { get; set; }
 
         /// <summary>Gets or sets the patient's gender.</summary>
         [Required(ErrorMessage = "Gender is required.")]

@@ -28,12 +28,36 @@ namespace HealthcareCRM.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Patient>> GetAllAsync()
+        public async Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize, string? doctorId = null)
         {
-            return await _patients
-                .Find(_ => true)
+            FilterDefinition<Patient> filter = Builders<Patient>.Filter.Empty;
+            
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var regexPattern = new BsonRegularExpression(query, "i"); // case-insensitive
+                filter = Builders<Patient>.Filter.Or(
+                    Builders<Patient>.Filter.Regex(p => p.Name,    regexPattern),
+                    Builders<Patient>.Filter.Regex(p => p.Phone,   regexPattern),
+                    Builders<Patient>.Filter.Regex(p => p.Address, regexPattern)
+                );
+            }
+
+            if (!string.IsNullOrEmpty(doctorId))
+            {
+                var doctorFilter = Builders<Patient>.Filter.Eq(p => p.AssignedDoctorId, doctorId);
+                filter = Builders<Patient>.Filter.And(filter, doctorFilter);
+            }
+
+            var totalCount = await _patients.CountDocumentsAsync(filter);
+            
+            var items = await _patients
+                .Find(filter)
                 .SortByDescending(p => p.CreatedDate)
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
                 .ToListAsync();
+
+            return (items, (int)totalCount);
         }
 
         /// <inheritdoc/>
@@ -45,37 +69,21 @@ namespace HealthcareCRM.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Patient>> SearchAsync(string query)
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                return await GetAllAsync();
-            }
-
-            var regexPattern = new BsonRegularExpression(query, "i"); // case-insensitive
-
-            var filter = Builders<Patient>.Filter.Or(
-                Builders<Patient>.Filter.Regex(p => p.Name,    regexPattern),
-                Builders<Patient>.Filter.Regex(p => p.Phone,   regexPattern),
-                Builders<Patient>.Filter.Regex(p => p.Address, regexPattern)
-            );
-
-            return await _patients
-                .Find(filter)
-                .SortByDescending(p => p.CreatedDate)
-                .ToListAsync();
-        }
-
-        /// <inheritdoc/>
         public async Task UpdateAsync(string id, Patient patient)
         {
             var update = Builders<Patient>.Update
                 .Set(p => p.Name,    patient.Name)
-                .Set(p => p.Age,     patient.Age)
+                .Set(p => p.DateOfBirth, patient.DateOfBirth)
                 .Set(p => p.Gender,  patient.Gender)
                 .Set(p => p.Status,  patient.Status)
                 .Set(p => p.Phone,   patient.Phone)
-                .Set(p => p.Address, patient.Address);
+                .Set(p => p.Address, patient.Address)
+                .Set(p => p.AssignedDoctorId, patient.AssignedDoctorId)
+                .Set(p => p.AppointmentDate, patient.AppointmentDate)
+                .Set(p => p.AppointmentTime, patient.AppointmentTime)
+                .Set(p => p.AppointmentStatus, patient.AppointmentStatus)
+                .Set(p => p.AppointmentFee, patient.AppointmentFee)
+                .Set(p => p.AppointmentCurrency, patient.AppointmentCurrency);
 
             await _patients.UpdateOneAsync(p => p.Id == id, update);
         }
@@ -85,6 +93,13 @@ namespace HealthcareCRM.Repositories
         {
             var result = await _patients.DeleteOneAsync(p => p.Id == id);
             return result.DeletedCount > 0;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Patient>> GetAppointmentsAsync()
+        {
+            var filter = Builders<Patient>.Filter.Ne(p => p.AssignedDoctorId, null);
+            return await _patients.Find(filter).SortBy(p => p.AppointmentDate).ToListAsync();
         }
     }
 }

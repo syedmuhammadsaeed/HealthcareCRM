@@ -3,6 +3,7 @@ using HealthcareCRM.Services;
 using HealthcareCRM.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HealthcareCRM.Controllers
 {
@@ -26,18 +27,57 @@ namespace HealthcareCRM.Controllers
         }
 
         /// <summary>
-        /// Retrieves all patient records, with optional case-insensitive search.
+        /// Retrieves all patient records, with optional case-insensitive search and pagination.
         /// </summary>
         /// <param name="search">Optional search term matched against name, phone, and address.</param>
+        /// <param name="page">Page number (default 1).</param>
+        /// <param name="pageSize">Number of items per page (default 20).</param>
         /// <response code="200">Returns the list of patients.</response>
         /// <response code="401">JWT token is missing or invalid.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Get([FromQuery] string? search)
+        public async Task<IActionResult> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
-            var patients = await _patientService.GetPatientsAsync(search);
+            var userRole = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
+            var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                         ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub);
+
+            string? doctorId = null;
+            if (userRole == "Doctor")
+            {
+                doctorId = userId;
+            }
+
+            var patients = await _patientService.GetPatientsAsync(search, page, pageSize, doctorId);
             return Ok(ApiResponse<object>.CreateSuccess(patients, "Patients retrieved successfully."));
+        }
+
+        /// <summary>
+        /// Retrieves a single patient by ID.
+        /// </summary>
+        /// <param name="id">MongoDB ObjectId string.</param>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(string id)
+        {
+            var patient = await _patientService.GetPatientByIdAsync(id);
+            if (patient == null) return NotFound(ApiResponse<object>.CreateError("Patient not found."));
+            return Ok(ApiResponse<object>.CreateSuccess(patient, "Patient retrieved successfully."));
+        }
+
+        /// <summary>
+        /// Retrieves all appointments.
+        /// </summary>
+        [HttpGet("appointments")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetAppointments()
+        {
+            var appointments = await _patientService.GetAppointmentsAsync();
+            return Ok(ApiResponse<object>.CreateSuccess(appointments, "Appointments retrieved successfully."));
         }
 
         /// <summary>
@@ -116,6 +156,68 @@ namespace HealthcareCRM.Controllers
             }
 
             return Ok(ApiResponse<object?>.CreateSuccess(null, result.Message));
+        }
+
+        public class AssignDoctorRequest
+        {
+            public string DoctorId { get; set; } = string.Empty;
+            public DateTime AppointmentDate { get; set; }
+            public string AppointmentTime { get; set; } = string.Empty;
+        }
+
+        /// <summary>
+        /// Assigns a patient to a doctor with an appointment date and time.
+        /// </summary>
+        [HttpPost("{id}/assign")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Assign(string id, [FromBody] AssignDoctorRequest request)
+        {
+            if (string.IsNullOrEmpty(request.DoctorId) || string.IsNullOrEmpty(request.AppointmentTime))
+            {
+                return BadRequest(ApiResponse<object>.CreateError("Invalid assignment data."));
+            }
+
+            var result = await _patientService.AssignPatientAsync(id, request.DoctorId, request.AppointmentDate, request.AppointmentTime);
+            if (!result.IsSuccess)
+            {
+                return NotFound(ApiResponse<object>.CreateError(result.Message));
+            }
+
+            return Ok(ApiResponse<object?>.CreateSuccess(null, result.Message));
+        }
+
+        /// <summary>
+        /// Marks an appointment as completed by the assigned doctor.
+        /// </summary>
+        [HttpPost("{id}/complete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> CompleteAppointment(string id)
+        {
+            var userRole = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
+            if (userRole != "Doctor") 
+            {
+                return Unauthorized(ApiResponse<object>.CreateError("Only doctors can complete appointments."));
+            }
+            
+            var doctorId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                           ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub);
+
+            if (string.IsNullOrEmpty(doctorId)) 
+            {
+                return Unauthorized(ApiResponse<object>.CreateError("Invalid doctor identity."));
+            }
+
+            var result = await _patientService.CompleteAppointmentAsync(id, doctorId);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(ApiResponse<object>.CreateError(result.Message));
+            }
+            
+            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
         }
     }
 }
