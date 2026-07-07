@@ -57,6 +57,40 @@
       <span class="ic">ℹ</span>
       <span>This is a summary view. Full medical history, appointments, and lab records for this patient will live on a dedicated Records tab.</span>
     </div>
+
+    <div class="profile-card" id="assign-doctor-section" style="display:none; margin-top:24px;">
+      <div class="data-card-header" style="padding: 20px 24px; border-bottom: 1px solid var(--line);">
+        <h2 class="data-card-title" style="font-size:18px; font-weight:600; margin:0;">Assign Doctor</h2>
+      </div>
+      <div style="padding: 24px;">
+        <div id="assign-alert" style="display:none; padding:12px; border-radius:8px; margin-bottom:16px;"></div>
+        
+        <div id="assigned-info" style="display:none; margin-bottom:20px; padding:16px; background:var(--sage-light); border-radius:8px;">
+          <strong style="color:var(--forest);">Currently Assigned:</strong> <span id="assigned-doctor-name"></span>
+          <div style="font-size:14px; margin-top:4px;">Appointment: <span id="assigned-appointment"></span></div>
+        </div>
+
+        <form id="assign-doctor-form">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div>
+              <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Select Doctor</label>
+              <select id="assign-doctor-select" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+                <option value="">Loading doctors...</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Appointment Date</label>
+              <input type="date" id="assign-date" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+            </div>
+            <div>
+              <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Appointment Time</label>
+              <input type="time" id="assign-time" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" id="btn-assign-doctor">Assign Patient</button>
+        </form>
+      </div>
+    </div>
 </div>
 
 <input type="hidden" id="patient-id" value="@patientId" />

@@ -3,26 +3,26 @@ using System.Security.Claims;
 
 namespace HealthcareCRM.Controllers
 {
-    public class DoctorController : Controller
+    public class AppointmentController : Controller
     {
         [HttpGet]
         public IActionResult Index()
         {
             var role = User.FindFirstValue(ClaimTypes.Role);
-            if (role == "Admin" || role == "SuperAdmin")
+            if (role != "Admin" && role != "SuperAdmin")
             {
-                return RedirectToAction("List");
+                return RedirectToAction("Index", "Home");
             }
             return View();
         }
 
         [HttpGet]
-        public IActionResult List()
+        public IActionResult Assign()
         {
             var role = User.FindFirstValue(ClaimTypes.Role);
-            if (role == "Doctor")
+            if (role != "Admin" && role != "SuperAdmin")
             {
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
             return View();
         }

@@ -28,7 +28,7 @@ namespace HealthcareCRM.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize)
+        public async Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize, string? doctorId = null)
         {
             FilterDefinition<Patient> filter = Builders<Patient>.Filter.Empty;
             
@@ -40,6 +40,12 @@ namespace HealthcareCRM.Repositories
                     Builders<Patient>.Filter.Regex(p => p.Phone,   regexPattern),
                     Builders<Patient>.Filter.Regex(p => p.Address, regexPattern)
                 );
+            }
+
+            if (!string.IsNullOrEmpty(doctorId))
+            {
+                var doctorFilter = Builders<Patient>.Filter.Eq(p => p.AssignedDoctorId, doctorId);
+                filter = Builders<Patient>.Filter.And(filter, doctorFilter);
             }
 
             var totalCount = await _patients.CountDocumentsAsync(filter);
@@ -71,7 +77,13 @@ namespace HealthcareCRM.Repositories
                 .Set(p => p.Gender,  patient.Gender)
                 .Set(p => p.Status,  patient.Status)
                 .Set(p => p.Phone,   patient.Phone)
-                .Set(p => p.Address, patient.Address);
+                .Set(p => p.Address, patient.Address)
+                .Set(p => p.AssignedDoctorId, patient.AssignedDoctorId)
+                .Set(p => p.AppointmentDate, patient.AppointmentDate)
+                .Set(p => p.AppointmentTime, patient.AppointmentTime)
+                .Set(p => p.AppointmentStatus, patient.AppointmentStatus)
+                .Set(p => p.AppointmentFee, patient.AppointmentFee)
+                .Set(p => p.AppointmentCurrency, patient.AppointmentCurrency);
 
             await _patients.UpdateOneAsync(p => p.Id == id, update);
         }
@@ -81,6 +93,13 @@ namespace HealthcareCRM.Repositories
         {
             var result = await _patients.DeleteOneAsync(p => p.Id == id);
             return result.DeletedCount > 0;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Patient>> GetAppointmentsAsync()
+        {
+            var filter = Builders<Patient>.Filter.Ne(p => p.AssignedDoctorId, null);
+            return await _patients.Find(filter).SortBy(p => p.AppointmentDate).ToListAsync();
         }
     }
 }

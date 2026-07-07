@@ -18,6 +18,15 @@ ViewData["Title"] = "Sign In";
 
         <form id="login-form" novalidate>
             <div class="field">
+                <label>Login As</label>
+                <div class="role-selector" style="display:flex; gap:15px; margin-bottom:10px;">
+                    <label><input type="radio" name="role" value="Admin" checked> Admin</label>
+                    <label><input type="radio" name="role" value="SuperAdmin"> Super Admin</label>
+                    <label><input type="radio" name="role" value="Doctor"> Doctor</label>
+                </div>
+            </div>
+
+            <div class="field">
                 <label for="email">Email address</label>
                 <div class="input-shell">
                     <input

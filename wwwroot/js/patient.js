@@ -375,6 +375,16 @@ async function loadDetails(id) {
                     }
                 };
             }
+
+            var payload = parseJwt(getToken());
+            var role = getRoleFromJwt(payload);
+            if (payload && (role === 'Admin' || role === 'SuperAdmin')) {
+                var assignSection = document.getElementById('assign-doctor-section');
+                if (assignSection) {
+                    assignSection.style.display = 'block';
+                    loadDoctorsForAssignment(p);
+                }
+            }
         } else {
             var container = document.getElementById('details-container');
             if (container) container.innerHTML = '<div style="color:var(--coral); padding:20px;">Patient not found.</div>';
@@ -383,5 +393,97 @@ async function loadDetails(id) {
         console.error('[Patient] loadDetails error:', err);
         var container = document.getElementById('details-container');
         if (container) container.innerHTML = '<div style="color:var(--coral); padding:20px;">Error loading patient details.</div>';
+    }
+}
+
+async function loadDoctorsForAssignment(patient) {
+    try {
+        var resp = await authFetch('/api/doctors');
+        var body = await resp.json();
+        var select = document.getElementById('assign-doctor-select');
+        
+        if (body.success && body.data) {
+            var doctors = body.data;
+            select.innerHTML = '<option value="">-- Select a Doctor --</option>';
+            doctors.forEach(function(d) {
+                var spec = d.specialization ? ' - ' + d.specialization : '';
+                select.innerHTML += '<option value="' + d.id + '">' + esc(d.name) + spec + '</option>';
+            });
+
+            if (patient.assignedDoctorId) {
+                var doc = doctors.find(function(x) { return x.id === patient.assignedDoctorId; });
+                if (doc) {
+                    var info = document.getElementById('assigned-info');
+                    if (info) info.style.display = 'block';
+                    document.getElementById('assigned-doctor-name').textContent = doc.name + (doc.specialization ? ' (' + doc.specialization + ')' : '');
+                    
+                    var dateStr = '';
+                    if (patient.appointmentDate) {
+                        dateStr = new Date(patient.appointmentDate).toLocaleDateString();
+                    }
+                    if (patient.appointmentTime) {
+                        dateStr += ' at ' + patient.appointmentTime;
+                    }
+                    document.getElementById('assigned-appointment').textContent = dateStr;
+
+                    select.value = patient.assignedDoctorId;
+                }
+            }
+            if (patient.appointmentDate) {
+                document.getElementById('assign-date').value = patient.appointmentDate.split('T')[0];
+            }
+            if (patient.appointmentTime) {
+                document.getElementById('assign-time').value = patient.appointmentTime;
+            }
+        } else {
+            select.innerHTML = '<option value="">Failed to load doctors</option>';
+        }
+
+        var form = document.getElementById('assign-doctor-form');
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btn-assign-doctor');
+            btn.disabled = true;
+            btn.textContent = 'Assigning...';
+            var alertBox = document.getElementById('assign-alert');
+            alertBox.style.display = 'none';
+
+            var payload = {
+                doctorId: select.value,
+                appointmentDate: document.getElementById('assign-date').value,
+                appointmentTime: document.getElementById('assign-time').value
+            };
+
+            try {
+                var assignResp = await authFetch('/api/patients/' + encodeURIComponent(patient.id) + '/assign', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                var assignBody = await assignResp.json();
+                if (assignBody.success) {
+                    alertBox.textContent = 'Assigned successfully!';
+                    alertBox.style.background = 'var(--sage-light)';
+                    alertBox.style.color = 'var(--forest-dark)';
+                    alertBox.style.display = 'block';
+                    setTimeout(function() { window.location.reload(); }, 1000);
+                } else {
+                    alertBox.textContent = assignBody.message || 'Failed to assign.';
+                    alertBox.style.background = 'var(--coral-light)';
+                    alertBox.style.color = 'var(--error)';
+                    alertBox.style.display = 'block';
+                }
+            } catch (ex) {
+                alertBox.textContent = 'Network error.';
+                alertBox.style.background = 'var(--coral-light)';
+                alertBox.style.color = 'var(--error)';
+                alertBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Assign Patient';
+            }
+        };
+
+    } catch (err) {
+        console.error('[Patient] loadDoctors error:', err);
     }
 }

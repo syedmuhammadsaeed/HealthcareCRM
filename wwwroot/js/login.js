@@ -76,12 +76,14 @@
 
         setLoading(true);
         try {
+            var selectedRole = document.querySelector('input[name="role"]:checked').value;
             var response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email:    emailInput.value.trim(),
-                    password: passwordInput.value
+                    password: passwordInput.value,
+                    role:     selectedRole
                 })
             });
 
@@ -89,7 +91,14 @@
 
             if (result.success && result.data && result.data.token) {
                 localStorage.setItem('hcrm_token', result.data.token);
-                window.location.replace('/Patient');
+                document.cookie = 'hcrm_token=' + result.data.token + '; path=/; SameSite=Lax';
+                if (selectedRole === 'Doctor') {
+                    window.location.replace('/Doctor');
+                } else if (selectedRole === 'SuperAdmin') {
+                    window.location.replace('/SuperAdmin');
+                } else {
+                    window.location.replace('/Home/Index');
+                }
             } else {
                 showAlert(result.message || 'Login failed. Please check your credentials.', 'danger');
             }
