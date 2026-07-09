@@ -139,6 +139,19 @@
     });
 
     // ---- Role Toggle ----
+    var roleCards = document.querySelectorAll('.role-card');
+    roleCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            roleCards.forEach(function(c) { c.classList.remove('selected'); });
+            card.classList.add('selected');
+            var rInput = card.querySelector('input');
+            if (rInput) {
+                rInput.checked = true;
+                rInput.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+
     var roleAdmin = document.getElementById('role-admin');
     var roleDoctor = document.getElementById('role-doctor');
     var doctorFields = document.getElementById('doctor-fields');

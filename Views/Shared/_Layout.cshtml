@@ -16,13 +16,16 @@
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    @{
-        var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-    }
+@{
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    bool isAuthPage = ctrl.Equals("Account", StringComparison.OrdinalIgnoreCase);
+}
+<body class="@(isAuthPage ? "auth-page-body" : "")">
 
     <!-- ── Floating Navbar ────────────────────────────────────────── -->
-    <div class="hcrm-navbar-wrap">
+    @if (!isAuthPage)
+    {
+        <div class="hcrm-navbar-wrap">
         <nav class="navbar" aria-label="Primary">
             <a href="/" class="nav-mark" aria-hidden="true" title="HealthcareCRM Home">+</a>
             
@@ -31,7 +34,7 @@
                 <a href="/Patient" class="@(ctrl == "Patient" ? "active" : "")">Patients</a>
                 <a href="/Doctor" class="@(ctrl == "Doctor" ? "active" : "")">Doctors</a>
                 <a href="/Appointment" class="@(ctrl == "Appointment" ? "active" : "")">Appointments</a>
-                <a href="#">Reports</a>
+                <a href="/Billing" class="@(ctrl == "Billing" ? "active" : "")">Billings</a>
                 <a href="/SuperAdmin" id="nav-approvals" style="display:none;" class="@(ctrl == "SuperAdmin" ? "active" : "")">Approvals</a>
             </div>
 
@@ -53,6 +56,7 @@
             </a>
         </nav>
     </div>
+    }
 
     <!-- ── Page Content ──────────────────────────────────── -->
     <main>

@@ -22,10 +22,26 @@
 
     <form id="register-form" novalidate>
       <div class="field">
-        <label>Register As</label>
-        <div class="role-selector" style="display:flex; gap:15px; margin-bottom:10px;">
-            <label><input type="radio" name="role" value="Admin" checked id="role-admin"> Admin</label>
-            <label><input type="radio" name="role" value="Doctor" id="role-doctor"> Doctor</label>
+        <label id="role-label">Register as</label>
+        <div class="role-select" role="radiogroup" aria-labelledby="role-label">
+            <label class="role-card selected">
+              <input type="radio" name="role" value="Admin" checked id="role-admin" />
+              <span class="role-icon">🛡</span>
+              <span class="role-text">
+                <span class="role-name">Admin</span>
+                <span class="role-desc">Manage staff & records</span>
+              </span>
+              <span class="role-check" aria-hidden="true">✓</span>
+            </label>
+            <label class="role-card">
+              <input type="radio" name="role" value="Doctor" id="role-doctor" />
+              <span class="role-icon">🩺</span>
+              <span class="role-text">
+                <span class="role-name">Doctor</span>
+                <span class="role-desc">Manage your patients</span>
+              </span>
+              <span class="role-check" aria-hidden="true">✓</span>
+            </label>
         </div>
       </div>
 

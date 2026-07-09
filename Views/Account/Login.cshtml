@@ -18,11 +18,23 @@ ViewData["Title"] = "Sign In";
 
         <form id="login-form" novalidate>
             <div class="field">
-                <label>Login As</label>
-                <div class="role-selector" style="display:flex; gap:15px; margin-bottom:10px;">
-                    <label><input type="radio" name="role" value="Admin" checked> Admin</label>
-                    <label><input type="radio" name="role" value="SuperAdmin"> Super Admin</label>
-                    <label><input type="radio" name="role" value="Doctor"> Doctor</label>
+                <label id="role-label">Login as</label>
+                <div class="role-select" role="radiogroup" aria-labelledby="role-label">
+                    <label class="role-pill selected">
+                        <input type="radio" name="role" value="Admin" checked />
+                        <span class="role-ic">🛡</span>
+                        <span class="role-txt">Admin</span>
+                    </label>
+                    <label class="role-pill">
+                        <input type="radio" name="role" value="SuperAdmin" />
+                        <span class="role-ic">⭐</span>
+                        <span class="role-txt">Super Admin</span>
+                    </label>
+                    <label class="role-pill">
+                        <input type="radio" name="role" value="Doctor" />
+                        <span class="role-ic">🩺</span>
+                        <span class="role-txt">Doctor</span>
+                    </label>
                 </div>
             </div>
 

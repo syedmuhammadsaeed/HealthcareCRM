@@ -134,4 +134,18 @@
         });
     }
 
+    // Role selector: toggle the selected pill
+    var rolePills = document.querySelectorAll('.role-pill');
+    rolePills.forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        rolePills.forEach(function(p) { p.classList.remove('selected'); });
+        pill.classList.add('selected');
+        var rInput = pill.querySelector('input');
+        if (rInput) {
+            rInput.checked = true;
+            rInput.dispatchEvent(new Event('change'));
+        }
+      });
+    });
+
 })();
