@@ -4,81 +4,77 @@ ViewData["Title"] = "Sign In";
 
 @section Styles {
 <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 }
 
-<main class="login-split-layout">
-    <div class="login-left">
-        <!-- Logo -->
-        <a href="/" class="brand-logo" style="text-decoration: none; cursor: pointer; color: inherit;">
-            <div class="brand-icon"><i class="fa-solid fa-plus"></i></div>
-            <h2>MediCare</h2>
-        </a>
+<main class="auth-wrap">
+    <div class="auth-card">
 
-        <h1>Welcome back.</h1>
-        <p class="sub">Sign in to continue your care.</p>
-        
-        <button type="button" class="btn-alt">
-            <img src="/images/google.png" alt="Google Logo" style="width: 16px; height: 16px; object-fit: contain;" /> Continue with Google
-        </button>
+        <div class="auth-eyebrow"><span class="icon">✛</span> Secure clinician access</div>
 
-        <div class="divider">or</div>
+        <h1>Welcome back</h1>
+        <p class="sub">Sign in to your HealthcareCRM account to manage patients, appointments, and records.</p>
 
         <div id="alert-container" role="alert" aria-live="polite"></div>
 
         <form id="login-form" novalidate>
             <div class="field">
-                <label id="role-label">Login as</label>
-                <div class="role-select" role="radiogroup" aria-labelledby="role-label">
-                    <label class="role-pill selected" data-role="user">
-                        <input type="radio" name="role" value="User" checked />
-                        <span class="role-ic"><i class="fa-solid fa-user"></i></span>
-                        <span class="role-txt">User</span>
-                    </label>
-                    <label class="role-pill" data-role="doctor">
-                        <input type="radio" name="role" value="Doctor" />
-                        <span class="role-ic"><i class="fa-solid fa-stethoscope"></i></span>
-                        <span class="role-txt">Doctor</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="field">
-                <label for="email">Email</label>
+                <label for="email">Email address</label>
                 <div class="input-shell">
-                    <input type="email" id="email" name="email" placeholder="User Email" required autocomplete="email" aria-describedby="email-error" />
+                    <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    aria-invalid="false"
+                    aria-describedby="email-error"
+                    required
+                    />
                 </div>
-                <span class="error-msg" id="email-error"></span>
+                <span class="error-msg" id="email-error" role="alert">Please enter a valid email address.</span>
             </div>
 
             <div class="field">
                 <div class="field-row" style="margin-bottom:-1px;">
                     <label for="password">Password</label>
-                    <a class="forgot-link" href="#">Forgot?</a>
                 </div>
                 <div class="input-shell">
-                    <input type="password" id="password" name="password" placeholder="User Password" required autocomplete="current-password" aria-describedby="password-error" />
-                    <button type="button" class="toggle-pw"><i class="fa-regular fa-eye"></i></button>
+                    <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    aria-invalid="false"
+                    aria-describedby="password-error"
+                    required
+                    />
+                    <button type="button" class="toggle-pw" aria-label="Show password" aria-pressed="false">Show</button>
                 </div>
-                <span class="error-msg" id="password-error"></span>
+                <span class="error-msg" id="password-error" role="alert">Password is required.</span>
+            </div>
+
+            <div class="field-row">
+                <label class="remember">
+                    <input type="checkbox" name="remember" />
+                    Remember me
+                </label>
+                <a class="forgot-link" href="#">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn-signin" id="login-btn">
-                <span class="spinner" id="login-spinner"></span>
-                <span id="login-btn-text">Sign In</span>
+                <span class="spinner" id="login-spinner" aria-hidden="true"></span>
+                <span id="login-btn-text">Sign in</span>
+            </button>
+
+            <div class="divider">or</div>
+
+            <button type="button" class="btn-alt">
+                Sign in with hospital SSO
             </button>
         </form>
 
-        <p class="footer-note">No account? <a href="/Account/Register">Create one</a></p>
-    </div>
-
-    <div class="login-right">
-        <div class="login-image-container">
-            <img src="/images/Login.png" alt="Doctor" class="login-bg-image" />
-        </div>
+        <p class="footer-note">Don't have an account? <a href="/Account/Register">Create one</a></p>
     </div>
 </main>
 

@@ -37,16 +37,5 @@ namespace HealthcareCRM.Controllers
             ViewBag.PatientId = id;
             return View("Form");
         }
-
-        /// <summary>
-        /// Displays the patient details page.
-        /// </summary>
-        /// <param name="id">MongoDB ObjectId string of the patient to view.</param>
-        [HttpGet]
-        public IActionResult Details(string id)
-        {
-            ViewBag.PatientId = id;
-            return View();
-        }
     }
 }

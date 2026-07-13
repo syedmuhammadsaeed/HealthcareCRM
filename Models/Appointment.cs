@@ -7,7 +7,6 @@ namespace HealthcareCRM.Models
     /// Represents an appointment record — included for the ERD.
     /// Appointment CRUD is NOT implemented in Week 1.
     /// </summary>
-    [BsonIgnoreExtraElements]
     public class Appointment
     {
         /// <summary>Gets or sets the unique MongoDB ObjectId.</summary>

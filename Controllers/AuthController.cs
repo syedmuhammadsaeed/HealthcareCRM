@@ -73,30 +73,5 @@ namespace HealthcareCRM.Controllers
 
             return Ok(ApiResponse<object?>.CreateSuccess(new { token = result.Token }, result.Message));
         }
-
-        [HttpPost("change-password")]
-        [Microsoft.AspNetCore.Authorization.Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ApiResponse<object>.CreateError("Invalid data."));
-            }
-
-            // Get current user ID from token
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized(ApiResponse<object>.CreateError("User not found."));
-            }
-
-            var result = await _authService.ChangePasswordAsync(userId, model);
-            if (!result.IsSuccess)
-            {
-                return BadRequest(ApiResponse<object>.CreateError(result.Message));
-            }
-
-            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
-        }
     }
 }

@@ -15,14 +15,5 @@ namespace HealthcareCRM.Interfaces
 
         /// <summary>Inserts a new user document into the Users collection.</summary>
         Task AddAsync(User user);
-
-        /// <summary>Updates an existing user document.</summary>
-        Task UpdateAsync(User user);
-
-        /// <summary>Retrieves all users with a Pending status.</summary>
-        Task<IEnumerable<User>> GetAllPendingAsync();
-
-        /// <summary>Retrieves all approved doctors.</summary>
-        Task<IEnumerable<User>> GetApprovedDoctorsAsync();
     }
 }

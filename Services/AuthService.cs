@@ -48,12 +48,7 @@ namespace HealthcareCRM.Services
                 Name         = model.FullName,
                 Email        = model.Email,
                 PasswordHash = _passwordHasher.HashPassword(model.Password),
-                CreatedDate  = DateTime.UtcNow,
-                Role         = model.Role,
-                Status       = "Pending", // Require Super Admin approval
-                Specialization = model.Role == "Doctor" ? model.Specialization : null,
-                Phone          = model.Role == "Doctor" ? model.Phone : null,
-                Address        = model.Role == "Doctor" ? model.Address : null
+                CreatedDate  = DateTime.UtcNow
             };
 
             await _userRepository.AddAsync(user);
@@ -71,46 +66,13 @@ namespace HealthcareCRM.Services
                 return (false, string.Empty, "Invalid email or password.");
             }
 
-            // Role is determined by the DB record
-
             if (!_passwordHasher.VerifyPassword(user.PasswordHash, model.Password))
             {
                 return (false, string.Empty, "Invalid email or password.");
             }
 
-            if (user.Role != "SuperAdmin")
-            {
-                if (user.Status == "Pending")
-                {
-                    return (false, string.Empty, "Your account is pending approval by the Super Admin.");
-                }
-                if (user.Status == "Rejected")
-                {
-                    return (false, string.Empty, "Your account registration was rejected.");
-                }
-            }
-
             var token = generateJwtToken(user);
             return (true, token, "Login successful.");
-        }
-
-        public async Task<(bool IsSuccess, string Message)> ChangePasswordAsync(string userId, ChangePasswordViewModel model)
-        {
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                return (false, "User not found.");
-            }
-
-            if (!_passwordHasher.VerifyPassword(user.PasswordHash, model.CurrentPassword))
-            {
-                return (false, "Incorrect current password.");
-            }
-
-            user.PasswordHash = _passwordHasher.HashPassword(model.NewPassword);
-            await _userRepository.UpdateAsync(user);
-
-            return (true, "Password updated successfully.");
         }
 
         // ── Private Helpers ───────────────────────────────────────────────
@@ -125,7 +87,6 @@ namespace HealthcareCRM.Services
                 new Claim(JwtRegisteredClaimNames.Sub,   user.Id),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("name", user.Name),
-                new Claim(ClaimTypes.Role, user.Role),
                 new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString())
             };
 
@@ -137,25 +98,6 @@ namespace HealthcareCRM.Services
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public async Task SeedSuperAdminAsync()
-        {
-            var adminEmail = "superadmin@healthcarecrm.com";
-            var existingAdmin = await _userRepository.GetByEmailAsync(adminEmail);
-            if (existingAdmin == null)
-            {
-                var admin = new User
-                {
-                    Name = "Super Admin",
-                    Email = adminEmail,
-                    PasswordHash = _passwordHasher.HashPassword("SuperAdmin123!"),
-                    CreatedDate = DateTime.UtcNow,
-                    Role = "SuperAdmin",
-                    Status = "Approved"
-                };
-                await _userRepository.AddAsync(admin);
-            }
         }
     }
 }

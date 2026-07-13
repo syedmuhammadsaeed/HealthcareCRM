@@ -27,11 +27,10 @@ function setToken(token) {
 }
 
 /**
- * Removes the JWT token from localStorage and cookies (user logout).
+ * Removes the JWT token from localStorage (user logout).
  */
 function clearToken() {
     localStorage.removeItem(HCRM_TOKEN_KEY);
-    document.cookie = 'hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 }
 
 /**
@@ -113,15 +112,6 @@ function parseJwt(token) {
     }
 }
 
-/**
- * Extracts the user role from the parsed JWT payload.
- * Handles the fully qualified Microsoft claim URI.
- */
-function getRoleFromJwt(payload) {
-    if (!payload) return null;
-    return payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-}
-
 // ── Navbar Auth State ───────────────────────────────────────────────
 // Toggles authenticated vs guest navigation items on every page load.
 
@@ -154,13 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
                 avatarEl.textContent = initials;
-            }
-            
-            // Show Approvals link if user is SuperAdmin
-            var role = getRoleFromJwt(payload);
-            var navApprovals = document.getElementById('nav-approvals');
-            if (navApprovals && role === 'SuperAdmin') {
-                navApprovals.style.display = ''; // Use default styling (e.g. flex or inline-block)
             }
         }
     } else {
