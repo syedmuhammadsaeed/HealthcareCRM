@@ -28,5 +28,8 @@ namespace HealthcareCRM.Data
 
         /// <summary>Gets the Patients collection.</summary>
         public IMongoCollection<Patient> Patients => _database.GetCollection<Patient>("Patients");
+
+        /// <summary>Gets the Doctors collection.</summary>
+        public IMongoCollection<Doctor> Doctors => _database.GetCollection<Doctor>("Doctors");
     }
 }

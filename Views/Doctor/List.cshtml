@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Doctors";
+}
+
+<div class="page" style="max-width:1080px; margin:0 auto; padding:26px 28px;">
+    <div class="page-head" style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:24px; flex-wrap:wrap;">
+        <div>
+            <h1 style="font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:30px; margin:0 0 6px; color:var(--forest);">Doctors</h1>
+            <p style="margin:0; color:var(--muted); font-size:13.5px;">Manage active doctors and their specializations</p>
+        </div>
+    </div>
+
+    <div class="panel" style="background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="border-bottom:1px solid var(--line); text-align:left;">
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Doctor Name</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Specialization</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Email</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Phone</th>
+                </tr>
+            </thead>
+            <tbody id="doctors-table-body">
+                <tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--muted);">Loading doctors...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            requireAuth();
+            var payload = parseJwt(getToken());
+            var role = getRoleFromJwt(payload);
+
+            try {
+                var resp = await authFetch('/api/doctors');
+                var body = await resp.json();
+                var tableBody = document.getElementById('doctors-table-body');
+                
+                if (body.success && body.data) {
+                    var doctors = body.data;
+                    
+                    if (doctors.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--muted);">No approved doctors found.</td></tr>';
+                    } else {
+                        var html = '';
+                        doctors.forEach(function(d) {
+                            var initial = d.name ? d.name.charAt(0).toUpperCase() : '?';
+                            
+                            html += `
+                            <tr style="border-bottom:1px solid var(--line); transition:background .15s ease;">
+                                <td style="padding:14px 20px;">
+                                    <div style="display:flex; align-items:center; gap:12px;">
+                                        <div style="width:36px; height:36px; border-radius:50%; background:var(--sage-light); color:var(--forest); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">${initial}</div>
+                                        <div style="font-weight:600; font-size:14px; color:var(--ink);">${esc(d.name)}</div>
+                                    </div>
+                                </td>
+                                <td style="padding:14px 20px; font-size:13.5px;">${esc(d.specialization || 'General')}</td>
+                                <td style="padding:14px 20px; font-size:13.5px; color:var(--muted);">${esc(d.email || '')}</td>
+                                <td style="padding:14px 20px; font-size:13.5px; color:var(--muted);">${esc(d.phone || 'N/A')}</td>
+                            </tr>
+                            `;
+                        });
+                        tableBody.innerHTML = html;
+                    }
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--coral);">Failed to load doctors.</td></tr>';
+                }
+            } catch (e) {
+                document.getElementById('doctors-table-body').innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 40px; color: var(--coral);">Network error.</td></tr>';
+            }
+
+            // Function to escape HTML
+            function esc(text) {
+                var d = document.createElement('div');
+                d.appendChild(document.createTextNode(String(text)));
+                return d.innerHTML;
+            }
+        });
+    </script>
+}

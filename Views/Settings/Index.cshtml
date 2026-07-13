@@ -1,0 +1,273 @@
+@model HealthcareCRM.Models.User
+
+@{
+    ViewData["Title"] = "Settings";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+}
+
+<div class="page" style="padding: 30px 40px;">
+    <div class="page-head" style="margin-bottom: 30px;">
+        <h1 style="font-family: var(--font-serif); font-size: 32px; font-weight: 700; font-style: italic; color: var(--forest-dark); margin: 0 0 8px 0;">Settings</h1>
+        <p style="color: var(--muted); font-size: 14.5px; margin: 0;">Manage your account settings and preferences</p>
+    </div>
+
+    <div class="settings-layout">
+        <aside class="settings-nav">
+            <a href="#profile" class="settings-nav-item active" id="nav-profile">
+                <i class="fa-regular fa-user"></i> Profile Settings
+            </a>
+            <a href="#password" class="settings-nav-item" id="nav-password">
+                <i class="fa-solid fa-lock"></i> Change Password
+            </a>
+        </aside>
+
+        <div class="settings-content">
+            <div id="alert-container" style="margin-bottom: -10px;"></div>
+
+            <!-- Profile Settings Card -->
+            <div id="profile" class="settings-card">
+                <div class="card-header">
+                    <h2>Profile Settings</h2>
+                    <p>Update your personal information and profile.</p>
+                </div>
+                <div class="card-body">
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label>Profile Picture</label>
+                            <div class="avatar-upload">
+                                <div class="avatar-circle" id="avatar-preview">
+                                    @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                                    {
+                                        <img src="@Model.ProfilePictureUrl" alt="Profile" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <span class="initials">@Model.Name.Substring(0, 2).ToUpper()</span>
+                                    }
+                                    <button type="button" class="btn-icon" onclick="document.getElementById('avatar-input').click()"><i class="fa-solid fa-camera"></i></button>
+                                </div>
+                                <div class="avatar-info">
+                                    <p class="format-info">JPG, PNG or GIF. Max size of 2MB.</p>
+                                    <button type="button" class="btn-outline" onclick="document.getElementById('avatar-input').click()">Upload Photo</button>
+                                    <input type="file" id="avatar-input" accept="image/png, image/jpeg, image/gif" style="display:none;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Full Name</label>
+                                <input type="text" id="profile-name" class="form-control" value="@Model.Name" />
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Email Address</label>
+                                <input type="email" id="profile-email" class="form-control" value="@Model.Email" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Role</label>
+                            <input type="text" class="form-control" value="@Model.Role" readonly style="background: #F4F6F5; color: var(--muted); border: none;" />
+                        </div>
+
+                        <div class="form-actions" style="display: flex; justify-content: flex-end; margin-top: 30px;">
+                            <button type="button" class="btn-primary" id="save-profile-btn" style="background: var(--forest-dark); border-radius: 8px;">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change Password Card -->
+            <div id="password" class="settings-card" style="display: none;">
+                <div class="card-header">
+                    <h2>Change Password</h2>
+                    <p>Update your password to keep your account secure.</p>
+                </div>
+                <div class="card-body">
+                    <form id="password-form">
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Current Password</label>
+                                <div class="input-shell">
+                                    <input type="password" id="current-password" class="form-control" placeholder="Enter current password" />
+                                    <button type="button" class="toggle-pw" onclick="togglePw(this)"><i class="fa-regular fa-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>New Password</label>
+                                <div class="input-shell">
+                                    <input type="password" id="new-password" class="form-control" placeholder="Enter new password" />
+                                    <button type="button" class="toggle-pw" onclick="togglePw(this)"><i class="fa-regular fa-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Confirm New Password</label>
+                                <div class="input-shell">
+                                    <input type="password" id="confirm-password" class="form-control" placeholder="Confirm new password" />
+                                    <button type="button" class="toggle-pw" onclick="togglePw(this)"><i class="fa-regular fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions" style="display: flex; justify-content: flex-end; margin-top: 30px;">
+                            <button type="button" class="btn-primary" id="update-password-btn" style="background: var(--sage); border-radius: 8px;">Update Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePw(btn) {
+            const input = btn.previousElementSibling;
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            requireAuth();
+
+            const alertContainer = document.getElementById('alert-container');
+            function showAlert(msg, type) {
+                alertContainer.innerHTML = `<div class="alert alert-${type === 'error' ? 'danger' : 'success'}">${msg}</div>`;
+                setTimeout(() => alertContainer.innerHTML = '', 5000);
+            }
+
+            // Tabs interaction
+            const navItems = document.querySelectorAll('.settings-nav-item');
+            const cards = document.querySelectorAll('.settings-card');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    navItems.forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const targetId = this.getAttribute('href').substring(1);
+                    cards.forEach(card => card.style.display = 'none');
+                    document.getElementById(targetId).style.display = 'block';
+                });
+            });
+
+            // Avatar Upload
+            document.getElementById('avatar-input').addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const token = localStorage.getItem('hcrm_token');
+                    const res = await fetch('/api/settings/upload-avatar', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: formData
+                    });
+                    const data = await res.json();
+                    
+                    if (res.ok && data.success) {
+                        showAlert('Profile picture updated successfully.', 'success');
+                        const preview = document.getElementById('avatar-preview');
+                        preview.innerHTML = `<img src="${data.url}" alt="Profile" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />` 
+                                          + `<button type="button" class="btn-icon" onclick="document.getElementById('avatar-input').click()"><i class="fa-solid fa-camera"></i></button>`;
+                    } else {
+                        showAlert(data.message || 'Failed to upload image.', 'error');
+                    }
+                } catch (err) {
+                    showAlert('An error occurred while uploading.', 'error');
+                }
+            });
+
+            // Update Password
+            document.getElementById('update-password-btn').addEventListener('click', async function () {
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    showAlert('Please fill in all password fields.', 'error');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    showAlert('New password and confirmation do not match.', 'error');
+                    return;
+                }
+
+                const btn = this;
+                btn.disabled = true;
+                btn.textContent = 'Updating...';
+
+                try {
+                    const res = await authFetch('/api/auth/change-password', {
+                        method: 'POST',
+                        body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+                    });
+                    const data = await res.json();
+                    
+                    if (res.ok && data.success) {
+                        showAlert('Password updated successfully.', 'success');
+                        document.getElementById('password-form').reset();
+                    } else {
+                        showAlert(data.message || 'Failed to update password.', 'error');
+                    }
+                } catch (e) {
+                    showAlert('An error occurred. Please try again.', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Update Password';
+                }
+            });
+
+            // Update Profile
+            document.getElementById('save-profile-btn').addEventListener('click', async function () {
+                const name = document.getElementById('profile-name').value;
+                const email = document.getElementById('profile-email').value;
+
+                if (!name || !email) {
+                    showAlert('Name and Email are required.', 'error');
+                    return;
+                }
+
+                const btn = this;
+                btn.disabled = true;
+                btn.textContent = 'Saving...';
+
+                try {
+                    const res = await authFetch('/api/settings/profile', {
+                        method: 'POST',
+                        body: JSON.stringify({ name, email })
+                    });
+                    const data = await res.json();
+                    
+                    if (res.ok && data.success) {
+                        showAlert('Profile updated successfully.', 'success');
+                    } else {
+                        showAlert(data.message || 'Failed to update profile.', 'error');
+                    }
+                } catch (e) {
+                    showAlert('An error occurred. Please try again.', 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Save Changes';
+                }
+            });
+        });
+    </script>
+}

@@ -16,46 +16,66 @@
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    @{
-        var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+@{
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    bool isAuthPage = ctrl.Equals("Account", StringComparison.OrdinalIgnoreCase);
+}
+<body class="@(isAuthPage ? "auth-page-body" : "")">
+
+    <!-- ── App Layout ────────────────────────────────────────── -->
+    @if (!isAuthPage)
+    {
+        <div class="app-container">
+            <aside class="sidebar">
+                <a href="/" class="brand" style="text-decoration: none; color: inherit; cursor: pointer;">
+                    <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                    <div class="brand-text">
+                        <span class="brand-name">MediCare</span>
+                        <span class="brand-tag">Better care. Every day.</span>
+                    </div>
+                </a>
+
+                <nav class="nav-menu">
+                    <a href="/Home" class="@(ctrl == "Home" ? "active" : "")"><i class="fa-solid fa-house"></i> Overview</a>
+                    <a href="/Patient" class="@(ctrl == "Patient" ? "active" : "")"><i class="fa-regular fa-user"></i> Patients</a>
+                    <a href="/Doctor" class="@(ctrl == "Doctor" ? "active" : "")"><i class="fa-solid fa-user-doctor"></i> Doctors</a>
+                    <a href="/Appointment" class="@(ctrl == "Appointment" ? "active" : "")"><i class="fa-regular fa-calendar"></i> Appointments</a>
+                    <a href="/Billing" class="@(ctrl == "Billing" ? "active" : "")"><i class="fa-solid fa-file-invoice"></i> Billings</a>
+                    <a href="/Report" class="@(ctrl == "Report" ? "active" : "")"><i class="fa-regular fa-file-lines"></i> Reports</a>
+                    <a href="/Settings" class="@(ctrl == "Settings" ? "active" : "")"><i class="fa-solid fa-gear"></i> Settings</a>
+                </nav>
+
+                <div class="sidebar-bottom">
+                    <div class="user-profile-card" id="nav-authenticated" style="display:none;">
+                        <div class="avatar" id="nav-user-avatar">..</div>
+                        <div class="user-info">
+                            <span class="name" id="nav-user-name">Loading...</span>
+                            <span class="role">Administrator</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <a href="#" class="logout-link" id="nav-logout-btn" onclick="logout()" style="display:none;" title="Sign out">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </a>
+
+                    <!-- Guest State -->
+                    <a href="/Account/Login" class="login-link" id="nav-guest" style="display:none;">
+                        Sign In
+                    </a>
+                </div>
+            </aside>
+            <main class="main-content">
+                @RenderBody()
+            </main>
+        </div>
     }
-
-    <!-- ── Floating Navbar ────────────────────────────────────────── -->
-    <div class="hcrm-navbar-wrap">
-        <nav class="navbar" aria-label="Primary">
-            <a href="/" class="nav-mark" aria-hidden="true" title="HealthcareCRM Home">+</a>
-            
-            <div class="nav-links">
-                <a href="/Home"    class="@(ctrl == "Home" ? "active" : "")">Overview</a>
-                <a href="/Patient" class="@(ctrl == "Patient" ? "active" : "")">Patients</a>
-                <a href="#">Appointments</a>
-                <a href="#">Reports</a>
-            </div>
-
-            <!-- Authenticated State -->
-            <button class="nav-user" id="nav-authenticated" title="Profile" style="display:none;">
-                <span class="avatar" id="nav-user-avatar">..</span>
-                <span class="label" id="nav-user-name">Loading...</span>
-            </button>
-
-            <!-- Fixed Logout Button -->
-            <button class="fixed-logout-btn" id="nav-logout-btn" onclick="logout()" style="display:none;" title="Sign out">
-                <i class="fa-solid fa-power-off"></i>
-                <span>Logout</span>
-            </button>
-
-            <!-- Guest State -->
-            <a href="/Account/Login" class="nav-guest-link" id="nav-guest" style="display:none;">
-                Sign In
-            </a>
-        </nav>
-    </div>
-
-    <!-- ── Page Content ──────────────────────────────────── -->
-    <main>
-        @RenderBody()
-    </main>
+    else
+    {
+        <main>
+            @RenderBody()
+        </main>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

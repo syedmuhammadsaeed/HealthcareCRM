@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "Appointments";
+}
+
+<div class="page" style="max-width:1080px; margin:0 auto; padding:26px 28px;">
+    <div class="page-head" style="display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:24px; flex-wrap:wrap;">
+        <div>
+            <h1 style="font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:30px; margin:0 0 6px; color:var(--forest);">Appointments</h1>
+            <p style="margin:0; color:var(--muted); font-size:13.5px;">View all patient appointments</p>
+        </div>
+        <a href="/Appointment/Assign" class="btn-primary" style="padding:10px 16px; border-radius:10px; font-weight:700; font-size:13.5px; background:var(--forest); color:#fff; text-decoration:none;">Assign Doctor</a>
+    </div>
+
+    <div class="panel" style="background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="border-bottom:1px solid var(--line); text-align:left;">
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Patient Name</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Gender</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Date of Birth</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Assigned Doctor</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Appointment</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Fee</th>
+                    <th style="padding:14px 20px; font-size:12.5px; font-weight:700; color:var(--muted);">Status</th>
+                </tr>
+            </thead>
+            <tbody id="appointments-table-body">
+                <tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--muted);">Loading appointments...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            requireAuth();
+
+            try {
+                // Fetch appointments and doctors to resolve doctor names
+                var [apptResp, docResp] = await Promise.all([
+                    authFetch('/api/patients/appointments'),
+                    authFetch('/api/doctors')
+                ]);
+                
+                var apptBody = await apptResp.json();
+                var docBody = await docResp.json();
+                var tableBody = document.getElementById('appointments-table-body');
+                
+                if (apptBody.success && apptBody.data && docBody.success && docBody.data) {
+                    var patients = apptBody.data;
+                    var doctors = docBody.data;
+                    
+                    if (patients.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--muted);">No appointments found.</td></tr>';
+                    } else {
+                        var html = '';
+                        patients.forEach(function(p) {
+                            var doc = doctors.find(d => d.id === p.assignedDoctorId);
+                            var docName = doc ? esc(doc.name) : 'Unknown Doctor';
+                            
+                            var dobStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString('en-GB') : 'Unknown';
+                            var apptDateStr = p.appointmentDate ? new Date(p.appointmentDate).toLocaleDateString('en-GB') : '';
+                            var apptStr = apptDateStr;
+                            if (p.appointmentTime) {
+                                apptStr += ' at ' + p.appointmentTime;
+                            }
+                            if (!apptStr) apptStr = 'Not set';
+                            
+                            var statusStr = p.appointmentStatus || 'Scheduled';
+                            var statusColor = statusStr === 'Completed' ? 'var(--forest)' : 'var(--amber)';
+                            var initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
+                            
+                            var feeStr = p.appointmentFee != null ? p.appointmentFee + ' ' + (p.appointmentCurrency || 'Rs') : 'N/A';
+                            
+                            html += `
+                            <tr style="border-bottom:1px solid var(--line); transition:background .15s ease;">
+                                <td style="padding:14px 20px;">
+                                    <div style="display:flex; align-items:center; gap:12px;">
+                                        <div style="width:36px; height:36px; border-radius:50%; background:var(--coral-light); color:var(--coral); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px;">${initial}</div>
+                                        <div style="font-weight:600; font-size:14px; color:var(--ink);">${esc(p.name)}</div>
+                                    </div>
+                                </td>
+                                <td style="padding:14px 20px; font-size:13.5px;">${esc(p.gender || 'Unknown')}</td>
+                                <td style="padding:14px 20px; font-size:13.5px; color:var(--muted);">${dobStr}</td>
+                                <td style="padding:14px 20px; font-size:13.5px;">Dr. ${docName}</td>
+                                <td style="padding:14px 20px; font-size:13.5px; font-weight:600; color:var(--ink);">${apptStr}</td>
+                                <td style="padding:14px 20px; font-size:13.5px;">${feeStr}</td>
+                                <td style="padding:14px 20px; font-size:13.5px; font-weight:600; color:${statusColor};">${statusStr}</td>
+                            </tr>
+                            `;
+                        });
+                        tableBody.innerHTML = html;
+                    }
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--coral);">Failed to load appointments.</td></tr>';
+                }
+            } catch (e) {
+                document.getElementById('appointments-table-body').innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--coral);">Network error.</td></tr>';
+            }
+
+            function esc(text) {
+                if (!text) return '';
+                var d = document.createElement('div');
+                d.appendChild(document.createTextNode(String(text)));
+                return d.innerHTML;
+            }
+        });
+    </script>
+}

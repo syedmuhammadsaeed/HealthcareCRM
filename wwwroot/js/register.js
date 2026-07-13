@@ -138,6 +138,8 @@
         }
     });
 
+
+
     // ---- Final Form Submission Validation ----
     function validateFormOnSubmit() {
         var valid = true;
@@ -188,7 +190,8 @@
                     fullName:        fullNameInput.value.trim(),
                     email:           emailInput.value.trim(),
                     password:        passwordInput.value,
-                    confirmPassword: confirmInput.value
+                    confirmPassword: confirmInput.value,
+                    role:            "User"
                 })
             });
 
