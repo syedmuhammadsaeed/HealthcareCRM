@@ -4,137 +4,122 @@
 
 @section Styles {
     <link href="~/css/register.css" rel="stylesheet" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 }
 
-<main class="auth-wrap">
-  <div class="auth-card">
-
-    <div class="auth-eyebrow"><span>✛</span> Clinician registration</div>
-
-    <h1>Create your account</h1>
-    <p class="sub">Join HealthcareCRM to manage patients, schedules, and records in one place.</p>
-
-    <div class="steps" aria-hidden="true">
-      <div class="step done"></div><div class="step"></div><div class="step"></div>
+<main class="register-split-layout">
+    <!-- Left Panel: Image -->
+    <div class="register-left">
+        <div class="register-image-container">
+            <img src="/images/Signup.png" alt="Patients and Clinicians" class="register-bg-image" />
+        </div>
     </div>
 
-    <div id="alert-container" role="alert" aria-live="polite"></div>
+    <!-- Right Panel: Form -->
+    <div class="register-right">
+        <div class="register-form-container">
+            <!-- Logo -->
+            <a href="/" class="brand-logo" style="text-decoration: none; cursor: pointer;">
+                <div class="brand-icon"><i class="fa-solid fa-plus"></i></div>
+                <div class="brand-text">
+                    <h2>MediCare</h2>
+                    <span class="brand-sub">CAREER ASSISTANT</span>
+                </div>
+            </a>
 
-    <form id="register-form" novalidate>
-      <div class="field">
-        <label id="role-label">Register as</label>
-        <div class="role-select" role="radiogroup" aria-labelledby="role-label">
-            <label class="role-card selected">
-              <input type="radio" name="role" value="Admin" checked id="role-admin" />
-              <span class="role-icon">🛡</span>
-              <span class="role-text">
-                <span class="role-name">Admin</span>
-                <span class="role-desc">Manage staff & records</span>
-              </span>
-              <span class="role-check" aria-hidden="true">✓</span>
-            </label>
-            <label class="role-card">
-              <input type="radio" name="role" value="Doctor" id="role-doctor" />
-              <span class="role-icon">🩺</span>
-              <span class="role-text">
-                <span class="role-name">Doctor</span>
-                <span class="role-desc">Manage your patients</span>
-              </span>
-              <span class="role-check" aria-hidden="true">✓</span>
-            </label>
+            <h1>Create your account.</h1>
+            <p class="sub">Free for academic use. No credit card.</p>
+
+            <div id="alert-container" role="alert" aria-live="polite"></div>
+
+            <form id="register-form" novalidate>
+                <div class="field" style="display:none;">
+                    <input type="hidden" name="role" id="role-user" value="User" />
+                    <!-- Hidden full name to preserve JS compatibility if needed -->
+                    <input type="hidden" id="fullName" name="fullName" value="Placeholder" />
+                </div>
+
+                <div class="name-row">
+                    <div class="field">
+                        <label for="firstName">First name</label>
+                        <div class="input-shell">
+                            <input type="text" id="firstName" name="firstName" autocomplete="given-name" required />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="lastName">Last name</label>
+                        <div class="input-shell">
+                            <input type="text" id="lastName" name="lastName" autocomplete="family-name" required />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="email"> email</label>
+                    <div class="input-shell">
+                        <input type="email" id="email" name="email" placeholder="admin@pt.com" autocomplete="email" required />
+                    </div>
+                    <span class="error-msg" id="email-error" role="alert">Please enter a valid email address.</span>
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="input-shell">
+                        <input type="password" id="password" name="password" autocomplete="new-password" aria-describedby="pw-requirements" required />
+                        <!-- Keeping the toggle but hidden if not needed, or just let CSS handle it -->
+                        <button type="button" class="toggle-pw" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+
+                    <!-- Password strength meter from mockup -->
+                    <div class="pw-strength-label">
+                        <span>Password strength</span>
+                        <span id="pw-strength-text">Too weak</span>
+                    </div>
+                    <div class="pw-meter" aria-hidden="true">
+                        <div class="bar" data-bar="1"></div>
+                        <div class="bar" data-bar="2"></div>
+                        <div class="bar" data-bar="3"></div>
+                        <div class="bar" data-bar="4"></div>
+                    </div>
+                    
+                    <ul class="req-list" id="pw-requirements">
+                        <li data-req="len"><span class="dot"></span> Min 8 characters</li>
+                        <li data-req="upper"><span class="dot"></span> Uppercase letter</li>
+                        <li data-req="lower"><span class="dot"></span> Lowercase letter</li>
+                        <li data-req="num"><span class="dot"></span> Number</li>
+                        <li data-req="special"><span class="dot"></span> Special character</li>
+                    </ul>
+                </div>
+
+                <!-- Confirm password hidden by default as it's not in the new mockup -->
+                <div class="field" style="display:none;">
+                    <label for="confirm">Confirm password</label>
+                    <div class="input-shell">
+                        <input type="password" id="confirm" name="confirm" value="Placeholder1!" />
+                    </div>
+                </div>
+
+                <label class="terms-label">
+                    <div class="custom-checkbox">
+                        <input type="checkbox" name="terms" id="terms" required checked />
+                        <span class="checkmark"><i class="fa-solid fa-check"></i></span>
+                    </div>
+                    <span>I agree to the <strong>Terms</strong> and <strong>Privacy Policy</strong>.</span>
+                </label>
+                <span class="error-msg" id="terms-error" role="alert">You must agree to the terms.</span>
+
+                <button type="submit" class="btn-signin" id="register-btn">
+                    <span class="spinner" id="register-spinner"></span>
+                    <span id="register-btn-text">Create Account</span>
+                </button>
+            </form>
+
+            <p class="footer-note">Already have an account? <a href="/Account/Login">Sign in</a></p>
         </div>
-      </div>
-
-      <div class="field">
-        <label for="fullName">Full name</label>
-        <div class="input-shell">
-          <input type="text" id="fullName" name="fullName" placeholder="Dr. John Doe" autocomplete="name" required />
-          <span class="check-ok" aria-hidden="true">✓</span>
-        </div>
-        <span class="helper">Used on patient records and appointment confirmations.</span>
-        <span class="error-msg" id="fullName-error" role="alert">Full name is required (minimum 2 characters).</span>
-      </div>
-
-      <div class="field">
-        <label for="email">Email address</label>
-        <div class="input-shell">
-          <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
-          <span class="check-ok" aria-hidden="true">✓</span>
-        </div>
-        <span class="error-msg" id="email-error" role="alert">Please enter a valid email address.</span>
-      </div>
-
-      <div class="field">
-        <label for="password">Password</label>
-        <div class="input-shell">
-          <input type="password" id="password" name="password" placeholder="Create a strong password" autocomplete="new-password" aria-describedby="pw-requirements" required />
-          <button type="button" class="toggle-pw" aria-label="Show password" aria-pressed="false">Show</button>
-        </div>
-
-        <div class="pw-strength-label">
-          <span>Password strength</span>
-          <span id="pw-strength-text">Too weak</span>
-        </div>
-        <div class="pw-meter" aria-hidden="true">
-          <div class="bar" data-bar="1"></div>
-          <div class="bar" data-bar="2"></div>
-          <div class="bar" data-bar="3"></div>
-          <div class="bar" data-bar="4"></div>
-        </div>
-
-        <ul class="req-list" id="pw-requirements">
-          <li data-req="len"><span class="dot"></span> Min 8 characters</li>
-          <li data-req="upper"><span class="dot"></span> Uppercase letter</li>
-          <li data-req="lower"><span class="dot"></span> Lowercase letter</li>
-          <li data-req="num"><span class="dot"></span> Number</li>
-          <li data-req="special"><span class="dot"></span> Special character</li>
-        </ul>
-      </div>
-
-      <div class="field">
-        <label for="confirm">Confirm password</label>
-        <div class="input-shell">
-          <input type="password" id="confirm" name="confirm" placeholder="Repeat your password" autocomplete="new-password" required />
-          <span class="check-ok" aria-hidden="true">✓</span>
-        </div>
-        <span class="error-msg" id="confirm-error" role="alert">Passwords do not match.</span>
-      </div>
-
-      <div id="doctor-fields" style="display:none; margin-bottom: 20px;">
-        <div class="field">
-          <label for="specialization">Specialization</label>
-          <div class="input-shell">
-            <input type="text" id="specialization" name="specialization" placeholder="e.g. Cardiologist" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="phone">Phone Number</label>
-          <div class="input-shell">
-            <input type="tel" id="phone" name="phone" placeholder="Your phone number" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="address">Address</label>
-          <div class="input-shell">
-            <input type="text" id="address" name="address" placeholder="Clinic/Hospital address" />
-          </div>
-        </div>
-      </div>
-
-      <label class="terms">
-        <input type="checkbox" name="terms" id="terms" required />
-        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>, including HIPAA-compliant handling of patient data.</span>
-      </label>
-      <span class="error-msg" id="terms-error" role="alert">You must agree to the terms to continue.</span>
-
-      <button type="submit" class="btn-primary" id="register-btn">
-        <span class="spinner" id="register-spinner" aria-hidden="true"></span>
-        <span id="register-btn-text">Create account</span>
-      </button>
-    </form>
-
-    <p class="footer-note">Already have an account? <a href="/Account/Login">Sign in</a></p>
-  </div>
+    </div>
 </main>
 
 @section Scripts {

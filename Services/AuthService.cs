@@ -71,10 +71,7 @@ namespace HealthcareCRM.Services
                 return (false, string.Empty, "Invalid email or password.");
             }
 
-            if (user.Role != model.Role)
-            {
-                return (false, string.Empty, "Invalid role for this user.");
-            }
+            // Role is determined by the DB record
 
             if (!_passwordHasher.VerifyPassword(user.PasswordHash, model.Password))
             {

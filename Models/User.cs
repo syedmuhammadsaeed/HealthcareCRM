@@ -64,5 +64,20 @@ namespace HealthcareCRM.Models
         [BsonElement("currency")]
         [BsonIgnoreIfNull]
         public string? Currency { get; set; }
+
+        /// <summary>Gets or sets the user's gender.</summary>
+        [BsonElement("gender")]
+        [BsonIgnoreIfNull]
+        public string? Gender { get; set; }
+
+        /// <summary>Gets or sets the user's age.</summary>
+        [BsonElement("age")]
+        [BsonIgnoreIfNull]
+        public int? Age { get; set; }
+
+        /// <summary>Gets or sets the user's profile picture URL.</summary>
+        [BsonElement("profilePictureUrl")]
+        [BsonIgnoreIfNull]
+        public string? ProfilePictureUrl { get; set; }
     }
 }

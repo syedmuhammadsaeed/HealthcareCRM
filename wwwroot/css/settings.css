@@ -1,0 +1,213 @@
+.settings-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+@media (max-width: 900px) {
+    .settings-layout {
+        flex-direction: column;
+    }
+}
+
+.settings-nav {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14.5px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.settings-nav-item i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+.settings-nav-item:hover {
+    background: rgba(0,0,0,0.03);
+    color: var(--ink);
+}
+.settings-nav-item.active {
+    background: #EAECE6; /* Light gray-green */
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.settings-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.settings-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.settings-card .card-header {
+    padding: 24px 30px;
+    border-bottom: 1px solid var(--line);
+}
+.settings-card .card-header h2 {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 6px 0;
+}
+.settings-card .card-header p {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: 0;
+}
+.settings-card .card-body {
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+}
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--ink);
+    transition: border-color 0.2s;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--sage);
+}
+.form-row {
+    display: flex;
+    gap: 24px;
+}
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+.avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 10px;
+}
+.avatar-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--sage);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-family: var(--font-serif);
+    font-weight: 600;
+}
+.avatar-circle .btn-icon {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #F4F6F5;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--ink);
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.avatar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+.avatar-info .format-info {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0;
+}
+.btn-outline {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-outline:hover {
+    background: var(--cream);
+}
+
+.input-shell {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.input-shell .form-control {
+    padding-right: 40px;
+}
+.toggle-pw {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.toggle-pw:hover {
+    color: var(--ink);
+}
+
+.btn-primary {
+    border: none;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn-primary:hover {
+    opacity: 0.9;
+}

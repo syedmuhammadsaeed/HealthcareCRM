@@ -213,6 +213,36 @@
     text-align: center;
     color: var(--muted);
   }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--forest);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background: var(--forest-dark);
+  }
 </style>
 </head>
 <body>
@@ -231,8 +261,71 @@
 
   <main class="main-content">
     <div class="header-section">
-      <h1 class="page-title">Pending Approvals</h1>
-      <p class="page-subtitle">Review and manage new Doctor and Admin registrations.</p>
+      <h1 class="page-title">Pending Approvals & Staff Management</h1>
+      <p class="page-subtitle">Review and manage new Doctor and Admin registrations, or add them directly.</p>
+    </div>
+
+    <div class="data-card" style="margin-bottom: 40px;">
+      <div class="data-card-header">
+        <h2 class="data-card-title">Add Admin / Doctor</h2>
+      </div>
+      <div style="padding: 24px;">
+        @if (TempData["Success"] != null)
+        {
+            <div style="padding: 12px; background: var(--sage-light); color: var(--forest); border-radius: 6px; margin-bottom: 20px;">
+                @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div style="padding: 12px; background: var(--coral-light); color: var(--error); border-radius: 6px; margin-bottom: 20px;">
+                @TempData["Error"]
+            </div>
+        }
+
+        <form asp-action="CreateStaff" asp-controller="SuperAdmin" method="post">
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role" id="staff-role" class="form-control" onchange="toggleFields()">
+                    <option value="Admin">Admin</option>
+                    <option value="Doctor">Doctor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <select name="gender" class="form-control" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div id="doctor-extra" style="display:none;">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Specialization</label>
+                    <input type="text" name="specialization" class="form-control" />
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+      </div>
     </div>
 
     <div class="data-card">
@@ -306,6 +399,11 @@
     function logout() {
       clearToken();
       window.location.replace('/Account/Login');
+    }
+    
+    function toggleFields() {
+        var role = document.getElementById('staff-role').value;
+        document.getElementById('doctor-extra').style.display = (role === 'Doctor') ? 'block' : 'none';
     }
   </script>
 </body>

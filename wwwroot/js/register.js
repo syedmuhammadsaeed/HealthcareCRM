@@ -138,36 +138,7 @@
         }
     });
 
-    // ---- Role Toggle ----
-    var roleCards = document.querySelectorAll('.role-card');
-    roleCards.forEach(function(card) {
-        card.addEventListener('click', function() {
-            roleCards.forEach(function(c) { c.classList.remove('selected'); });
-            card.classList.add('selected');
-            var rInput = card.querySelector('input');
-            if (rInput) {
-                rInput.checked = true;
-                rInput.dispatchEvent(new Event('change'));
-            }
-        });
-    });
 
-    var roleAdmin = document.getElementById('role-admin');
-    var roleDoctor = document.getElementById('role-doctor');
-    var doctorFields = document.getElementById('doctor-fields');
-    var specializationInput = document.getElementById('specialization');
-    var phoneInput = document.getElementById('phone');
-    var addressInput = document.getElementById('address');
-
-    function toggleDoctorFields() {
-        if (roleDoctor.checked) {
-            doctorFields.style.display = 'block';
-        } else {
-            doctorFields.style.display = 'none';
-        }
-    }
-    roleAdmin.addEventListener('change', toggleDoctorFields);
-    roleDoctor.addEventListener('change', toggleDoctorFields);
 
     // ---- Final Form Submission Validation ----
     function validateFormOnSubmit() {
@@ -212,7 +183,6 @@
 
         setLoading(true);
         try {
-            var selectedRole = document.querySelector('input[name="role"]:checked').value;
             var response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -221,10 +191,7 @@
                     email:           emailInput.value.trim(),
                     password:        passwordInput.value,
                     confirmPassword: confirmInput.value,
-                    role:            selectedRole,
-                    specialization:  selectedRole === 'Doctor' ? specializationInput.value.trim() : null,
-                    phone:           selectedRole === 'Doctor' ? phoneInput.value.trim() : null,
-                    address:         selectedRole === 'Doctor' ? addressInput.value.trim() : null
+                    role:            "User"
                 })
             });
 

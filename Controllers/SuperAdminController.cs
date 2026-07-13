@@ -9,10 +9,12 @@ namespace HealthcareCRM.Controllers
     public class SuperAdminController : Controller
     {
         private readonly IUserRepository _userRepository;
+        private readonly Helpers.PasswordHasher _passwordHasher;
 
-        public SuperAdminController(IUserRepository userRepository)
+        public SuperAdminController(IUserRepository userRepository, Helpers.PasswordHasher passwordHasher)
         {
             _userRepository = userRepository;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<IActionResult> Index()
@@ -47,6 +49,34 @@ namespace HealthcareCRM.Controllers
                 user.Status = "Rejected";
                 await _userRepository.UpdateAsync(user);
             }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStaff(string role, string name, string email, string password, string gender, int? age, string specialization)
+        {
+            var existingUser = await _userRepository.GetByEmailAsync(email);
+            if (existingUser != null)
+            {
+                TempData["Error"] = "Email is already registered.";
+                return RedirectToAction("Index");
+            }
+
+            var user = new User
+            {
+                Name = name,
+                Email = email,
+                PasswordHash = _passwordHasher.HashPassword(password),
+                CreatedDate = DateTime.UtcNow,
+                Role = role,
+                Status = "Approved",
+                Gender = gender,
+                Age = age,
+                Specialization = role == "Doctor" ? specialization : null
+            };
+
+            await _userRepository.AddAsync(user);
+            TempData["Success"] = $"{role} account created successfully.";
             return RedirectToAction("Index");
         }
     }
