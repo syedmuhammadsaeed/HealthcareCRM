@@ -2,57 +2,81 @@
     ViewData["Title"] = "Patients";
 }
 
-<div class="page">
-    <div class="page-head">
-      <div>
+<!-- Hero Section -->
+<div class="pm-hero">
+    <div class="pm-hero-text">
         <h1>Patient roster</h1>
-        <p id="page-info-text">Loading...</p>
-      </div>
-      <a href="/Patient/Create" class="btn-add">+ Add patient</a>
+        <p id="hero-subtitle">Loading patient data...</p>
     </div>
+    <a href="/Patient/Create" class="btn-add">
+        <span aria-hidden="true">+</span> Add patient
+    </a>
+</div>
 
-    <div class="panel">
-      <div class="panel-toolbar">
-        <div class="search-box">🔍 <input id="search-input" class="pm-search-input" placeholder="Search by name, phone, or city…" autocomplete="off" /></div>
-        <div class="chip-filter" id="filter-chips">
-          <button class="pm-chip on" data-filter="all">All</button>
-          <button class="pm-chip" data-filter="active">Active</button>
-          <button class="pm-chip" data-filter="followup">Follow-up</button>
-          <button class="pm-chip" data-filter="critical">Critical</button>
+<!-- Search & Filter Row -->
+<div class="pm-search-row">
+    <div class="pm-search-wrapper">
+        <input type="text"
+               id="search-input"
+               class="pm-search-input"
+               placeholder="Search by name, phone, or city&hellip;"
+               autocomplete="off" />
+    </div>
+    <div class="pm-chip-filter" id="filter-chips">
+        <span class="pm-chip on" data-filter="all">All</span>
+        <span class="pm-chip" data-filter="active">Active</span>
+        <span class="pm-chip" data-filter="followup">Follow-up</span>
+        <span class="pm-chip" data-filter="critical">Critical</span>
+    </div>
+</div>
+
+<!-- Grid Layout -->
+<div class="pm-grid" id="patient-grid">
+    <!-- Skeletons (rendered initially) -->
+    <div class="pm-skeleton-card">
+        <div class="pm-card-top">
+            <div class="pm-skeleton-box sk-avatar"></div>
+            <div class="pm-skeleton-box" style="width:60px; height:22px; border-radius:999px;"></div>
         </div>
-      </div>
-
-      <table class="pt">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone Number</th>
-            <th>Date of Birth</th>
-            <th>Gender</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="patient-table-body">
-          <tr><td colspan="5" style="text-align:center; padding: 20px;">Loading patients...</td></tr>
-        </tbody>
-      </table>
-
-      <div class="panel-footer">
-        <div class="footer-info" id="footer-info">Showing patients</div>
-
-        <nav class="pagination" aria-label="Pagination" id="pagination-controls">
-          <!-- Pagination rendered by JS -->
-        </nav>
-
-        <div class="per-page">
-          <span>Rows per page</span>
-          <select id="page-size-select">
-            <option value="10">10</option>
-            <option value="20" selected>20</option>
-            <option value="50">50</option>
-          </select>
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-meta"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-card-actions" style="border:none">
+            <div class="pm-skeleton-box sk-btn"></div>
+            <div class="pm-skeleton-box sk-btn"></div>
         </div>
-      </div>
+    </div>
+    <div class="pm-skeleton-card">
+        <div class="pm-card-top">
+            <div class="pm-skeleton-box sk-avatar"></div>
+            <div class="pm-skeleton-box" style="width:60px; height:22px; border-radius:999px;"></div>
+        </div>
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-meta"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-card-actions" style="border:none">
+            <div class="pm-skeleton-box sk-btn"></div>
+            <div class="pm-skeleton-box sk-btn"></div>
+        </div>
+    </div>
+    <div class="pm-skeleton-card">
+        <div class="pm-card-top">
+            <div class="pm-skeleton-box sk-avatar"></div>
+            <div class="pm-skeleton-box" style="width:60px; height:22px; border-radius:999px;"></div>
+        </div>
+        <div class="pm-skeleton-box sk-title"></div>
+        <div class="pm-skeleton-box sk-meta"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-skeleton-box sk-row"></div>
+        <div class="pm-card-actions" style="border:none">
+            <div class="pm-skeleton-box sk-btn"></div>
+            <div class="pm-skeleton-box sk-btn"></div>
+        </div>
     </div>
 </div>
 

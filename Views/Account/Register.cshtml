@@ -22,14 +22,6 @@
 
     <form id="register-form" novalidate>
       <div class="field">
-        <label>Register As</label>
-        <div class="role-selector" style="display:flex; gap:15px; margin-bottom:10px;">
-            <label><input type="radio" name="role" value="Admin" checked id="role-admin"> Admin</label>
-            <label><input type="radio" name="role" value="Doctor" id="role-doctor"> Doctor</label>
-        </div>
-      </div>
-
-      <div class="field">
         <label for="fullName">Full name</label>
         <div class="input-shell">
           <input type="text" id="fullName" name="fullName" placeholder="Dr. John Doe" autocomplete="name" required />
@@ -82,27 +74,6 @@
           <span class="check-ok" aria-hidden="true">✓</span>
         </div>
         <span class="error-msg" id="confirm-error" role="alert">Passwords do not match.</span>
-      </div>
-
-      <div id="doctor-fields" style="display:none; margin-bottom: 20px;">
-        <div class="field">
-          <label for="specialization">Specialization</label>
-          <div class="input-shell">
-            <input type="text" id="specialization" name="specialization" placeholder="e.g. Cardiologist" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="phone">Phone Number</label>
-          <div class="input-shell">
-            <input type="tel" id="phone" name="phone" placeholder="Your phone number" />
-          </div>
-        </div>
-        <div class="field">
-          <label for="address">Address</label>
-          <div class="input-shell">
-            <input type="text" id="address" name="address" placeholder="Clinic/Hospital address" />
-          </div>
-        </div>
       </div>
 
       <label class="terms">
