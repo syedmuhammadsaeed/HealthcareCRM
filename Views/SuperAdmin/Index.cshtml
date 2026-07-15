@@ -579,7 +579,7 @@
                 </div>
                 <i class="fa-solid fa-chevron-down" style="color: var(--muted); font-size: 12px;"></i>
             </div>
-            <a href="/Account/Login" class="logout-btn" onclick="clearToken()">
+            <a href="#" class="logout-btn" onclick="logout(); return false;">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </div>
@@ -792,10 +792,5 @@
     </main>
 
     <script src="/js/site.js"></script>
-    <script>
-        function clearToken() {
-            localStorage.removeItem('token');
-        }
-    </script>
 </body>
 </html>
