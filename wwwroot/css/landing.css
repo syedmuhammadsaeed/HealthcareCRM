@@ -26,11 +26,11 @@ body {
     align-items: center;
     padding: 16px 40px;
     background: transparent;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .brand-card {
@@ -142,12 +142,12 @@ body {
 
 .hero-bg {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
-    border-radius: 30px;
-    background-image: url("/images/Crm.png");
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    background-image: url("/images/Crm.png?v=2");
     background-size: cover;
     background-position: center;
     z-index: -1;
@@ -155,11 +155,11 @@ body {
 
 .contact-hero-bg {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
-    border-radius: 30px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
     /* Placeholder for the user to add their contact page background */
     background-image: url("/images/contact.png");
     background-size: cover;
@@ -245,7 +245,7 @@ body {
     padding: 60px 80px 20px 80px;
     background: var(--cream);
     overflow: hidden;
-    margin-top: 40px;
+    margin-top: 0;
 }
 
 .footer-watermark {
@@ -504,18 +504,19 @@ body {
 
 .about-hero-inner-bg {
     position: absolute;
-    top: 20px;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 40px);
-    max-width: 1150px;
-    border-radius: 30px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    transform: none;
+    border-radius: 0;
     background-image: url("/images/About_us.png");
     background-size: cover;
     background-position: center;
     z-index: -1;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    box-shadow: none;
 }
 
 .about-hero-content {
@@ -654,7 +655,7 @@ body {
 .services-hero-bg {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url("/images/Crm.png");
+    background-image: url("/images/Crm.png?v=2");
     background-size: cover;
     background-position: center;
     filter: blur(30px);
@@ -663,18 +664,19 @@ body {
 }
 .services-hero-inner-bg {
     position: absolute;
-    top: 20px;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 40px);
-    max-width: 1150px;
-    border-radius: 30px;
-    background-image: url("/images/Crm.png");
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    transform: none;
+    border-radius: 0;
+    background-image: url("/images/Crm.png?v=2");
     background-size: cover;
     background-position: center;
     z-index: -1;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    box-shadow: none;
 }
 
 .services-header {

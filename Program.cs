@@ -134,6 +134,17 @@ using (var scope = app.Services.CreateScope())
 {
     var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
     await authService.SeedSuperAdminAsync();
+
+    // TEMPORARY PASSWORD RESET
+    var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+    var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
+    var targetDoctor = await userRepo.GetByEmailAsync("Drreza12@gmail.com");
+    if (targetDoctor != null)
+    {
+        targetDoctor.PasswordHash = hasher.HashPassword("Doctor123!");
+        targetDoctor.Status = "Approved"; // ensure approved
+        await userRepo.UpdateAsync(targetDoctor);
+    }
 }
 
 app.Run();

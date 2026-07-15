@@ -1,410 +1,801 @@
 @model IEnumerable<HealthcareCRM.Models.User>
-
 @{
-    ViewData["Title"] = "Super Admin — HealthcareCRM";
+    ViewData["Title"] = "Super Admin Dashboard";
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@ViewData["Title"]</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --cream:#FAF7F1;
-    --forest:#1B4332;
-    --forest-dark:#122E22;
-    --sage:#6E9C7D;
-    --sage-light:#E4EFE3;
-    --coral:#E76F51;
-    --coral-light:#FBE3DC;
-    --amber:#B3672B;
-    --amber-light:#FBEADB;
-    --ink:#26301F;
-    --muted:#7C8873;
-    --line:#E7E0D2;
-    --ok:#3E7C4A;
-    --error:#C0392B;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:'Inter',sans-serif;
-    background:var(--cream);
-    color:var(--ink);
-    min-height:100vh;
-    padding-bottom:60px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --cream: #FAF7F1;
+            --forest: #1B4332;
+            --forest-dark: #122E22;
+            --sage: #6E9C7D;
+            --sage-light: #E4EFE3;
+            --ink: #26301F;
+            --muted: #7C8873;
+            --line: #E7E0D2;
+            
+            --warning-text: #B3672B;
+            --warning-bg: #FBEADB;
+            --error-text: #C0392B;
+            --error-bg: #FBE3DC;
+            --success-text: #3E7C4A;
+            --success-bg: #E4EFE3;
+        }
 
-  .topbar {
-    background: #fff;
-    border-bottom: 1px solid var(--line);
-    padding: 0 24px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .brand {
-    font-family: 'Fraunces', serif;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--forest);
-    text-decoration: none;
-  }
-  .nav-links {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-  }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--muted);
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover, .nav-links a.active {
-    color: var(--forest);
-  }
-  .user-menu {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-  }
-  .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--sage-light);
-    color: var(--forest);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 16px;
-  }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+            display: flex;
+            min-height: 100vh;
+        }
 
-  .main-content {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 24px;
-  }
-  .header-section {
-    margin-bottom: 40px;
-  }
-  .page-title {
-    font-family: 'Fraunces', serif;
-    font-size: 36px;
-    color: var(--forest);
-    margin: 0 0 8px 0;
-  }
-  .page-subtitle {
-    color: var(--muted);
-    font-size: 16px;
-    margin: 0;
-  }
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--cream);
+            border-right: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            padding: 32px 24px;
+        }
 
-  .data-card {
-    background: #fff;
-    border-radius: 16px;
-    border: 1px solid var(--line);
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-  }
-  .data-card-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .data-card-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-  }
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            text-decoration: none;
+        }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th {
-    text-align: left;
-    padding: 16px 24px;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    border-bottom: 1px solid var(--line);
-    background: #FAFAFA;
-  }
-  td {
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--line);
-    vertical-align: middle;
-  }
-  tr:last-child td {
-    border-bottom: none;
-  }
-  .user-info {
-    display: flex;
-    flex-direction: column;
-  }
-  .user-name {
-    font-weight: 600;
-    color: var(--ink);
-  }
-  .user-email {
-    font-size: 14px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-  .role-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    background: var(--sage-light);
-    color: var(--forest);
-  }
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--forest);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
 
-  .actions {
-    display: flex;
-    gap: 8px;
-  }
-  .btn-approve {
-    background: var(--ok);
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-approve:hover {
-    background: #32643C;
-  }
-  .btn-reject {
-    background: #fff;
-    color: var(--error);
-    border: 1px solid var(--error);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-reject:hover {
-    background: var(--error);
-    color: #fff;
-  }
-  .empty-state {
-    padding: 60px 24px;
-    text-align: center;
-    color: var(--muted);
-  }
-  
-  .form-group {
-    margin-bottom: 16px;
-  }
-  .form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-  .form-control {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: inherit;
-  }
-  .btn-primary {
-    background: var(--forest);
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-primary:hover {
-    background: var(--forest-dark);
-  }
-</style>
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-family: 'Fraunces', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--forest);
+            line-height: 1.2;
+        }
+
+        .brand-slogan {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(27, 67, 50, 0.05);
+            color: var(--forest);
+        }
+
+        .nav-item.active {
+            background: var(--forest);
+            color: #fff;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--sage);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 40px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--forest-dark);
+            margin: 0 0 8px 0;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--sage-light);
+            color: var(--forest);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-icon.warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 12px;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-trend.positive { color: var(--success-text); }
+        .stat-trend.warning { color: var(--warning-text); }
+        
+        .stat-trend span {
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        /* Generic Card */
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0 0 4px 0;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Form */
+        .form-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.two-col > .form-group {
+            flex: 1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--ink);
+            background: #fff;
+            appearance: none;
+        }
+        
+        select.form-control {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .form-control::placeholder {
+            color: #A0AAB2;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            padding-right: 40px;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--forest);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--forest-dark);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--sage-light);
+            color: var(--forest);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0 0 8px 0;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 16px 24px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px;
+            color: var(--muted);
+            vertical-align: middle;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar-sm {
+            width: 32px;
+            height: 32px;
+            background: var(--sage-light);
+            color: var(--forest);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .user-cell span {
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: var(--success-bg); color: var(--success-text); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning-text); }
+        .badge-error { background: var(--error-bg); color: var(--error-text); }
+
+        .btn-outline-small {
+            background: var(--cream);
+            border: 1px solid var(--line);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .card-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+
+        .card-footer span {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .pagination-buttons button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 6px;
+            color: var(--ink);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination-buttons button.active {
+            background: var(--forest);
+            color: #fff;
+            border-color: var(--forest);
+        }
+    </style>
 </head>
 <body>
 
-  <header class="topbar">
-    <a href="/" class="brand">HealthcareCRM</a>
-    <div class="nav-links">
-      <a href="/SuperAdmin" class="active">Approvals</a>
-      <a href="/SuperAdmin/Profile">Profile</a>
-    </div>
-    <div class="user-menu" onclick="logout()">
-      <div class="avatar">SA</div>
-      <span style="font-weight:500; font-size:15px;">Super Admin <small style="display:block; color:var(--muted); font-size:12px; font-weight:400;">Logout</small></span>
-    </div>
-  </header>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">HealthcareCRM</span>
+                <span class="brand-slogan">Better care. Every day.</span>
+            </div>
+        </a>
 
-  <main class="main-content">
-    <div class="header-section">
-      <h1 class="page-title">Pending Approvals & Staff Management</h1>
-      <p class="page-subtitle">Review and manage new Doctor and Admin registrations, or add them directly.</p>
-    </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
+            <a href="#" class="nav-item"><i class="fa-regular fa-circle-check"></i> Approvals</a>
+            <a href="#" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+        </nav>
 
-    <div class="data-card" style="margin-bottom: 40px;">
-      <div class="data-card-header">
-        <h2 class="data-card-title">Add Admin / Doctor</h2>
-      </div>
-      <div style="padding: 24px;">
-        @if (TempData["Success"] != null)
-        {
-            <div style="padding: 12px; background: var(--sage-light); color: var(--forest); border-radius: 6px; margin-bottom: 20px;">
-                @TempData["Success"]
-            </div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div style="padding: 12px; background: var(--coral-light); color: var(--error); border-radius: 6px; margin-bottom: 20px;">
-                @TempData["Error"]
-            </div>
-        }
-
-        <form asp-action="CreateStaff" asp-controller="SuperAdmin" method="post">
-            <div class="form-group">
-                <label>Role</label>
-                <select name="role" id="staff-role" class="form-control" onchange="toggleFields()">
-                    <option value="Admin">Admin</option>
-                    <option value="Doctor">Doctor</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" name="name" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required />
-            </div>
-            <div class="form-group">
-                <label>Gender</label>
-                <select name="gender" class="form-control" required>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div id="doctor-extra" style="display:none;">
-                <div class="form-group">
-                    <label>Age</label>
-                    <input type="number" name="age" class="form-control" />
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">SA</div>
+                <div class="user-info">
+                    <div class="user-name">Super Admin</div>
+                    <div class="user-role">Super Administrator</div>
                 </div>
-                <div class="form-group">
-                    <label>Specialization</label>
-                    <input type="text" name="specialization" class="form-control" />
+                <i class="fa-solid fa-chevron-down" style="color: var(--muted); font-size: 12px;"></i>
+            </div>
+            <a href="/Account/Login" class="logout-btn" onclick="clearToken()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <div class="page-header">
+            <h1>Welcome back, Super Admin 👋</h1>
+            <p>Here's what's happening with your system today.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <span class="stat-label">Total Users</span>
                 </div>
+                <div class="stat-value">128</div>
+                <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 12% <span>from last month</span></div>
             </div>
 
-            <button type="submit" class="btn-primary">Create Account</button>
-        </form>
-      </div>
-    </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon warning"><i class="fa-solid fa-shield-halved"></i></div>
+                    <span class="stat-label">Pending Approvals</span>
+                </div>
+                <div class="stat-value">8</div>
+                <div class="stat-trend warning"><i class="fa-solid fa-arrow-trend-up"></i> 33% <span>from last week</span></div>
+            </div>
 
-    <div class="data-card">
-      <div class="data-card-header">
-        <h2 class="data-card-title">Registration Queue</h2>
-      </div>
-      
-      @if (!Model.Any())
-      {
-          <div class="empty-state">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px; color:var(--sage);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-              <h3 style="margin:0 0 8px 0; color:var(--ink);">All Caught Up!</h3>
-              <p style="margin:0; font-size:15px;">There are no pending registrations requiring approval.</p>
-          </div>
-      }
-      else
-      {
-          <table>
-            <thead>
-              <tr>
-                <th>User Details</th>
-                <th>Role</th>
-                <th>Registered On</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach (var user in Model)
-              {
-                <tr>
-                  <td>
-                    <div class="user-info">
-                      <span class="user-name">@user.Name</span>
-                      <span class="user-email">@user.Email</span>
-                      @if (user.Role == "Doctor")
-                      {
-                        <span class="user-email" style="color:var(--forest);">@user.Specialization</span>
-                      }
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fa-regular fa-user"></i></div>
+                    <span class="stat-label">Doctors</span>
+                </div>
+                <div class="stat-value">64</div>
+                <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 8% <span>from last month</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fa-regular fa-file-lines"></i></div>
+                    <span class="stat-label">Admins</span>
+                </div>
+                <div class="stat-value">32</div>
+                <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 5% <span>from last month</span></div>
+            </div>
+        </div>
+
+        <!-- Add Admin / Doctor Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Add Admin / Doctor</h2>
+                <p>Create a new admin or doctor account.</p>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-row">
+                        <div class="form-group" style="width: 250px;">
+                            <label>Role</label>
+                            <select class="form-control">
+                                <option>Admin</option>
+                                <option>Doctor</option>
+                            </select>
+                        </div>
                     </div>
-                  </td>
-                  <td>
-                    <span class="role-badge">@user.Role</span>
-                  </td>
-                  <td style="color:var(--muted); font-size:14px;">
-                    @user.CreatedDate.ToString("MMM dd, yyyy")
-                  </td>
-                  <td>
-                    <div class="actions">
-                      <form asp-action="ApproveUser" asp-controller="SuperAdmin" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="@user.Id" />
-                        <button type="submit" class="btn-approve">Approve</button>
-                      </form>
-                      <form asp-action="RejectUser" asp-controller="SuperAdmin" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="@user.Id" />
-                        <button type="submit" class="btn-reject">Reject</button>
-                      </form>
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" placeholder="Enter full name" />
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" placeholder="Enter email address" />
+                        </div>
                     </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-      }
-    </div>
-  </main>
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" class="form-control" placeholder="Enter password" />
+                                <i class="fa-regular fa-eye"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" class="form-control" placeholder="Confirm password" />
+                                <i class="fa-regular fa-eye"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions text-right">
+                        <button type="button" class="btn-primary">Create Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-  <script src="/js/site.js"></script>
-  <script>
-    requireAuth();
+        <!-- Registration Queue Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Registration Queue</h2>
+            </div>
+            <div class="card-body empty-state">
+                <div class="empty-icon"><i class="fa-regular fa-circle-check"></i></div>
+                <h3>All Caught Up!</h3>
+                <p>There are no pending registrations requiring approval.</p>
+            </div>
+        </div>
 
-    function logout() {
-      clearToken();
-      window.location.replace('/Account/Login');
-    }
-    
-    function toggleFields() {
-        var role = document.getElementById('staff-role').value;
-        document.getElementById('doctor-extra').style.display = (role === 'Doctor') ? 'block' : 'none';
-    }
-  </script>
+        <!-- Recent Registration Activity Card -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">Recent Registration Activity</h2>
+                <button class="btn-outline-small">View all</button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Registered On</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm">D</div>
+                                <span>Dr. Ahmed Khan</span>
+                            </div>
+                        </td>
+                        <td>Doctor</td>
+                        <td>ahmed.khan@hospital.com</td>
+                        <td><span class="badge badge-success">Approved</span></td>
+                        <td>09 Jul 2026, 10:30 AM</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm" style="background:#FBE3DC; color:var(--error-text);">M</div>
+                                <span>Maryam Fatima</span>
+                            </div>
+                        </td>
+                        <td>Admin</td>
+                        <td>maryam.fatima@hospital.com</td>
+                        <td><span class="badge badge-warning">Pending</span></td>
+                        <td>09 Jul 2026, 09:15 AM</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm">D</div>
+                                <span>Dr. Ali Raza</span>
+                            </div>
+                        </td>
+                        <td>Doctor</td>
+                        <td>ali.raza@hospital.com</td>
+                        <td><span class="badge badge-success">Approved</span></td>
+                        <td>08 Jul 2026, 04:45 PM</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm" style="background:#F0F0F0; color:#333;">U</div>
+                                <span>Usman Ahmed</span>
+                            </div>
+                        </td>
+                        <td>Admin</td>
+                        <td>usman.ahmed@hospital.com</td>
+                        <td><span class="badge badge-error">Rejected</span></td>
+                        <td>08 Jul 2026, 03:20 PM</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-sm">S</div>
+                                <span>Dr. Sara Malik</span>
+                            </div>
+                        </td>
+                        <td>Doctor</td>
+                        <td>sara.malik@hospital.com</td>
+                        <td><span class="badge badge-warning">Pending</span></td>
+                        <td>08 Jul 2026, 11:05 AM</td>
+                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="card-footer">
+                <span>Showing 1 to 5 of 12 results</span>
+                <div class="pagination-buttons">
+                    <button>&lt;</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>&gt;</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/site.js"></script>
+    <script>
+        function clearToken() {
+            localStorage.removeItem('token');
+        }
+    </script>
 </body>
 </html>
