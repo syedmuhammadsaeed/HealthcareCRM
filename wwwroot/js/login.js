@@ -47,8 +47,14 @@
         var valid = true;
 
         var emailError = document.getElementById('email-error');
-        if (!emailInput.value.trim() || !EMAIL_REGEX.test(emailInput.value.trim())) {
+        if (!emailInput.value.trim()) {
             emailInput.setAttribute('aria-invalid', 'true');
+            emailError.innerText = 'Email is required.';
+            emailError.style.display = 'flex';
+            valid = false;
+        } else if (!EMAIL_REGEX.test(emailInput.value.trim())) {
+            emailInput.setAttribute('aria-invalid', 'true');
+            emailError.innerText = 'Please enter a valid email address.';
             emailError.style.display = 'flex';
             valid = false;
         } else {
@@ -59,6 +65,7 @@
         var pwError = document.getElementById('password-error');
         if (!passwordInput.value) {
             passwordInput.setAttribute('aria-invalid', 'true');
+            pwError.innerText = 'Password is required.';
             pwError.style.display = 'flex';
             valid = false;
         } else {

@@ -310,6 +310,9 @@ body, html {
     margin-top: 4px;
     display: none;
 }
+.error-msg.show {
+    display: block;
+}
 #alert-container:empty {
     display: none;
 }

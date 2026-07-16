@@ -150,6 +150,7 @@ body {
     background-image: url("/images/Crm.png?v=2");
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
     z-index: -1;
 }
 
@@ -164,6 +165,7 @@ body {
     background-image: url("/images/contact.png");
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
     z-index: -1;
 }
 
@@ -497,6 +499,7 @@ body {
     background-image: url("/images/About_us.png");
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
     filter: blur(30px);
     transform: scale(1.1); /* Prevents blurred edges from shrinking inwards */
     z-index: -2;
@@ -515,6 +518,7 @@ body {
     background-image: url("/images/About_us.png");
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
     z-index: -1;
     box-shadow: none;
 }
@@ -658,6 +662,7 @@ body {
     background-image: url("/images/Crm.png?v=2");
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
     filter: blur(30px);
     transform: scale(1.1);
     z-index: -2;
@@ -675,6 +680,7 @@ body {
     background-image: url("/images/Crm.png?v=2");
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
     z-index: -1;
     box-shadow: none;
 }

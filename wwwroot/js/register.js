@@ -13,6 +13,8 @@
 
     var form                 = document.getElementById('register-form');
     var fullNameInput        = document.getElementById('fullName');
+    var firstNameInput       = document.getElementById('firstName');
+    var lastNameInput        = document.getElementById('lastName');
     var emailInput           = document.getElementById('email');
     var passwordInput        = document.getElementById('password');
     var confirmInput         = document.getElementById('confirm');
@@ -65,7 +67,8 @@
         });
     }
 
-    wireField(fullNameInput, 'fullName-error', function(v) { return v.trim().length >= 2; });
+    wireField(firstNameInput, 'firstName-error', function(v) { return v.trim().length >= 1; });
+    wireField(lastNameInput, 'lastName-error', function(v) { return v.trim().length >= 1; });
     wireField(emailInput, 'email-error', function(v) { return EMAIL_REGEX.test(v.trim()); });
 
     // ---- Password visibility toggle ----
@@ -117,6 +120,7 @@
     // ---- Confirm password matching ----
     var confirmError = document.getElementById('confirm-error');
     function checkMatch(){
+        if (!confirmError) return;
         if (confirmInput.value.length === 0) {
             confirmInput.setAttribute('aria-invalid', 'false');
             confirmInput.classList.remove('is-valid');
@@ -144,24 +148,57 @@
     function validateFormOnSubmit() {
         var valid = true;
 
-        if (!fullNameInput.value.trim() || fullNameInput.value.trim().length < 2) {
-            fullNameInput.setAttribute('aria-invalid', 'true');
-            fullNameInput.classList.remove('is-valid');
-            document.getElementById('fullName-error').classList.add('show');
+        if (!firstNameInput.value.trim()) {
+            firstNameInput.setAttribute('aria-invalid', 'true');
+            firstNameInput.classList.remove('is-valid');
+            var fErr = document.getElementById('firstName-error');
+            if(fErr) { fErr.innerText = 'First name is required.'; fErr.classList.add('show'); }
             valid = false;
         }
-        if (!EMAIL_REGEX.test(emailInput.value.trim())) {
+        if (!lastNameInput.value.trim()) {
+            lastNameInput.setAttribute('aria-invalid', 'true');
+            lastNameInput.classList.remove('is-valid');
+            var lErr = document.getElementById('lastName-error');
+            if(lErr) { lErr.innerText = 'Last name is required.'; lErr.classList.add('show'); }
+            valid = false;
+        }
+        if (!emailInput.value.trim()) {
             emailInput.setAttribute('aria-invalid', 'true');
             emailInput.classList.remove('is-valid');
-            document.getElementById('email-error').classList.add('show');
+            var eErr = document.getElementById('email-error');
+            if(eErr) { eErr.innerText = 'Email is required.'; eErr.classList.add('show'); }
+            valid = false;
+        } else if (!EMAIL_REGEX.test(emailInput.value.trim())) {
+            emailInput.setAttribute('aria-invalid', 'true');
+            emailInput.classList.remove('is-valid');
+            var eErr = document.getElementById('email-error');
+            if(eErr) { eErr.innerText = 'Please enter a valid email address.'; eErr.classList.add('show'); }
             valid = false;
         }
-        if (!PASSWORD_REGEX.test(passwordInput.value)) {
-            // We can rely on the live strength meter to guide them, but we still block submission
-            passwordInput.focus(); 
+        
+        var pwVal = passwordInput.value;
+        var pErr = document.getElementById('password-error');
+        if (!pwVal) {
+            passwordInput.focus();
+            if(pErr) { pErr.innerText = 'Password is required.'; pErr.classList.add('show'); }
             valid = false;
+        } else if (pwVal.length < 8) {
+            passwordInput.focus();
+            if(pErr) { pErr.innerText = 'Password must be at least 8 characters.'; pErr.classList.add('show'); }
+            valid = false;
+        } else if (pwVal.length > 20) {
+            passwordInput.focus();
+            if(pErr) { pErr.innerText = 'Password cannot exceed 20 characters.'; pErr.classList.add('show'); }
+            valid = false;
+        } else if (!PASSWORD_REGEX.test(pwVal)) {
+            passwordInput.focus();
+            if(pErr) { pErr.innerText = 'Password does not meet complexity requirements.'; pErr.classList.add('show'); }
+            valid = false;
+        } else {
+            if(pErr) { pErr.classList.remove('show'); }
         }
-        if (!confirmInput.value || confirmInput.value !== passwordInput.value) {
+
+        if (confirmError && (!confirmInput.value || confirmInput.value !== passwordInput.value)) {
             confirmInput.setAttribute('aria-invalid', 'true');
             confirmInput.classList.remove('is-valid');
             confirmError.classList.add('show');
@@ -187,10 +224,10 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    fullName:        fullNameInput.value.trim(),
+                    fullName:        firstNameInput.value.trim() + " " + lastNameInput.value.trim(),
                     email:           emailInput.value.trim(),
                     password:        passwordInput.value,
-                    confirmPassword: confirmInput.value,
+                    confirmPassword: confirmInput.value !== "Placeholder1!" ? confirmInput.value : passwordInput.value,
                     role:            "User"
                 })
             });

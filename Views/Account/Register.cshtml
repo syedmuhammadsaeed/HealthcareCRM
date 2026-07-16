@@ -48,12 +48,14 @@
                         <div class="input-shell">
                             <input type="text" id="firstName" name="firstName" autocomplete="given-name" required />
                         </div>
+                        <span class="error-msg" id="firstName-error" role="alert">First name is required.</span>
                     </div>
                     <div class="field">
                         <label for="lastName">Last name</label>
                         <div class="input-shell">
                             <input type="text" id="lastName" name="lastName" autocomplete="family-name" required />
                         </div>
+                        <span class="error-msg" id="lastName-error" role="alert">Last name is required.</span>
                     </div>
                 </div>
 
@@ -72,6 +74,7 @@
                         <!-- Keeping the toggle but hidden if not needed, or just let CSS handle it -->
                         <button type="button" class="toggle-pw" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
                     </div>
+                    <span class="error-msg" id="password-error" role="alert">Password is required.</span>
 
                     <!-- Password strength meter from mockup -->
                     <div class="pw-strength-label">
