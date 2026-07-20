@@ -31,6 +31,7 @@ namespace HealthcareCRM.Controllers
         {
             public string Name { get; set; } = string.Empty;
             public string Email { get; set; } = string.Empty;
+            public string ProfilePictureBase64 { get; set; } = string.Empty;
         }
 
         [HttpPost]
@@ -46,9 +47,14 @@ namespace HealthcareCRM.Controllers
             user.Name = model.Name;
             user.Email = model.Email;
             
+            if (!string.IsNullOrEmpty(model.ProfilePictureBase64))
+            {
+                user.ProfilePictureUrl = model.ProfilePictureBase64;
+            }
+            
             await _userRepository.UpdateAsync(user);
 
-            return Ok(new { success = true, message = "Profile updated." });
+            return Ok(new { success = true, message = "Profile updated.", url = user.ProfilePictureUrl });
         }
 
         [HttpPost]

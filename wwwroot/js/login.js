@@ -5,8 +5,28 @@
 'use strict';
 
 (function () {
-    // Already logged in — go straight to patients
-    if (localStorage.getItem('hcrm_token')) {
+    // Already logged in — go straight to role dashboard
+    var token = localStorage.getItem('hcrm_token');
+    if (token) {
+        try {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            var payload = JSON.parse(jsonPayload);
+            var actualRole = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+            if (actualRole === 'Doctor') {
+                window.location.replace('/Doctor');
+                return;
+            } else if (actualRole === 'SuperAdmin') {
+                window.location.replace('/SuperAdmin');
+                return;
+            } else if (actualRole === 'Admin') {
+                window.location.replace('/Patient');
+                return;
+            }
+        } catch(e) {}
         window.location.replace('/Patient');
         return;
     }

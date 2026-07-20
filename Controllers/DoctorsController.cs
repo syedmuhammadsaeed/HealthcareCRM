@@ -67,6 +67,28 @@ namespace HealthcareCRM.Controllers
 
             return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
         }
+        /// <summary>
+        /// Updates the currently logged-in doctor's profile.
+        /// </summary>
+        [HttpPost("profile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateDoctorProfileRequest request)
+        {
+            var userRole = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
+            if (userRole != "Doctor") return Unauthorized(ApiResponse<object>.CreateError("Only doctors can update profile."));
+
+            var doctorId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) 
+                           ?? User.FindFirstValue(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub);
+
+            if (string.IsNullOrEmpty(doctorId)) return Unauthorized(ApiResponse<object>.CreateError("Invalid doctor identity."));
+
+            var result = await _doctorService.UpdateProfileAsync(doctorId, request.Name, request.Email, request.Phone, request.Specialization, request.Qualification, request.ProfilePictureBase64);
+            if (!result.IsSuccess) return BadRequest(ApiResponse<object>.CreateError(result.Message));
+
+            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
+        }
     }
 
     /// <summary>
@@ -76,5 +98,18 @@ namespace HealthcareCRM.Controllers
     {
         public decimal Fee { get; set; }
         public string Currency { get; set; } = "Rs";
+    }
+
+    /// <summary>
+    /// Payload structure for updating doctor's profile.
+    /// </summary>
+    public class UpdateDoctorProfileRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Specialization { get; set; } = string.Empty;
+        public string Qualification { get; set; } = string.Empty;
+        public string ProfilePictureBase64 { get; set; } = string.Empty;
     }
 }

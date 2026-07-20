@@ -27,26 +27,31 @@
     {
         <div class="app-container">
             <aside class="sidebar">
-                <a href="/" class="brand" style="text-decoration: none; color: inherit; cursor: pointer;">
-                    <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
-                    <div class="brand-text">
-                        <span class="brand-name">MediCare</span>
-                        <span class="brand-tag">Better care. Every day.</span>
-                    </div>
-                </a>
+                <div class="brand" style="display:flex; justify-content:space-between; align-items:center; width:100%; text-decoration: none; color: inherit; margin-bottom: 40px;">
+                    <a href="/" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;">
+                        <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                        <div class="brand-text">
+                            <span class="brand-name">MediCare</span>
+                            <span class="brand-tag">Better care. Every day.</span>
+                        </div>
+                    </a>
+                    <button onclick="toggleSidebar()" style="background:none; border:none; cursor:pointer; color:var(--muted); padding:0; display:flex;">
+                        <i class="fa-solid fa-chevron-left sidebar-toggle" style="transition: transform 0.3s; font-size:14px;"></i>
+                    </button>
+                </div>
 
                 <nav class="nav-menu">
-                    <a href="/Home" class="@(ctrl == "Home" ? "active" : "")"><i class="fa-solid fa-house"></i> Overview</a>
-                    <a href="/Patient" class="@(ctrl == "Patient" ? "active" : "")"><i class="fa-regular fa-user"></i> Patients</a>
-                    <a href="/Doctor" class="@(ctrl == "Doctor" ? "active" : "")"><i class="fa-solid fa-user-doctor"></i> Doctors</a>
-                    <a href="/Appointment" class="@(ctrl == "Appointment" ? "active" : "")"><i class="fa-regular fa-calendar"></i> Appointments</a>
-                    <a href="/Billing" class="@(ctrl == "Billing" ? "active" : "")"><i class="fa-solid fa-file-invoice"></i> Billings</a>
-                    <a href="/Report" class="@(ctrl == "Report" ? "active" : "")"><i class="fa-regular fa-file-lines"></i> Reports</a>
-                    <a href="/Settings" class="@(ctrl == "Settings" ? "active" : "")"><i class="fa-solid fa-gear"></i> Settings</a>
+                    <a href="/Home" class="@(ctrl == "Home" ? "active" : "")"><i class="fa-solid fa-house"></i> <span class="nav-text">Overview</span></a>
+                    <a href="/Patient" class="@(ctrl == "Patient" ? "active" : "")"><i class="fa-regular fa-user"></i> <span class="nav-text">Patients</span></a>
+                    <a href="/Doctor" class="@(ctrl == "Doctor" ? "active" : "")"><i class="fa-solid fa-user-doctor"></i> <span class="nav-text">Doctors</span></a>
+                    <a href="/Appointment" class="@(ctrl == "Appointment" ? "active" : "")"><i class="fa-regular fa-calendar"></i> <span class="nav-text">Appointments</span></a>
+                    <a href="/Billing" class="@(ctrl == "Billing" ? "active" : "")"><i class="fa-solid fa-file-invoice"></i> <span class="nav-text">Billings</span></a>
+                    <a href="/Report" class="@(ctrl == "Report" ? "active" : "")"><i class="fa-regular fa-file-lines"></i> <span class="nav-text">Reports</span></a>
+                    <a href="/Settings" class="@(ctrl == "Settings" ? "active" : "")"><i class="fa-solid fa-gear"></i> <span class="nav-text">Settings</span></a>
                 </nav>
 
                 <div class="sidebar-bottom">
-                    <div class="user-profile-card" id="nav-authenticated" style="display:none;">
+                    <div class="user-profile-card" id="nav-authenticated" style="display:none;" onclick="toggleLogout()">
                         <div class="avatar" id="nav-user-avatar">..</div>
                         <div class="user-info">
                             <span class="name" id="nav-user-name">Loading...</span>
@@ -56,7 +61,7 @@
                     </div>
 
                     <a href="#" class="logout-link" id="nav-logout-btn" onclick="logout()" style="display:none;" title="Sign out">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="logout-text">Logout</span>
                     </a>
 
                     <!-- Guest State -->
@@ -80,6 +85,19 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        }
+        function toggleLogout() {
+            var btn = document.getElementById('nav-logout-btn');
+            if (btn.style.display === 'none' || btn.style.display === '') {
+                btn.style.display = 'flex';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

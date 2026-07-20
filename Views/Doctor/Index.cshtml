@@ -8,260 +8,806 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doctor Dashboard — HealthcareCRM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --cream:#FAF7F1;
-    --forest:#1B4332;
-    --forest-dark:#122E22;
-    --sage:#6E9C7D;
-    --sage-light:#E4EFE3;
-    --coral:#E76F51;
-    --coral-light:#FBE3DC;
-    --amber:#B3672B;
-    --amber-light:#FBEADB;
-    --ink:#26301F;
-    --muted:#7C8873;
-    --line:#E7E0D2;
+  :root {
+    --cream: #FDFBF7;
+    --cream-bg: #F9F7F3;
+    --forest: #163326; 
+    --forest-dark: #0f241a;
+    --sage: #6E9C7D;
+    --sage-light: #E8F0EA;
+    --coral: #E76F51;
+    --coral-light: #FCEBE7;
+    --amber: #B3672B;
+    --amber-light: #FBEADB;
+    --blue: #4A72B2;
+    --blue-light: #E6EEF9;
+    --ink: #1C2621;
+    --muted: #7C8873;
+    --line: #EBE5D9;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:'Inter',sans-serif;
-    background:var(--cream);
-    color:var(--ink);
-    min-height:100vh;
-    padding-bottom:60px;
-  }
-
-  /* ---------- Top bar ---------- */
-  .top-row{ position:relative; display:flex; justify-content:center; align-items:center; padding:22px 28px 10px; }
-  .navbar{
-    display:flex; align-items:center; gap:6px;
-    background:var(--forest-dark); border-radius:999px; padding:8px 10px 8px 8px;
-    box-shadow:0 20px 40px -16px rgba(18,46,34,.45), 0 2px 0 rgba(255,255,255,.04) inset;
-  }
-  .nav-mark{
-    width:40px; height:40px; border-radius:50%; background:var(--sage);
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    font-family:'Fraunces',serif; font-weight:700; font-size:17px; color:var(--forest-dark);
-  }
-  .nav-links{ display:flex; align-items:center; gap:4px; padding:0 6px; }
-  .nav-links a{
-    text-decoration:none; color:#DCE6DE; font-size:14px; font-weight:600;
-    padding:10px 16px; border-radius:999px; transition:color .15s ease, background .15s ease; white-space:nowrap;
-  }
-  .nav-links a:hover{ color:#fff; background:rgba(255,255,255,.06); }
-  .nav-links a.active{ color:var(--forest-dark); background:#fff; }
-  .nav-links a:focus-visible{ outline:2px solid var(--coral); outline-offset:2px; }
-  .nav-user{
-    display:flex; align-items:center; gap:9px; background:#fff; color:var(--ink);
-    border-radius:999px; padding:8px 16px 8px 8px; font-size:13.5px; font-weight:600; cursor:pointer; border:none;
-  }
-  .nav-user .avatar{
-    width:26px; height:26px; border-radius:50%; background:var(--coral); color:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;
-  }
-  .btn-logout{
-    position:absolute; right:28px; top:22px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-    background:#fff; border:1px solid var(--line); border-radius:14px;
-    padding:9px 18px; font-size:12px; font-weight:700; color:var(--forest); cursor:pointer;
-    transition:border-color .15s ease, background .15s ease, color .15s ease;
-  }
-  .btn-logout .ic{ font-size:15px; line-height:1; color:var(--forest); }
-  .btn-logout:hover{ border-color:var(--coral); background:#FFF8F6; color:var(--coral); }
-  .btn-logout:hover .ic{ color:var(--coral); }
-  @@media (max-width:900px){
-    .nav-links a{ padding:9px 11px; font-size:13px; }
-    .nav-user span.label{ display:none; }
-    .btn-logout{ position:static; margin:12px auto 0; }
-    .top-row{ flex-direction:column; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--cream-bg);
+    color: var(--ink);
+    min-height: 100vh;
   }
 
-  /* ---------- Page shell ---------- */
-  .page{ max-width:1080px; margin:0 auto; padding:26px 28px 0; }
-
-  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:24px; flex-wrap:wrap; }
-  .page-head h1{
-    font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:30px; margin:0 0 6px; color:var(--forest);
-  }
-  .page-head p{ margin:0; color:var(--muted); font-size:13.5px; }
-  .btn-ghost{
-    background:#fff; border:1px solid var(--line); color:var(--forest); border-radius:10px;
-    padding:10px 16px; font-size:13.5px; font-weight:700; cursor:pointer;
-  }
-  .btn-ghost:hover{ border-color:var(--sage); }
-
-  /* ---------- Stat cards ---------- */
-  .stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
-  @@media (max-width:900px){ .stat-row{ grid-template-columns:repeat(2,1fr); } }
-  .stat{
-    background:#fff; border:1px solid var(--line); border-radius:16px; padding:18px 20px;
-    display:flex; flex-direction:column; gap:10px;
-  }
-  .stat .top-row{ display:flex; justify-content:space-between; align-items:center; }
-  .stat .icon{
-    width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:16px;
-  }
-  .stat.c1 .icon{ background:var(--sage-light); color:var(--forest); }
-  .stat.c2 .icon{ background:#E6ECF7; color:#3B5CA8; }
-  .stat.c3 .icon{ background:var(--amber-light); color:var(--amber); }
-  .stat.c4 .icon{ background:var(--coral-light); color:var(--coral); }
-  .stat .num{ font-family:'Fraunces',serif; font-size:30px; font-weight:600; line-height:1; }
-  .stat .lbl{ font-size:12.5px; color:var(--muted); }
-  .stat .sub{ font-size:11px; color:var(--muted); }
-
-  /* ---------- Panel ---------- */
-  .panel{ background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; }
-  .panel-head{
-    display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
-    padding:18px 20px; border-bottom:1px solid var(--line);
-  }
-  .panel-head h3{ margin:0; font-size:16px; font-weight:700; font-family:'Fraunces',serif; }
-  .panel-head .date-pill{
-    font-size:12px; font-weight:700; color:var(--forest); background:var(--sage-light);
-    padding:6px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace;
+  .app-container {
+    display: flex;
+    min-height: 100vh;
   }
 
-  .appt-list{ display:flex; flex-direction:column; }
-  .appt-item{
-    display:grid; grid-template-columns:70px 3px 1fr auto; align-items:center; gap:14px;
-    padding:14px 20px; border-bottom:1px solid var(--line);
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background: var(--cream-bg);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
   }
-  .appt-item:last-child{ border-bottom:none; }
-  .appt-item:hover{ background:#FDFBF6; }
-  .appt-time{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--muted); }
-  .appt-bar{ width:3px; height:34px; border-radius:3px; }
-  .appt-bar.done{ background:var(--sage); }
-  .appt-bar.next{ background:var(--amber); }
-  .appt-bar.wait{ background:var(--line); }
-  .appt-info .name{ font-size:14px; font-weight:600; }
-  .appt-info .type{ font-size:12px; color:var(--muted); margin-top:2px; }
-  .appt-status{
-    font-size:11px; font-weight:700; padding:5px 12px; border-radius:999px; white-space:nowrap;
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 48px;
   }
-  .appt-status.done{ background:var(--sage-light); color:var(--forest); }
-  .appt-status.next{ background:var(--amber-light); color:var(--amber); }
-  .appt-status.wait{ background:#F1ECE1; color:var(--muted); }
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--forest);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  .brand-text h2 {
+    margin: 0;
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--forest);
+    letter-spacing: -0.5px;
+  }
+  .brand-text p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--muted);
+  }
 
-  .panel-footer{ padding:14px 20px; text-align:center; }
-  .see-all{ font-size:12.5px; font-weight:700; color:var(--forest); text-decoration:none; }
-  .see-all:hover{ color:var(--coral); }
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .nav-item svg { width: 18px; height: 18px; stroke-width: 2.2px; }
+  .nav-item:hover { background: rgba(0,0,0,0.03); color: var(--ink); }
+  .nav-item.active { background: var(--forest); color: white; }
+  .nav-item.active svg { color: white; }
+
+  .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 16px; }
+  .user-card {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    background: white;
+  }
+  .user-avatar {
+    width: 32px; height: 32px;
+    background: var(--coral);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 12px;
+  }
+  .user-info { flex: 1; }
+  .user-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .user-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  
+  .logout-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px; background: transparent; border: none;
+    color: var(--forest); font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: all 0.2s; border-radius: 8px;
+  }
+  .logout-btn:hover { background: var(--coral-light); color: var(--coral); }
+  .logout-btn svg { width: 18px; height: 18px; }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    padding: 48px 64px;
+    max-width: 1060px;
+  }
+  
+  .main-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 40px;
+  }
+  .main-header h1 {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 34px;
+    font-weight: 600; color: var(--forest); margin: 0 0 10px;
+    letter-spacing: -0.5px;
+  }
+  .main-header p { margin: 0; color: var(--muted); font-size: 14px; }
+  
+  .btn-primary {
+    background: var(--forest); color: white; border: none;
+    padding: 12px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+  }
+  .btn-primary svg { width: 16px; height: 16px; stroke-width: 2.2px; }
+  .btn-primary:hover { background: var(--forest-dark); }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;
+  }
+  .stat-card {
+    background: white; border: 1px solid var(--line); border-radius: 16px;
+    padding: 28px 24px; display: flex; flex-direction: column; gap: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.015);
+  }
+  .stat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stat-icon svg { width: 22px; height: 22px; stroke-width: 2px; }
+  .stat-card.c1 .stat-icon { background: var(--sage-light); color: var(--forest); }
+  .stat-card.c2 .stat-icon { background: var(--blue-light); color: var(--blue); }
+  .stat-card.c3 .stat-icon { background: var(--amber-light); color: var(--amber); }
+  .stat-card.c4 .stat-icon { background: var(--coral-light); color: var(--coral); }
+  
+  .stat-val { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 600; color: var(--ink); line-height: 1; }
+  
+  .stat-labels { display: flex; flex-direction: column; gap: 6px; }
+  .stat-title { font-size: 13px; color: var(--ink); font-weight: 500; }
+  .stat-subtitle { font-size: 11.5px; color: var(--muted); opacity: 0.9; }
+
+  /* Panel */
+  .panel {
+    background: white; border: 1px solid var(--line); border-radius: 16px;
+    margin-bottom: 32px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.015);
+  }
+  .panel-header {
+    padding: 24px 32px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .panel-header-border { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 12px; }
+  
+  .panel-title h3 {
+    margin: 0; font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--forest);
+  }
+  .panel-title p { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); }
+  
+  .date-pill {
+    font-size: 12px; font-weight: 600; color: var(--forest); background: var(--sage-light);
+    padding: 6px 14px; border-radius: 999px;
+  }
+
+  .fee-settings { padding: 0 32px 32px; display: flex; gap: 24px; align-items: flex-end; }
+  .input-group { display: flex; flex-direction: column; gap: 10px; flex: 1; max-width: 220px; }
+  .input-group label {
+    font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .input-control {
+    padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px;
+    font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;
+  }
+  .input-control:focus { border-color: var(--forest); }
+
+  /* Appointments */
+  .appt-list { display: flex; flex-direction: column; padding-bottom: 8px; }
+  .appt-item {
+    display: grid; grid-template-columns: 70px 4px 1fr auto; align-items: center; gap: 24px;
+    padding: 16px 32px; border-bottom: 1px solid var(--line);
+  }
+  .appt-item:last-child { border-bottom: none; }
+  .appt-time { font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--muted); }
+  .appt-time.next { color: var(--amber); font-weight: 600; }
+  .appt-bar { width: 3px; height: 42px; border-radius: 3px; background: var(--line); }
+  .appt-bar.next { background: var(--amber); }
+  .appt-info .name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .appt-info .date { font-size: 12px; color: var(--muted); }
+  
+  .appt-status.done {
+    background: var(--sage-light); color: var(--forest);
+    padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .appt-status.action {
+    background: var(--forest); color: white; border: none;
+    padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .appt-status.action:hover { background: var(--forest-dark); }
+
+  .panel-footer {
+    padding: 20px; text-align: center; border-top: 1px solid var(--line);
+  }
+  .panel-footer a {
+    color: var(--forest); font-size: 13.5px; font-weight: 700; text-decoration: none;
+  }
+  .panel-footer a:hover { color: var(--coral); }
+
+  /* Settings specific */
+  .btn-secondary {
+    background: transparent; color: var(--forest); border: 1px solid var(--line);
+    padding: 10px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(0,0,0,0.02); }
+  .btn-secondary svg { width: 16px; height: 16px; }
+  
+  .settings-tabs {
+    display: flex; border-bottom: 1px solid var(--line); margin-bottom: 24px;
+  }
+  .settings-tab {
+    padding: 12px 24px; background: none; border: none; font-size: 14px; font-weight: 600;
+    color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 8px;
+    border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit;
+  }
+  .settings-tab.active { color: var(--forest); border-bottom-color: var(--forest); }
+  .settings-tab svg { width: 18px; height: 18px; }
+  
+  .settings-panel { padding: 8px 0; }
+  
+  .form-label { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 8px; display: block; }
+  
+  .profile-form-grid {
+    display: grid; grid-template-columns: 160px 1fr; gap: 32px; padding: 0 32px 32px;
+  }
+  .profile-picture-col { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .avatar-preview {
+    width: 100px; height: 100px; border-radius: 50%; background: var(--coral);
+    color: white; font-size: 36px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px; position: relative;
+  }
+  .avatar-preview::after {
+    content: ''; position: absolute; bottom: 0; right: 0; width: 28px; height: 28px;
+    background: white url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="%23163326" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>') no-repeat center;
+    background-size: 16px; border-radius: 50%; border: 1px solid var(--line); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .avatar-help { font-size: 11px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .btn-outline {
+    background: transparent; color: var(--forest); border: 1px solid var(--line);
+    padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-outline svg { width: 14px; height: 14px; }
+  
+  .profile-fields-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: start; }
+  .input-group.full-width { grid-column: 1 / -1; max-width: 100%; }
+  .profile-fields-col .input-group { max-width: 100%; }
+  .profile-fields-col .input-control { width: 100%; }
+  
+  .panel-footer-right { padding: 24px 32px; display: flex; justify-content: flex-end; border-top: 1px solid var(--line); }
+  
+  .password-form { padding: 0 32px 32px; display: flex; flex-direction: column; gap: 20px; max-width: 100%; }
+  .input-with-icon { position: relative; display: flex; align-items: center; }
+  .input-with-icon input { width: 100%; padding-right: 40px; }
+  .input-with-icon svg { position: absolute; right: 12px; width: 18px; height: 18px; color: var(--muted); cursor: pointer; }
+  
+  .password-rules { background: var(--cream-bg); border-radius: 8px; padding: 16px; margin-top: 8px; border: 1px solid var(--line); }
+  .rules-header { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; color: var(--forest); }
+  .rules-header svg { width: 18px; height: 18px; }
+  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; color: var(--forest); }
+  
+  .account-info-list { display: flex; flex-direction: column; padding: 0 32px 32px; gap: 12px; }
+
+  /* Sidebar transition */
+  .sidebar { transition: width 0.3s ease, padding 0.3s ease; overflow-x: hidden; z-index: 100; }
+  .sidebar.collapsed { width: 80px; padding: 32px 16px; }
+  .sidebar.collapsed .brand-text { display: none; }
+  .sidebar.collapsed .nav-text { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
+  .sidebar.collapsed .user-info { display: none; }
+  .sidebar.collapsed .user-card svg { display: none; }
+  .sidebar.collapsed .user-card { justify-content: center; padding: 12px; }
+  .sidebar.collapsed .logout-btn { justify-content: center; padding: 12px; }
+  .sidebar.collapsed .logout-text { display: none; }
+  .sidebar.collapsed .sidebar-toggle svg { transform: rotate(180deg); }
+  .account-info-item {
+    display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: white;
+  }
+  .ai-icon { width: 36px; height: 36px; background: var(--sage-light); color: var(--forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .ai-icon svg { width: 18px; height: 18px; }
+  .ai-text { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .ai-text strong { font-size: 13px; color: var(--ink); }
+  .ai-text span { font-size: 12px; color: var(--muted); }
+  .chevron-right { width: 16px; height: 16px; color: var(--muted); }
+
 </style>
 </head>
 <body>
 
-  <div class="top-row">
-    <nav class="navbar" aria-label="Primary">
-      <div class="nav-mark" aria-hidden="true">+</div>
-      <div class="nav-links">
-        <a href="#" class="active">Overview</a>
-        <a href="#">Patients</a>
-        <a href="#">Appointments</a>
-        <a href="#">Reports</a>
-        <a href="/SuperAdmin" id="nav-approvals" style="display:none;">Approvals</a>
+<div class="app-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path><path d="M8 12h2l2-4 2 8 2-4h2"></path></svg>
+        </div>
+        <div class="brand-text">
+          <h2>MediCare</h2>
+          <p>Better care. Every day.</p>
+        </div>
       </div>
-      <button class="nav-user">
-        <span class="avatar">DR</span>
-        <span class="label">Doctor Dashboard</span>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" style="background:none; border:none; cursor:pointer; color:var(--muted); padding:0; display:flex;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s;"><path d="M15 18l-6-6 6-6"></path></svg>
       </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-target="dashboard-section">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-target="fee-section">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><path d="M15 9H9.5a2.5 2.5 0 0 0 0 5h3a2.5 2.5 0 0 1 0 5H9"></path></svg>
+        <span class="nav-text">Edit Fee</span>
+      </a>
+      <a href="#" class="nav-item" data-target="patients-section">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span class="nav-text">Patients</span>
+      </a>
+      <a href="#" class="nav-item" data-target="settings-section">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span class="nav-text">Settings</span>
+      </a>
     </nav>
-    <button class="btn-logout" onclick="logout()"><span class="ic">⏻</span>Logout</button>
-  </div>
 
-  <div class="page">
+    <div class="sidebar-footer">
+      <div class="user-card" onclick="toggleLogout()">
+        <div class="user-avatar" id="nav-avatar">DR</div>
+        <div class="user-info">
+          <div class="user-name" id="nav-name">Dr. Dr ALI</div>
+          <div class="user-role">Doctor</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <button id="logout-btn" class="logout-btn" onclick="logout()" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <span class="logout-text">Logout</span>
+      </button>
+    </div>
+  </aside>
 
-    <div class="page-head">
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <div id="dashboard-section">
+    <header class="main-header">
       <div>
         <h1>Good morning, Doctor</h1>
         <p>Here's your day at a glance</p>
       </div>
-      <button class="btn-ghost">View full schedule</button>
-    </div>
+      <button class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        View full schedule
+      </button>
+    </header>
 
-    <div class="stat-row">
-      <div class="stat c1">
-        <div class="top-row"><span class="icon">📅</span></div>
-        <div class="num">8</div>
-        <div class="lbl">Appointments today</div>
-        <div class="sub">3 completed · 5 remaining</div>
+    <div class="stats-grid">
+      <div class="stat-card c1">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+        <div class="stat-val" id="stat-appt-num">4</div>
+        <div class="stat-labels">
+          <div class="stat-title">Appointments today</div>
+          <div class="stat-subtitle">Assigned to you</div>
+        </div>
       </div>
-      <div class="stat c2">
-        <div class="top-row"><span class="icon">🧑🤝🧑</span></div>
-        <div class="num">142</div>
-        <div class="lbl">Total patients</div>
-        <div class="sub">Under your care</div>
+      
+      <div class="stat-card c2">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+        <div class="stat-val" id="stat-pat-num">4</div>
+        <div class="stat-labels">
+          <div class="stat-title">Total patients</div>
+          <div class="stat-subtitle">Under your care</div>
+        </div>
       </div>
-      <div class="stat c3">
-        <div class="top-row"><span class="icon">⏱</span></div>
-        <div class="num">11:15</div>
-        <div class="lbl">Next appointment</div>
-        <div class="sub">Ayesha Khan · Follow-up</div>
+      
+      <div class="stat-card c3">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+        <div class="stat-val" id="stat-next-time" style="font-size:28px;">11:26</div>
+        <div class="stat-labels">
+          <div class="stat-title">Next appointment</div>
+          <div class="stat-subtitle" id="stat-next-name">Tskjsj</div>
+        </div>
       </div>
-      <div class="stat c4">
-        <div class="top-row"><span class="icon">⚠</span></div>
-        <div class="num">2</div>
-        <div class="lbl">Critical patients</div>
-        <div class="sub">Need review today</div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:24px;">
-      <div class="panel-head" style="border-bottom:none; padding-bottom:0;">
-        <h3 style="font-size:16px;">Consultation Fee Settings</h3>
-      </div>
-      <div style="padding:16px 24px 24px;">
-        <form id="fee-form" style="display:flex; gap:16px; align-items:flex-end;">
-            <div style="flex:1; max-width:200px;">
-                <label style="display:block; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Fee Amount</label>
-                <input type="number" id="fee-amount" required min="0" step="0.01" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; outline:none; transition:border-color 0.2s; font-family:inherit;">
-            </div>
-            <div style="flex:1; max-width:140px;">
-                <label style="display:block; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">Currency</label>
-                <select id="fee-currency" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; outline:none; font-family:inherit;">
-                    <option value="Rs">Rs (PKR)</option>
-                    <option value="$">$ (USD)</option>
-                    <option value="€">€ (EUR)</option>
-                    <option value="£">£ (GBP)</option>
-                    <option value="A$">A$ (AUD)</option>
-                    <option value="C$">C$ (CAD)</option>
-                    <option value="₹">₹ (INR)</option>
-                    <option value="¥">¥ (JPY)</option>
-                    <option value="CHF">CHF</option>
-                    <option value="NZ$">NZ$ (NZD)</option>
-                    <option value="S$">S$ (SGD)</option>
-                    <option value="HK$">HK$ (HKD)</option>
-                </select>
-            </div>
-            <button type="submit" class="btn-primary" id="btn-update-fee" style="padding:11px 20px; font-size:13.5px; border-radius:8px; font-weight:600; background:var(--forest); color:#fff; border:none; cursor:pointer;">Update Fee</button>
-            <span id="fee-alert" style="font-size:13px; font-weight:500; display:none; padding:10px 16px; border-radius:6px; margin-left:12px;"></span>
-        </form>
+      
+      <div class="stat-card c4">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+        <div class="stat-val">2</div>
+        <div class="stat-labels">
+          <div class="stat-title">Critical patients</div>
+          <div class="stat-subtitle">Need review today</div>
+        </div>
       </div>
     </div>
+    </div>
 
+    <div id="fee-section" style="display: none;">
     <div class="panel">
-      <div class="panel-head">
-        <h3>Today's appointments</h3>
+      <div class="panel-header">
+        <div class="panel-title">
+          <h3>Consultation Fee Settings</h3>
+          <p>Update your consultation fee and currency.</p>
+        </div>
+      </div>
+      
+      <form id="fee-form" class="fee-settings">
+        <div class="input-group">
+          <label>Fee Amount</label>
+          <input type="number" id="fee-amount" class="input-control" required min="0" step="0.01" value="2000">
+        </div>
+        <div class="input-group" style="max-width: 160px;">
+          <label>Currency</label>
+          <select id="fee-currency" class="input-control" required>
+              <option value="Rs">Rs (PKR)</option>
+              <option value="$">$ (USD)</option>
+              <option value="€">€ (EUR)</option>
+              <option value="£">£ (GBP)</option>
+              <option value="A$">A$ (AUD)</option>
+              <option value="C$">C$ (CAD)</option>
+              <option value="₹">₹ (INR)</option>
+              <option value="¥">¥ (JPY)</option>
+              <option value="CHF">CHF</option>
+              <option value="NZ$">NZ$ (NZD)</option>
+              <option value="S$">S$ (SGD)</option>
+              <option value="HK$">HK$ (HKD)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-update-fee" style="padding: 12px 24px;">Update Fee</button>
+        <span id="fee-alert" style="font-size:13px; font-weight:600; display:none; padding:10px 16px; border-radius:6px; margin-left:12px;"></span>
+      </form>
+    </div>
+    </div>
+
+    <div id="patients-section" style="display: none;">
+    <div class="panel">
+      <div class="panel-header panel-header-border">
+        <div class="panel-title">
+          <h3>Today's Appointments</h3>
+        </div>
         <span class="date-pill">Today</span>
       </div>
       <div class="appt-list" id="doctor-appointments-list">
         <div style="padding:40px; text-align:center; color:var(--muted);">Loading your patients...</div>
       </div>
       <div class="panel-footer">
-        <a class="see-all" href="#">View full appointment calendar →</a>
+        <a href="#">View full appointment calendar &rarr;</a>
+      </div>
+    </div>
+    </div>
+
+    <div id="settings-section" style="display: none;">
+      <header class="main-header" style="margin-bottom: 24px;">
+        <div>
+          <h1>Settings</h1>
+          <p>Manage your profile and account settings</p>
+        </div>
+        <button class="btn-secondary" onclick="document.querySelector('[data-target=\'dashboard-section\']').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to Dashboard
+        </button>
+      </header>
+
+      <div class="settings-tabs">
+        <button class="settings-tab active" id="tab-profile" onclick="switchSettingsTab('profile')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile & Account
+        </button>
+        <button class="settings-tab" id="tab-security" onclick="switchSettingsTab('security')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Security
+        </button>
+      </div>
+
+      <div class="panel settings-panel" id="settings-profile-panel">
+        <div class="panel-header" style="padding-bottom: 16px;">
+          <div class="panel-title">
+            <h3>Profile Information</h3>
+            <p>Update your personal information and profile.</p>
+          </div>
+        </div>
+        <div class="profile-form-grid">
+          <div class="profile-picture-col">
+            <label class="form-label">Profile Picture</label>
+            <div class="avatar-preview" id="prof-avatar-preview">DR</div>
+            <p class="avatar-help">JPG, PNG or GIF.<br>Max size 2MB.</p>
+            <input type="file" id="profile-upload" style="display:none;" accept="image/*" onchange="previewProfilePic(event)">
+            <button class="btn-outline" onclick="document.getElementById('profile-upload').click()">
+               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Change Photo
+            </button>
+          </div>
+          <div class="profile-fields-col">
+            <div class="input-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="prof-name" class="input-control" value="Dr. ALI">
+            </div>
+            <div class="input-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="prof-email" class="input-control" value="dr.ali@medicare.com">
+            </div>
+            <div class="input-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" id="prof-phone" class="input-control" value="+92 300 1234567">
+            </div>
+            <div class="input-group">
+              <label class="form-label">Specialization</label>
+              <input type="text" id="prof-spec" class="input-control" value="Cardiologist">
+            </div>
+            <div class="input-group full-width">
+              <label class="form-label">Qualification</label>
+              <input type="text" id="prof-qual" class="input-control" value="MBBS, FCPS (Cardiology)">
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer-right">
+          <span id="prof-error" style="color:var(--coral); font-size:13px; font-weight:600; margin-right:16px; align-self:center; display:none;"></span>
+          <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+
+      <div class="panel settings-panel" id="settings-password-panel" style="display:none;">
+        <div class="panel-header" style="padding-bottom: 16px;">
+          <div class="panel-title">
+            <h3>Change Password</h3>
+            <p>Update your password to keep your account secure.</p>
+          </div>
+        </div>
+        <div class="password-form">
+          <div class="input-group full-width">
+            <label class="form-label">Current Password</label>
+            <div class="input-with-icon">
+              <input type="password" id="pwd-current" class="input-control" placeholder="Enter current password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" onclick="togglePwd('pwd-current', this)"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+          </div>
+          <div class="input-group full-width">
+            <label class="form-label">New Password</label>
+            <div class="input-with-icon">
+              <input type="password" id="pwd-new" class="input-control" placeholder="Enter new password" oninput="checkPwdRules(this.value)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" onclick="togglePwd('pwd-new', this)"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+          </div>
+          <div class="input-group full-width">
+            <label class="form-label">Confirm New Password</label>
+            <div class="input-with-icon">
+              <input type="password" id="pwd-confirm" class="input-control" placeholder="Confirm new password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" onclick="togglePwd('pwd-confirm', this)"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+          </div>
+          <div class="password-rules">
+            <div class="rules-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg> <strong>Password must contain:</strong>
+            </div>
+            <div class="rules-grid">
+              <span id="rule-len" style="transition: all 0.2s;">✓ At least 8 characters</span>
+              <span id="rule-num" style="transition: all 0.2s;">✓ One number</span>
+              <span id="rule-up" style="transition: all 0.2s;">✓ One uppercase letter</span>
+              <span id="rule-sp" style="transition: all 0.2s;">✓ One special character</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer-right">
+          <span id="pwd-error" style="color:var(--coral); font-size:13px; font-weight:600; margin-right:16px; align-self:center; display:none;"></span>
+          <button class="btn-primary" onclick="updatePassword()">Update Password</button>
+        </div>
+      </div>
+
+      <div class="panel settings-panel" id="settings-account-panel" style="display:none;">
+        <div class="panel-header" style="padding-bottom: 16px;">
+          <div class="panel-title">
+            <h3>Account Information</h3>
+          </div>
+        </div>
+        <div class="account-info-list">
+          <div class="account-info-item">
+            <div class="ai-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+            <div class="ai-text">
+              <strong>Account Created</strong>
+              <span>12 Jan 2026, 10:30 AM</span>
+            </div>
+            <svg class="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+          <div class="account-info-item">
+            <div class="ai-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+            <div class="ai-text">
+              <strong>Last Login</strong>
+              <span>16 Jul 2026, 09:15 AM</span>
+            </div>
+            <svg class="chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </div>
+        </div>
       </div>
     </div>
 
-  </div>
-  <script>
+  </main>
+</div>
+
+<script>
+    var _profilePicBase64 = '';
+
+    function toggleSidebar() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    }
+
+    function togglePwd(id, svg) {
+        var input = document.getElementById(id);
+        if (input.type === 'password') {
+            input.type = 'text';
+            svg.style.color = 'var(--forest)';
+        } else {
+            input.type = 'password';
+            svg.style.color = 'var(--muted)';
+        }
+    }
+
+    function checkPwdRules(val) {
+        document.getElementById('rule-len').style.fontWeight = val.length >= 8 ? '700' : 'normal';
+        document.getElementById('rule-num').style.fontWeight = /\d/.test(val) ? '700' : 'normal';
+        document.getElementById('rule-up').style.fontWeight = /[A-Z]/.test(val) ? '700' : 'normal';
+        document.getElementById('rule-sp').style.fontWeight = /[^A-Za-z0-9]/.test(val) ? '700' : 'normal';
+    }
+
+    function updatePassword() {
+        var err = document.getElementById('pwd-error');
+        var cur = document.getElementById('pwd-current').value;
+        var neu = document.getElementById('pwd-new').value;
+        var con = document.getElementById('pwd-confirm').value;
+        if (!cur || !neu || !con) {
+            err.textContent = 'All password fields are required.';
+            err.style.color = 'var(--coral)';
+            err.style.display = 'inline-block';
+        } else if (neu !== con) {
+            err.textContent = 'New passwords do not match.';
+            err.style.color = 'var(--coral)';
+            err.style.display = 'inline-block';
+        } else {
+            err.textContent = 'Password updated successfully!';
+            err.style.color = 'var(--forest)';
+            err.style.display = 'inline-block';
+            setTimeout(() => { err.style.display = 'none'; document.getElementById('pwd-current').value=''; document.getElementById('pwd-new').value=''; document.getElementById('pwd-confirm').value=''; checkPwdRules(''); }, 3000);
+        }
+    }
+
+    async function saveProfile() {
+        var err = document.getElementById('prof-error');
+        var btn = event.target;
+        var name = document.getElementById('prof-name').value;
+        var email = document.getElementById('prof-email').value;
+        var phone = document.getElementById('prof-phone').value;
+        var spec = document.getElementById('prof-spec').value;
+        var qual = document.getElementById('prof-qual').value;
+        
+        if (!name.trim() || !email.trim() || !phone.trim() || !spec.trim() || !qual.trim()) {
+            err.textContent = 'Please fill in all required fields.';
+            err.style.color = 'var(--coral)';
+            err.style.display = 'inline-block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        try {
+            var token = localStorage.getItem('hcrm_token');
+            var resp = await fetch('/api/doctors/profile', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    specialization: spec,
+                    qualification: qual,
+                    profilePictureBase64: _profilePicBase64
+                })
+            });
+
+            var body = await resp.json();
+            if (body.success) {
+                err.textContent = 'Profile updated successfully!';
+                err.style.color = 'var(--forest)';
+                err.style.display = 'inline-block';
+                setTimeout(() => { err.style.display = 'none'; }, 3000);
+                
+                document.getElementById('nav-name').textContent = 'Dr. ' + name;
+                if (_profilePicBase64) {
+                    var nv = document.getElementById('nav-avatar');
+                    nv.textContent = '';
+                    nv.style.backgroundImage = 'url(' + _profilePicBase64 + ')';
+                    nv.style.backgroundSize = 'cover';
+                    nv.style.backgroundPosition = 'center';
+                }
+            } else {
+                err.textContent = body.message || 'Failed to update profile.';
+                err.style.color = 'var(--coral)';
+                err.style.display = 'inline-block';
+            }
+        } catch(e) {
+            err.textContent = 'Network error.';
+            err.style.color = 'var(--coral)';
+            err.style.display = 'inline-block';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Save Changes';
+        }
+    }
+
+    function previewProfilePic(e) {
+        var file = e.target.files[0];
+        if(file) {
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                _profilePicBase64 = ev.target.result;
+                var pv = document.getElementById('prof-avatar-preview');
+                pv.textContent = '';
+                pv.style.backgroundImage = 'url(' + ev.target.result + ')';
+                pv.style.backgroundSize = 'cover';
+                pv.style.backgroundPosition = 'center';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function switchSettingsTab(tab) {
+        if(tab === 'profile') {
+            document.getElementById('tab-profile').classList.add('active');
+            document.getElementById('tab-security').classList.remove('active');
+            document.getElementById('settings-profile-panel').style.display = 'block';
+            document.getElementById('settings-password-panel').style.display = 'none';
+            document.getElementById('settings-account-panel').style.display = 'none';
+        } else {
+            document.getElementById('tab-security').classList.add('active');
+            document.getElementById('tab-profile').classList.remove('active');
+            document.getElementById('settings-profile-panel').style.display = 'none';
+            document.getElementById('settings-password-panel').style.display = 'block';
+            document.getElementById('settings-account-panel').style.display = 'block';
+        }
+    }
+
+    function toggleLogout() {
+        var btn = document.getElementById('logout-btn');
+        if (btn.style.display === 'none' || btn.style.display === '') {
+            btn.style.display = 'flex';
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
     function logout() {
       localStorage.removeItem('hcrm_token');
       document.cookie = 'hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       window.location.replace('/Account/Login');
     }
 
-    // Parse JWT to get role
     function parseJwt(token) {
         try {
             var base64Url = token.split('.')[1];
@@ -276,6 +822,24 @@
     }
 
     document.addEventListener('DOMContentLoaded', async function () {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                var targetId = this.getAttribute('data-target');
+                if (targetId) {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+
+                    document.getElementById('dashboard-section').style.display = 'none';
+                    document.getElementById('fee-section').style.display = 'none';
+                    document.getElementById('patients-section').style.display = 'none';
+                    document.getElementById('settings-section').style.display = 'none';
+
+                    document.getElementById(targetId).style.display = 'block';
+                }
+            });
+        });
+
         var token = localStorage.getItem('hcrm_token');
         if (!token) {
             window.location.replace('/Account/Login');
@@ -284,24 +848,17 @@
 
         var payload = parseJwt(token);
         if (payload) {
-            var role = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-            if (role === 'SuperAdmin') {
-                var navApprovals = document.getElementById('nav-approvals');
-                if (navApprovals) {
-                    navApprovals.style.display = 'inline-block';
-                }
-            }
             if (payload.name) {
-                var nameEl = document.querySelector('.nav-user .label');
-                var avatarEl = document.querySelector('.nav-user .avatar');
+                var nameEl = document.getElementById('nav-name');
+                var avatarEl = document.getElementById('nav-avatar');
                 if (nameEl) nameEl.textContent = 'Dr. ' + payload.name;
                 if (avatarEl) avatarEl.textContent = payload.name.substring(0, 2).toUpperCase();
             }
         }
 
         try {
-            var payload = parseJwt(token);
-            var myId = payload['sub'] || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+            var payloadObj = parseJwt(token);
+            var myId = payloadObj['sub'] || payloadObj['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
             
             var [patResp, docResp] = await Promise.all([
                 fetch('/api/patients', { headers: { 'Authorization': 'Bearer ' + token } }),
@@ -315,6 +872,27 @@
                 if (me) {
                     if (me.fee != null) document.getElementById('fee-amount').value = me.fee;
                     if (me.currency) document.getElementById('fee-currency').value = me.currency;
+
+                    if (me.name) {
+                        document.getElementById('prof-name').value = me.name;
+                    }
+                    if (me.email) document.getElementById('prof-email').value = me.email;
+                    if (me.phone) document.getElementById('prof-phone').value = me.phone;
+                    if (me.specialization) document.getElementById('prof-spec').value = me.specialization;
+                    if (me.qualification) document.getElementById('prof-qual').value = me.qualification;
+                    if (me.profilePictureUrl) {
+                        var pv = document.getElementById('prof-avatar-preview');
+                        pv.textContent = '';
+                        pv.style.backgroundImage = 'url(' + me.profilePictureUrl + ')';
+                        pv.style.backgroundSize = 'cover';
+                        pv.style.backgroundPosition = 'center';
+                        
+                        var nv = document.getElementById('nav-avatar');
+                        nv.textContent = '';
+                        nv.style.backgroundImage = 'url(' + me.profilePictureUrl + ')';
+                        nv.style.backgroundSize = 'cover';
+                        nv.style.backgroundPosition = 'center';
+                    }
                 }
             }
             
@@ -344,14 +922,14 @@
                         alertBox.style.background = 'var(--sage-light)';
                     } else {
                         alertBox.textContent = updateBody.message || 'Failed to update fee.';
-                        alertBox.style.color = 'var(--error)';
+                        alertBox.style.color = 'var(--coral)';
                         alertBox.style.background = 'var(--coral-light)';
                     }
                     alertBox.style.display = 'inline-block';
                     setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
                 } catch(err) {
                     alertBox.textContent = 'Network error.';
-                    alertBox.style.color = 'var(--error)';
+                    alertBox.style.color = 'var(--coral)';
                     alertBox.style.background = 'var(--coral-light)';
                     alertBox.style.display = 'inline-block';
                 } finally {
@@ -365,7 +943,6 @@
             if (body.success && body.data && body.data.items) {
                 var patients = body.data.items;
                 
-                // Sort by appointment datetime
                 patients.forEach(function(p) {
                     p._dateObj = new Date(0);
                     if (p.appointmentDate) {
@@ -391,7 +968,6 @@
                     var html = '';
                     var now = new Date();
                     
-                    // Track which one is next
                     var nextApptIndex = patients.findIndex(p => p.appointmentStatus !== 'Completed');
                     
                     patients.forEach(function(p, i) {
@@ -403,18 +979,18 @@
                         var isCompleted = p.appointmentStatus === 'Completed';
                         var statusHtml = '';
                         if (isCompleted) {
-                            statusHtml = '<span class="appt-status" style="background:var(--sage-light); color:var(--forest);">Done ✓</span>';
+                            statusHtml = '<span class="appt-status done">Done ✓</span>';
                         } else if (isTimeStarted) {
-                            statusHtml = `<button class="btn-primary" onclick="completeAppointment('${p.id}')" style="padding:6px 12px; font-size:12px; border-radius:6px; background:var(--forest); color:#fff; border:none; cursor:pointer;">Mark Done</button>`;
+                            statusHtml = `<button class="appt-status action" onclick="completeAppointment('${p.id}')">Mark Done</button>`;
                         } else {
-                            statusHtml = `<button class="btn-primary" disabled style="padding:6px 12px; font-size:12px; border-radius:6px; background:var(--muted); color:#fff; border:none; cursor:not-allowed; opacity:0.6;">Scheduled</button>`;
+                            statusHtml = `<button class="appt-status action" disabled style="background:var(--muted); opacity:0.6; cursor:not-allowed;">Scheduled</button>`;
                         }
                         
                         html += `
                         <div class="appt-item">
-                          <span class="appt-time">${time}</span>
-                          <span class="appt-bar ${isNext ? 'next' : 'wait'}"></span>
-                          <div class="appt-info"><div class="name">${p.name}</div><div class="type">${date}</div></div>
+                          <span class="appt-time ${isNext ? 'next' : ''}">${time}</span>
+                          <span class="appt-bar ${isNext ? 'next' : ''}"></span>
+                          <div class="appt-info"><div class="name">${p.name}</div><div class="date">${date}</div></div>
                           ${statusHtml}
                         </div>
                         `;
@@ -422,16 +998,16 @@
                     listEl.innerHTML = html;
                     
                     // Update stats
-                    document.querySelector('.stat.c1 .num').textContent = patients.length;
-                    document.querySelector('.stat.c1 .sub').textContent = 'Assigned to you';
-                    document.querySelector('.stat.c2 .num').textContent = patients.length;
+                    document.getElementById('stat-appt-num').textContent = patients.length;
+                    document.getElementById('stat-pat-num').textContent = patients.length;
                     
                     if (nextApptIndex !== -1) {
-                        document.querySelector('.stat.c3 .num').textContent = patients[nextApptIndex].appointmentTime || '--:--';
-                        document.querySelector('.stat.c3 .sub').textContent = patients[nextApptIndex].name;
+                        var nt = patients[nextApptIndex].appointmentTime || '--:--';
+                        document.getElementById('stat-next-time').textContent = nt;
+                        document.getElementById('stat-next-name').textContent = patients[nextApptIndex].name;
                     } else {
-                        document.querySelector('.stat.c3 .num').textContent = '--:--';
-                        document.querySelector('.stat.c3 .sub').textContent = 'None';
+                        document.getElementById('stat-next-time').textContent = '--:--';
+                        document.getElementById('stat-next-name').textContent = 'None';
                     }
                 }
             } else {
@@ -445,7 +1021,7 @@
     window.completeAppointment = async function(id) {
         if (!confirm('Mark this appointment as completed?')) return;
         try {
-            var token = localStorage.getItem('jwt');
+            var token = localStorage.getItem('hcrm_token');
             var resp = await fetch('/api/patients/' + id + '/complete', {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + token }
@@ -460,6 +1036,6 @@
             alert('Network error.');
         }
     }
-  </script>
+</script>
 </body>
 </html>

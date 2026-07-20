@@ -45,6 +45,11 @@ namespace HealthcareCRM.Models
         [BsonIgnoreIfNull]
         public string? Specialization { get; set; }
 
+        /// <summary>Gets or sets the doctor's qualification.</summary>
+        [BsonElement("qualification")]
+        [BsonIgnoreIfNull]
+        public string? Qualification { get; set; }
+
         /// <summary>Gets or sets the doctor's phone number.</summary>
         [BsonElement("phone")]
         [BsonIgnoreIfNull]

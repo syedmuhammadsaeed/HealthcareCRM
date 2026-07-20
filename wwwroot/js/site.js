@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (isAuthenticated()) {
         if (navAuthenticated) navAuthenticated.style.display = 'flex';
-        if (navLogout)        navLogout.style.display        = 'flex';
+        // navLogout is hidden by default and toggled by clicking navAuthenticated
         if (navGuest)         navGuest.style.display         = 'none';
 
         var payload = parseJwt(getToken());
