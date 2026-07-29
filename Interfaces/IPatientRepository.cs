@@ -7,8 +7,8 @@ namespace HealthcareCRM.Interfaces
     /// </summary>
     public interface IPatientRepository
     {
-        /// <summary>Retrieves a paginated list of patients, optionally filtered by a search query and doctor ID.</summary>
-        Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize, string? doctorId = null);
+        /// <summary>Retrieves a paginated list of patients, optionally filtered by a search query, doctor ID, and online status.</summary>
+        Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize, string? doctorId = null, bool? isOnline = null);
 
         /// <summary>Retrieves a patient by their MongoDB ObjectId string.</summary>
         Task<Patient?> GetByIdAsync(string patientId);

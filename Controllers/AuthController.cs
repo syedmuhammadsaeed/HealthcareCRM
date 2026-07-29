@@ -96,7 +96,7 @@ namespace HealthcareCRM.Controllers
                 return BadRequest(ApiResponse<object>.CreateError(result.Message));
             }
 
-            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
+            return Ok(ApiResponse<object?>.CreateSuccess(null, result.Message));
         }
     }
 }

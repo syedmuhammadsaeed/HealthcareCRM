@@ -71,5 +71,14 @@ namespace HealthcareCRM.Models
         [BsonElement("appointmentCurrency")]
         [BsonIgnoreIfNull]
         public string? AppointmentCurrency { get; set; }
+
+        /// <summary>Gets or sets whether the patient booked online.</summary>
+        [BsonElement("isOnline")]
+        public bool IsOnline { get; set; } = false;
+
+        /// <summary>Gets or sets the linked online user ID, if applicable.</summary>
+        [BsonElement("userId")]
+        [BsonIgnoreIfNull]
+        public string? UserId { get; set; }
     }
 }

@@ -84,5 +84,21 @@ namespace HealthcareCRM.Models
         [BsonElement("profilePictureUrl")]
         [BsonIgnoreIfNull]
         public string? ProfilePictureUrl { get; set; }
+
+        [BsonElement("dateOfBirth")]
+        [BsonIgnoreIfNull]
+        public DateTime? DateOfBirth { get; set; }
+
+        [BsonElement("emergencyContactName")]
+        [BsonIgnoreIfNull]
+        public string? EmergencyContactName { get; set; }
+
+        [BsonElement("emergencyContactRelationship")]
+        [BsonIgnoreIfNull]
+        public string? EmergencyContactRelationship { get; set; }
+
+        [BsonElement("emergencyContactNumber")]
+        [BsonIgnoreIfNull]
+        public string? EmergencyContactNumber { get; set; }
     }
 }

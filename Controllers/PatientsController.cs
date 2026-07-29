@@ -32,12 +32,13 @@ namespace HealthcareCRM.Controllers
         /// <param name="search">Optional search term matched against name, phone, and address.</param>
         /// <param name="page">Page number (default 1).</param>
         /// <param name="pageSize">Number of items per page (default 20).</param>
+        /// <param name="isOnline">Optional filter for online patients.</param>
         /// <response code="200">Returns the list of patients.</response>
         /// <response code="401">JWT token is missing or invalid.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] bool? isOnline = null)
         {
             var userRole = User.FindFirstValue(System.Security.Claims.ClaimTypes.Role);
             var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) 
@@ -49,7 +50,7 @@ namespace HealthcareCRM.Controllers
                 doctorId = userId;
             }
 
-            var patients = await _patientService.GetPatientsAsync(search, page, pageSize, doctorId);
+            var patients = await _patientService.GetPatientsAsync(search, page, pageSize, doctorId, isOnline);
             return Ok(ApiResponse<object>.CreateSuccess(patients, "Patients retrieved successfully."));
         }
 
@@ -217,7 +218,7 @@ namespace HealthcareCRM.Controllers
                 return BadRequest(ApiResponse<object>.CreateError(result.Message));
             }
             
-            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
+            return Ok(ApiResponse<object?>.CreateSuccess(null, result.Message));
         }
     }
 }

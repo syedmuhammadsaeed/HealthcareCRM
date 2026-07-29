@@ -65,7 +65,7 @@ namespace HealthcareCRM.Controllers
                 return BadRequest(ApiResponse<object>.CreateError(result.Message));
             }
 
-            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
+            return Ok(ApiResponse<object?>.CreateSuccess(null, result.Message));
         }
         /// <summary>
         /// Updates the currently logged-in doctor's profile.
@@ -87,7 +87,7 @@ namespace HealthcareCRM.Controllers
             var result = await _doctorService.UpdateProfileAsync(doctorId, request.Name, request.Email, request.Phone, request.Specialization, request.Qualification, request.ProfilePictureBase64);
             if (!result.IsSuccess) return BadRequest(ApiResponse<object>.CreateError(result.Message));
 
-            return Ok(ApiResponse<object>.CreateSuccess(null, result.Message));
+            return Ok(ApiResponse<object?>.CreateSuccess(null, result.Message));
         }
     }
 

@@ -28,7 +28,7 @@ namespace HealthcareCRM.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize, string? doctorId = null)
+        public async Task<(IEnumerable<Patient> Items, int TotalCount)> GetPagedAsync(string? query, int page, int pageSize, string? doctorId = null, bool? isOnline = null)
         {
             FilterDefinition<Patient> filter = Builders<Patient>.Filter.Empty;
             
@@ -46,6 +46,23 @@ namespace HealthcareCRM.Repositories
             {
                 var doctorFilter = Builders<Patient>.Filter.Eq(p => p.AssignedDoctorId, doctorId);
                 filter = Builders<Patient>.Filter.And(filter, doctorFilter);
+            }
+
+            if (isOnline.HasValue)
+            {
+                if (isOnline.Value)
+                {
+                    var onlineFilter = Builders<Patient>.Filter.Eq(p => p.IsOnline, true);
+                    filter = Builders<Patient>.Filter.And(filter, onlineFilter);
+                }
+                else
+                {
+                    var offlineFilter = Builders<Patient>.Filter.Or(
+                        Builders<Patient>.Filter.Eq(p => p.IsOnline, false),
+                        Builders<Patient>.Filter.Exists(p => p.IsOnline, false)
+                    );
+                    filter = Builders<Patient>.Filter.And(filter, offlineFilter);
+                }
             }
 
             var totalCount = await _patients.CountDocumentsAsync(filter);

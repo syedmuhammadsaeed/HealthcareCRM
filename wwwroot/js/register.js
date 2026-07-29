@@ -5,10 +5,10 @@
 'use strict';
 
 (function () {
-    // Already logged in — go straight to patients
+    // If the user navigates to the register page, clear existing session
     if (localStorage.getItem('hcrm_token')) {
-        window.location.replace('/Patient');
-        return;
+        localStorage.removeItem('hcrm_token');
+        document.cookie = 'hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
 
     var form                 = document.getElementById('register-form');

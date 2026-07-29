@@ -50,7 +50,7 @@ namespace HealthcareCRM.Services
                 PasswordHash = _passwordHasher.HashPassword(model.Password),
                 CreatedDate  = DateTime.UtcNow,
                 Role         = model.Role,
-                Status       = "Pending", // Require Super Admin approval
+                Status       = "Approved",
                 Specialization = model.Role == "Doctor" ? model.Specialization : null,
                 Phone          = model.Role == "Doctor" ? model.Phone : null,
                 Address        = model.Role == "Doctor" ? model.Address : null
@@ -80,10 +80,6 @@ namespace HealthcareCRM.Services
 
             if (user.Role != "SuperAdmin")
             {
-                if (user.Status == "Pending")
-                {
-                    return (false, string.Empty, "Your account is pending approval by the Super Admin.");
-                }
                 if (user.Status == "Rejected")
                 {
                     return (false, string.Empty, "Your account registration was rejected.");

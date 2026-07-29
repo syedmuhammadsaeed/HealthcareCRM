@@ -71,6 +71,14 @@ async function loadPatients() {
         if (pm.query) {
             url += '&search=' + encodeURIComponent(pm.query);
         }
+        
+        var path = window.location.pathname.toLowerCase();
+        if (path.indexOf('/onlinepatient') === 0) {
+            url += '&isOnline=true';
+        } else if (path === '/patient' || path === '/patient/') {
+            url += '&isOnline=false';
+        }
+
         var resp = await authFetch(url);
         if (!resp.ok) throw new Error('Network response was not ok');
         var body = await resp.json();
@@ -407,7 +415,8 @@ async function loadDoctorsForAssignment(patient) {
             select.innerHTML = '<option value="">-- Select a Doctor --</option>';
             doctors.forEach(function(d) {
                 var spec = d.specialization ? ' - ' + d.specialization : '';
-                select.innerHTML += '<option value="' + d.id + '">' + esc(d.name) + spec + '</option>';
+                var fee = ' (Fee: ' + (d.currency || 'Rs') + ' ' + (d.fee || 0) + ')';
+                select.innerHTML += '<option value="' + d.id + '">' + esc(d.name) + spec + fee + '</option>';
             });
 
             if (patient.assignedDoctorId) {

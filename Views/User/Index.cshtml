@@ -1,0 +1,348 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Zenith Health</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --bg-color: #f2f7f4;
+            --sidebar-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary: #2b7a4b;
+            --primary-light: #e8f3ec;
+            --border: #e5e7eb;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; font-weight: 700; font-size: 20px; }
+        .brand img, .brand i { color: var(--primary); font-size: 26px; }
+        
+        .nav-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 16px; padding: 0 8px; }
+        
+        .nav-items { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; text-decoration: none; color: var(--text-main); font-weight: 500; font-size: 14px; transition: all 0.2s; }
+        .nav-item i { width: 20px; text-align: center; color: var(--text-muted); font-size: 16px; }
+        .nav-item:hover { background: #f3f4f6; }
+        .nav-item.active { background: var(--primary-light); color: var(--primary); border-left: 4px solid var(--primary); border-radius: 4px 8px 8px 4px; padding-left: 10px; }
+        .nav-item.active i { color: var(--primary); }
+        
+        .nav-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+        
+        /* Main Content */
+        .main-content { flex: 1; padding: 32px 40px; overflow-y: auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
+        .header h1 { font-size: 26px; font-weight: 700; margin: 0; }
+        .user-profile { display: flex; align-items: center; gap: 16px; text-align: right; }
+        .user-profile-text h2 { font-size: 22px; font-weight: 600; margin: 0; color: #000; }
+        .user-profile-text p { font-size: 14px; color: var(--text-muted); margin: 4px 0 0; }
+        .user-profile img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--card-bg); border: 1.5px solid var(--primary); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .stat-card .icon { background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 20px; }
+        .stat-card h3 { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
+        .stat-card p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.4; }
+        .stat-card .value { font-size: 24px; font-weight: 600; color: var(--text-main); margin-top: 4px; }
+        
+        /* Main Grid */
+        .main-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
+        
+        .panel { background: var(--card-bg); border-radius: 12px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #f0f0f0; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .panel-header h3 { font-size: 16px; font-weight: 600; margin: 0; }
+        .panel-header i { color: var(--text-muted); cursor: pointer; }
+        
+        /* Next Appointment */
+        .doctor-profile { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+        .doctor-profile img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .doctor-profile h4 { font-size: 16px; font-weight: 600; margin: 0 0 2px; }
+        .doctor-profile p { font-size: 13px; color: var(--text-muted); margin: 0; }
+        
+        .btn { display: block; width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; transition: all 0.2s; border: none; margin-bottom: 12px; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #236c43; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary-light); }
+        
+        /* Appointment History Table */
+        .panel-table { padding: 0; overflow: hidden; }
+        .panel-table .panel-header { padding: 22px 22px 10px; margin-bottom: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 13px; font-weight: 600; color: #000; padding: 12px 22px; border-bottom: 1px solid var(--border); }
+        td { padding: 16px 22px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        .status-badge { background: var(--success-light); color: var(--success); padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .btn-view { padding: 7px 14px; border: 1px solid var(--border); border-radius: 6px; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); }
+        .btn-view:hover { background: #f9fafb; }
+        
+        /* Recent Activity */
+        .timeline { position: relative; padding-left: 20px; }
+        .timeline::before { content: ''; position: absolute; left: 5px; top: 8px; bottom: 0; width: 1.5px; background: #e5e7eb; }
+        .timeline-item { position: relative; margin-bottom: 24px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-item::before { content: ''; position: absolute; left: -19px; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--primary); border: 2px solid white; box-shadow: 0 0 0 1.5px var(--primary); }
+        .timeline-item h4 { font-size: 14px; font-weight: 500; margin: 0 0 4px; }
+        .timeline-item p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.4; }
+        
+        /* Skeletons */
+        .skeleton-line { height: 12px; background: #f0f0f0; border-radius: 6px; margin-bottom: 12px; }
+        .skeleton-line:nth-child(1) { width: 100%; }
+        .skeleton-line:nth-child(2) { width: 85%; }
+        .skeleton-line:nth-child(3) { width: 50%; }
+        
+        /* Health Summary */
+        .vitals { margin-top: 10px; }
+        .vitals p { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: var(--text-main); }
+        .vitals span { color: var(--text-muted); font-size: 13px; font-weight: 400; }
+        .chart-placeholder { height: 50px; margin-top: 20px; position: relative; overflow: hidden; margin-right: -22px; margin-bottom: -22px;}
+        .chart-placeholder svg { width: 100%; height: 100%; display: block; }
+    </style>
+    <style>
+        body.dark-mode { --bg-color: #111827; --sidebar-bg: #1f2937; --text-main: #f9fafb; --text-muted: #9ca3af; --primary: #34d399; --primary-light: rgba(52, 211, 153, 0.15); --border: #374151; --card-bg: #1f2937; }
+        body.dark-mode .panel { border: 1px solid var(--border); box-shadow: none; }
+        body.dark-mode .form-control, body.dark-mode .search-box input, body.dark-mode .phone-prefix, body.dark-mode .select-icon, body.dark-mode .filter-select { background-color: #374151 !important; border-color: var(--border) !important; color: var(--text-main) !important; }
+        body.dark-mode .nav-item:hover { background: rgba(255,255,255,0.05); }
+        body.dark-mode table th { background: #1f2937; color: #f9fafb; border-bottom-color: var(--border); }
+        body.dark-mode table td { border-bottom-color: var(--border); }
+        body.dark-mode .btn-outline { border-color: var(--border); color: var(--text-main); }
+        body.dark-mode .btn-outline:hover { background: #374151; }
+        body.dark-mode .dropdown-menu, body.dark-mode .profile-dropdown-menu { background: #1f2937; border-color: var(--border); }
+        body.dark-mode .dropdown-item, body.dark-mode .profile-dropdown-menu a { color: var(--text-main) !important; }
+        body.dark-mode .dropdown-item:hover, body.dark-mode .profile-dropdown-menu a:hover { background: #374151; }
+        body.dark-mode .profile-dropdown-btn { background: #1f2937 !important; border-color: var(--border) !important; }
+        /* Fix invisible words (white text on white background) */
+        body.dark-mode .btn-action, body.dark-mode .page-btn, body.dark-mode .upload-area, body.dark-mode .file-item, body.dark-mode .time-slot, body.dark-mode .doc-card, body.dark-mode .timeline-item::before { background: #1f2937 !important; border-color: var(--border) !important; color: var(--text-main) !important; }
+        body.dark-mode .btn-action:hover, body.dark-mode .page-btn:hover, body.dark-mode .time-slot:hover { background: #374151 !important; }
+        body.dark-mode .icon, body.dark-mode .pt-avatar, body.dark-mode .feature-icon, body.dark-mode .skeleton-line { background: #374151 !important; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6, body.dark-mode p, body.dark-mode label { color: inherit; }
+        body.dark-mode .text-muted, body.dark-mode .patient-id, body.dark-mode .sub-text { color: var(--text-muted) !important; }
+        body.dark-mode .tab { color: var(--text-muted); }
+        body.dark-mode .tab.active { color: var(--text-main); }
+
+        .sidebar { transition: width 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .brand span { display: none; }
+        .sidebar.collapsed .brand { justify-content: center; padding: 0; }
+        .sidebar.collapsed .nav-label { display: none; }
+        .sidebar.collapsed .nav-item span { display: none; }
+        .sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-square-plus"></i>
+            <span>MediCare</span>
+        </div>
+        
+        <div class="nav-label">Nav items</div>
+        <div class="nav-items">
+            <a href="/User" class="nav-item active"><i class="fa-solid fa-border-all"></i> <span>Dashboard</span></a>
+            <a href="/User/BookAppointment" class="nav-item"><i class="fa-regular fa-calendar-check"></i> <span>Book Appointment</span></a>
+            <a href="/User/AppointmentHistory" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> <span>Appointment History</span></a>
+            <a href="/User/LabReports" class="nav-item"><i class="fa-solid fa-file-waveform"></i> <span>Lab Reports</span></a>
+        </div>
+        
+        <div class="nav-bottom">
+            <div class="nav-item" onclick="toggleSidebar()" style="cursor:pointer; color:var(--text-muted);">
+                <i class="fa-solid fa-chevron-left" id="collapseIcon"></i>
+                <span>Collapse Menu</span>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+
+        <div style="display:flex; justify-content: flex-end; align-items: flex-start; margin-bottom: 20px; width: 100%;">
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="toggleProfileMenu(event)" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:var(--card-bg); border:1px solid var(--border); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString((string)ViewBag.UserName ?? "User") + "&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2;">@(ViewBag.UserName ?? "User")</span>
+                        <span style="font-size:11px; color:var(--text-muted); line-height:1.2;">Patient</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--text-muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/User/Settings" style="padding:10px 14px; color:var(--text-main); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-gear"></i> Settings</a>
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token');" style="padding:10px 14px; color:#ef4444; text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header">
+            <h1>Dashboard</h1>
+            
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon"><i class="fa-regular fa-calendar"></i></div>
+                <h3>Upcoming Appointments</h3>
+                <div class="value">@ViewBag.UpcomingCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fa-solid fa-flask"></i></div>
+                <h3>Pending Lab Reports</h3>
+                <div class="value">@ViewBag.PendingLabCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fa-regular fa-file-lines"></i></div>
+                <h3>Completed Lab Reports</h3>
+                <div class="value">@ViewBag.CompletedLabCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fa-solid fa-receipt"></i></div>
+                <h3>Today Appointments</h3>
+                <div class="value">@ViewBag.TodayAppointmentsCount</div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div class="col-left">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Next Appointment</h3>
+                    </div>
+                    @if(ViewBag.NextAppointment != null)
+                    {
+                        var nextAppt = (HealthcareCRM.Models.Appointment)ViewBag.NextAppointment;
+                        <div class="doctor-profile">
+                            <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(nextAppt.DoctorName ?? "Unknown")&background=random" alt="@nextAppt.DoctorName" />
+                            <div>
+                                <h4>Dr. @nextAppt.DoctorName</h4>
+                                <p>@nextAppt.ScheduledAt.ToString("MMM dd, yyyy • h:mm tt")</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Join Video Call</button>
+                        <button class="btn btn-outline">Reschedule</button>
+                        <form method="post" action="/User/BookAppointment" style="margin-top:12px;">
+                            <button type="button" class="btn btn-outline" style="margin-bottom: 0;">Cancel</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">No upcoming appointments scheduled.</p>
+                        <a href="/User/BookAppointment" class="btn btn-primary" style="margin-bottom: 0;">Book Now</a>
+                    }
+                </div>
+            </div>
+            
+            <!-- Center Column -->
+            <div class="col-center">
+                <div class="panel panel-table" style="height: calc(100% - 20px);">
+                    <div class="panel-header">
+                        <h3>Appointment History</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Department</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if(ViewBag.Appointments != null)
+                            {
+                                var appts = (List<HealthcareCRM.Models.Appointment>)ViewBag.Appointments;
+                                if (appts.Any())
+                                {
+                                    foreach(var appt in appts)
+                                    {
+                                        var statusClass = appt.Status == "Completed" ? "status-completed" : appt.Status == "Cancelled" ? "status-cancelled" : appt.Status == "Pending" ? "status-pending" : "status-upcoming";
+                                        <tr>
+                                            <td>Dr. @appt.DoctorName</td>
+                                            <td>@appt.Specialty</td>
+                                            <td>@appt.ScheduledAt.ToString("MM/dd/yy")</td>
+                                            <td><span class="status-badge @statusClass" style="background:var(--primary-light); color:var(--primary);">@appt.Status</span></td>
+                                            <td><button class="btn-view">View Details</button></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr><td colspan="5" style="text-align:center; padding: 20px; color:var(--text-muted);">No recent appointments.</td></tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('collapsed');
+                var icon = document.getElementById('collapseIcon');
+                if (icon) {
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                        localStorage.setItem('sidebarCollapsed', 'true');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                        localStorage.setItem('sidebarCollapsed', 'false');
+                    }
+                }
+            }
+        }
+        
+        function toggleProfileMenu(e) {
+            e.stopPropagation();
+            var menu = document.getElementById('topProfileMenu');
+            if (menu) {
+                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            }
+        }
+        
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
+
+        // Initialize Theme & Sidebar for all pages
+        if (localStorage.getItem('theme') === 'dark' && !document.body.classList.contains('dark-mode')) {
+            document.body.classList.add('dark-mode');
+        }
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            var sidebar = document.querySelector('.sidebar');
+            if(sidebar) {
+                sidebar.classList.add('collapsed');
+                var icon = document.getElementById('collapseIcon');
+                if(icon) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

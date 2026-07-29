@@ -5,30 +5,11 @@
 'use strict';
 
 (function () {
-    // Already logged in — go straight to role dashboard
-    var token = localStorage.getItem('hcrm_token');
-    if (token) {
-        try {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            var payload = JSON.parse(jsonPayload);
-            var actualRole = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-            if (actualRole === 'Doctor') {
-                window.location.replace('/Doctor');
-                return;
-            } else if (actualRole === 'SuperAdmin') {
-                window.location.replace('/SuperAdmin');
-                return;
-            } else if (actualRole === 'Admin') {
-                window.location.replace('/Patient');
-                return;
-            }
-        } catch(e) {}
-        window.location.replace('/Patient');
-        return;
+    // If the user navigates to the login page, ensure any old session is cleared
+    // so they can log in to a different account if they want to.
+    if (localStorage.getItem('hcrm_token')) {
+        localStorage.removeItem('hcrm_token');
+        document.cookie = 'hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
 
     var form           = document.getElementById('login-form');
@@ -134,8 +115,10 @@
                     window.location.replace('/SuperAdmin');
                 } else if (actualRole === 'Admin') {
                     window.location.replace('/Patient');
+                } else if (actualRole === 'User') {
+                    window.location.replace('/User');
                 } else {
-                    window.location.replace('/Home/Index');
+                    window.location.replace('/User');
                 }
             } else {
                 showAlert(result.message || 'Login failed. Please check your credentials.', 'danger');

@@ -22,11 +22,11 @@ namespace HealthcareCRM.Services
         }
 
         /// <summary>
-        /// Returns a paginated list of patients, or filters by a search query and doctor ID if provided.
+        /// Returns a paginated list of patients, or filters by a search query, doctor ID, and online status if provided.
         /// </summary>
-        public async Task<PagedResult<Patient>> GetPatientsAsync(string? query, int page, int pageSize, string? doctorId = null)
+        public async Task<PagedResult<Patient>> GetPatientsAsync(string? query, int page, int pageSize, string? doctorId = null, bool? isOnline = null)
         {
-            var (items, totalCount) = await _patientRepository.GetPagedAsync(query, page, pageSize, doctorId);
+            var (items, totalCount) = await _patientRepository.GetPagedAsync(query, page, pageSize, doctorId, isOnline);
             return new PagedResult<Patient>
             {
                 Items = items,

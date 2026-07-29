@@ -1,0 +1,519 @@
+@model HealthcareCRM.Models.User
+@{
+    Layout = null;
+    var patientId = "P-" + (Model.Id.Length >= 6 ? Model.Id.Substring(Model.Id.Length - 6).ToUpper() : "123456");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Zenith Health</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --bg-color: #f2f7f4;
+            --sidebar-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary: #2b7a4b;
+            --primary-light: #e8f3ec;
+            --border: #e5e7eb;
+            --card-bg: #ffffff;
+            --success: #10b981;
+        }
+        
+        body.dark-mode {
+            --bg-color: #111827;
+            --sidebar-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --primary: #34d399;
+            --primary-light: rgba(52, 211, 153, 0.15);
+            --border: #374151;
+            --card-bg: #1f2937;
+        }
+        body.dark-mode .panel { border: 1px solid var(--border); box-shadow: none; }
+        body.dark-mode .form-control, body.dark-mode .phone-prefix, body.dark-mode .select-icon {
+            background-color: #374151 !important;
+            border-color: var(--border) !important;
+            color: var(--text-main) !important;
+        }
+        body.dark-mode .nav-item:hover { background: rgba(255,255,255,0.05); }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; font-weight: 700; font-size: 20px; }
+        .brand i { color: var(--primary); font-size: 26px; }
+        
+        .nav-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 16px; padding: 0 8px; }
+        
+        .nav-items { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; text-decoration: none; color: var(--text-main); font-weight: 500; font-size: 14px; transition: all 0.2s; }
+        .nav-item i { width: 20px; text-align: center; color: var(--text-muted); font-size: 16px; }
+        .nav-item:hover { background: #f3f4f6; }
+        .nav-item.active { background: var(--primary-light); color: var(--primary); border-left: 4px solid var(--primary); border-radius: 4px 8px 8px 4px; padding-left: 10px; }
+        .nav-item.active i { color: var(--primary); }
+        
+        .nav-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+        
+        /* Main Content */
+        .main-content { flex: 1; padding: 32px 40px; overflow-y: auto; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; font-weight: 700; margin: 0; }
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        
+        .toggle-switch { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #d1d5db; border-radius: 24px; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        
+        .lang-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: white; cursor: pointer; color: var(--text-main); outline: none; -webkit-appearance: none; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .tab { font-size: 15px; font-weight: 500; color: var(--text-main); padding-bottom: 12px; text-decoration: none; position: relative; padding-left: 4px; padding-right: 4px; }
+        .tab:hover { color: var(--text-main); }
+        .tab.active { font-weight: 600; }
+        .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background-color: var(--primary); border-radius: 3px 3px 0 0; }
+        
+        /* Section Header */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-header h2 { font-size: 18px; font-weight: 600; margin: 0; }
+        .section-deco { width: 100px; height: 6px; background-color: #c6ebd4; border-radius: 3px; }
+        
+        /* Grid Layout */
+        .settings-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+        
+        .panel { background: var(--card-bg); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #f0f0f0; position: relative; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .panel-header h3 { font-size: 16px; font-weight: 600; margin: 0; }
+        .panel-header i { color: var(--text-muted); cursor: pointer; }
+        
+        /* Profile Summary */
+        .profile-summary { display: flex; align-items: center; gap: 20px; }
+        .profile-summary img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+        .profile-info h4 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
+        .profile-info p { font-size: 13px; color: var(--text-main); margin: 0 0 12px; font-weight: 500; }
+        .btn-upload { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .btn-upload:hover { background: #236c43; }
+        
+        /* Forms */
+        .form-group { display: flex; align-items: center; margin-bottom: 16px; gap: 16px; }
+        .form-group > label { width: 140px; font-size: 14px; color: var(--text-main); font-weight: 500; }
+        .form-control { flex: 1; padding: 10px 14px; border: 1.5px solid var(--primary); border-radius: 6px; font-size: 14px; outline: none; background: white; color: var(--text-main); }
+        .form-control-placeholder { color: var(--text-main); }
+        .form-control:focus { box-shadow: 0 0 0 3px var(--primary-light); }
+        
+        .form-row { display: flex; gap: 16px; flex: 1; }
+        .form-col { flex: 1; display: flex; align-items: center; gap: 16px; }
+        .form-col label { font-size: 14px; color: var(--text-main); font-weight: 500; }
+        
+        .phone-group { display: flex; flex: 1; gap: 12px; }
+        .phone-prefix { width: 80px; padding: 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; outline: none; -webkit-appearance: none; appearance: none; background: white url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") no-repeat right 10px top 50%; background-size: 10px auto; }
+        
+        .form-group-vertical { margin-bottom: 20px; }
+        .form-group-vertical label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-main); display: none; }
+        
+        .select-icon { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px; outline: none; -webkit-appearance: none; appearance: none; background: white url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E") no-repeat right 14px top 50%; background-size: 10px auto; }
+        
+        /* Emergency Contact specific */
+        .panel-full-height { height: calc(100% - 20px); display: flex; flex-direction: column; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; align-self: flex-end; margin-top: auto; }
+        .btn-save:hover { background: #236c43; }
+
+    </style>
+    <style>
+        body.dark-mode { --bg-color: #111827; --sidebar-bg: #1f2937; --text-main: #f9fafb; --text-muted: #9ca3af; --primary: #34d399; --primary-light: rgba(52, 211, 153, 0.15); --border: #374151; --card-bg: #1f2937; }
+        body.dark-mode .panel { border: 1px solid var(--border); box-shadow: none; }
+        body.dark-mode .form-control, body.dark-mode .search-box input, body.dark-mode .phone-prefix, body.dark-mode .select-icon, body.dark-mode .filter-select { background-color: #374151 !important; border-color: var(--border) !important; color: var(--text-main) !important; }
+        body.dark-mode .nav-item:hover { background: rgba(255,255,255,0.05); }
+        body.dark-mode table th { background: #1f2937; color: #f9fafb; border-bottom-color: var(--border); }
+        body.dark-mode table td { border-bottom-color: var(--border); }
+        body.dark-mode .btn-outline { border-color: var(--border); color: var(--text-main); }
+        body.dark-mode .btn-outline:hover { background: #374151; }
+        body.dark-mode .dropdown-menu, body.dark-mode .profile-dropdown-menu { background: #1f2937; border-color: var(--border); }
+        body.dark-mode .dropdown-item, body.dark-mode .profile-dropdown-menu a { color: var(--text-main) !important; }
+        body.dark-mode .dropdown-item:hover, body.dark-mode .profile-dropdown-menu a:hover { background: #374151; }
+        body.dark-mode .profile-dropdown-btn { background: #1f2937 !important; border-color: var(--border) !important; }
+        /* Fix invisible words (white text on white background) */
+        body.dark-mode .btn-action, body.dark-mode .page-btn, body.dark-mode .upload-area, body.dark-mode .file-item, body.dark-mode .time-slot, body.dark-mode .doc-card, body.dark-mode .timeline-item::before { background: #1f2937 !important; border-color: var(--border) !important; color: var(--text-main) !important; }
+        body.dark-mode .btn-action:hover, body.dark-mode .page-btn:hover, body.dark-mode .time-slot:hover { background: #374151 !important; }
+        body.dark-mode .icon, body.dark-mode .pt-avatar, body.dark-mode .feature-icon, body.dark-mode .skeleton-line { background: #374151 !important; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6, body.dark-mode p, body.dark-mode label { color: inherit; }
+        body.dark-mode .text-muted, body.dark-mode .patient-id, body.dark-mode .sub-text { color: var(--text-muted) !important; }
+        body.dark-mode .tab { color: var(--text-muted); }
+        body.dark-mode .tab.active { color: var(--text-main); }
+
+        .sidebar { transition: width 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .brand span { display: none; }
+        .sidebar.collapsed .brand { justify-content: center; padding: 0; }
+        .sidebar.collapsed .nav-label { display: none; }
+        .sidebar.collapsed .nav-item span { display: none; }
+        .sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-square-plus"></i>
+            <span>MediCare</span>
+        </div>
+        
+        <div class="nav-label">Nav items</div>
+        <div class="nav-items">
+            <a href="/User" class="nav-item"><i class="fa-solid fa-border-all"></i> <span>Dashboard</span></a>
+            <a href="/User/BookAppointment" class="nav-item"><i class="fa-regular fa-calendar-check"></i> <span>Book Appointment</span></a>
+            <a href="/User/AppointmentHistory" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> <span>Appointment History</span></a>
+            <a href="/User/LabReports" class="nav-item"><i class="fa-solid fa-file-waveform"></i> <span>Lab Reports</span></a>
+        </div>
+        
+        <div class="nav-bottom">
+            <div class="nav-item" onclick="toggleSidebar()" style="cursor:pointer; color:var(--text-muted);">
+                <i class="fa-solid fa-chevron-left" id="collapseIcon"></i>
+                <span>Collapse Menu</span>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+
+        <div style="display:flex; justify-content: flex-end; align-items: flex-start; margin-bottom: 20px; width: 100%;">
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="toggleProfileMenu(event)" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:var(--card-bg); border:1px solid var(--border); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString((string)ViewBag.UserName ?? "User") + "&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2;">@(ViewBag.UserName ?? "User")</span>
+                        <span style="font-size:11px; color:var(--text-muted); line-height:1.2;">Patient</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--text-muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/User/Settings" style="padding:10px 14px; color:var(--text-main); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-gear"></i> Settings</a>
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token');" style="padding:10px 14px; color:#ef4444; text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header">
+            <h1>Settings</h1>
+            <div class="header-actions">
+                <div class="toggle-switch">
+                    Dark Mode
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <a href="#" class="tab active" id="link-profile" onclick="switchTab('profile'); return false;">Profile</a>
+            <a href="#" class="tab" id="link-security" onclick="switchTab('security'); return false;">Security</a>
+        </div>
+        
+        
+        <div id="tab-profile" class="tab-content">
+            <div class="section-header">
+                <h2>Profile Management</h2>
+                <div class="section-deco"></div>
+            </div>
+            
+            <form method="post" action="/User/Settings" enctype="multipart/form-data">
+            <div class="settings-grid">
+            <!-- Left Column -->
+            <div class="col-left">
+                <!-- Profile Summary Panel -->
+                <div class="panel">
+                    <i class="fa-solid fa-ellipsis" style="position: absolute; right: 24px; top: 24px; color: var(--text-muted); cursor: pointer;"></i>
+                    <div class="profile-summary">
+                        <img id="profile-preview" src="@(string.IsNullOrEmpty(Model.ProfilePictureUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.Name ?? "User")}&background=random" : Model.ProfilePictureUrl)" alt="@Model.Name" />
+                        <div class="profile-info">
+                            <h4>@Model.Name</h4>
+                            <p>Patient ID: @patientId</p>
+                            <label class="btn-upload" style="display:inline-block; text-align:center;">
+                                Upload New Photo
+                                <input type="file" name="profilePhoto" accept="image/*" style="display:none;" onchange="previewImage(this);" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Personal Information Panel -->
+                <div class="panel">
+                    @if(TempData["SuccessMessage"] != null)
+                    {
+                        <div style="background-color: var(--success-light); color: var(--success); padding: 10px; border-radius: 6px; margin-bottom: 16px;">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+                    @if(TempData["ErrorMessage"] != null)
+                    {
+                        <div style="background-color: #fee2e2; color: #ef4444; padding: 10px; border-radius: 6px; margin-bottom: 16px;">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    <div class="panel-header">
+                        <h3>Personal Information</h3>
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" class="form-control form-control-placeholder" value="@Model.Name" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-row">
+                            <div class="form-col" style="flex:1;">
+                                <label style="width:auto; margin-right:auto;">Date of Birth</label>
+                                <input type="date" name="dateOfBirth" class="form-control" style="width: 140px; flex:none;" value="@(Model.DateOfBirth?.ToString("yyyy-MM-dd"))" required />
+                            </div>
+                            <div class="form-col" style="flex:1;">
+                                <label style="width:auto; margin-right:auto;">Gender</label>
+                                <select name="gender" class="form-control select-icon" style="flex:none; width:120px;" required>
+                                    <option value="">Select</option>
+                                    <option value="Male" selected="@(Model.Gender == "Male")">Male</option>
+                                    <option value="Female" selected="@(Model.Gender == "Female")">Female</option>
+                                    <option value="Other" selected="@(Model.Gender == "Other")">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <div class="phone-group">
+                            <input type="text" name="phone" class="form-control" value="@Model.Phone" required />
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" class="form-control" value="@Model.Email" readonly style="background:#f9fafb; color:var(--text-muted);" />
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Home Address</label>
+                        <input type="text" name="address" class="form-control" value="@Model.Address" required />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div class="col-right">
+                <!-- Emergency Contact Panel -->
+                <div class="panel panel-full-height">
+                    <div class="panel-header">
+                        <h3>Emergency Contact</h3>
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                    
+                    <div class="form-group-vertical">
+                        <input type="text" name="emergencyContactName" class="form-control" placeholder="Contact Name" value="@Model.EmergencyContactName" required />
+                    </div>
+                    
+                    <div class="form-group-vertical">
+                        <input type="text" name="emergencyContactRelationship" class="form-control" placeholder="Relationship" value="@Model.EmergencyContactRelationship" required />
+                    </div>
+                    
+                    <div class="form-group-vertical">
+                        <input type="text" name="emergencyContactNumber" class="form-control" placeholder="Contact Number" value="@Model.EmergencyContactNumber" required />
+                    </div>
+                    
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </div>
+        </div>
+        </form>
+        </div>
+
+        <div id="tab-security" class="tab-content" style="display:none;">
+            <div class="section-header">
+                <h2>Security Settings</h2>
+                <div class="section-deco"></div>
+            </div>
+
+            <form method="post" action="/User/UpdatePassword">
+            <div class="settings-grid">
+                <!-- Left Column -->
+                <div class="col-left">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Change Password</h3>
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
+
+                        <div class="form-group-vertical">
+                            <label style="display:block; margin-bottom:8px;">Current Password</label>
+                            <input type="password" name="currentPassword" class="form-control" required />
+                        </div>
+
+                        <div class="form-group-vertical" style="margin-top:20px;">
+                            <label style="display:block; margin-bottom:8px;">New Password</label>
+                            <input type="password" name="newPassword" class="form-control" required />
+                            <p style="font-size:12px; color:var(--primary); margin-top:6px;">Use at least 8 characters with numbers and symbols.</p>
+                        </div>
+
+                        <div class="form-group-vertical" style="margin-top:20px;">
+                            <label style="display:block; margin-bottom:8px;">Confirm New Password</label>
+                            <input type="password" name="confirmPassword" class="form-control" required />
+                        </div>
+
+                        <div style="text-align:right; margin-top:30px;">
+                            <button type="submit" class="btn-save">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-right">
+                    <div class="panel" style="border-left:4px solid #f59e0b;">
+                        <div class="panel-header" style="margin-bottom:12px;">
+                            <h3 style="display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i> Active Security Alert</h3>
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
+                        <p style="font-size:13.5px; line-height:1.5;">Suspicious Login Attempt detected: Today 10:15 AM from [IP Address - city, country]</p>
+                        <button type="button" style="margin-top:12px; padding:6px 12px; background:white; border:1px solid var(--border); border-radius:6px; font-size:12px; cursor:pointer;">View Details</button>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header" style="margin-bottom:16px;">
+                            <h3>Login Device Logs</h3>
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <tr style="border-bottom:1px solid var(--border); color:var(--text-muted); text-align:left;">
+                                <th style="padding-bottom:8px; font-weight:500;">Device</th>
+                                <th style="padding-bottom:8px; font-weight:500;">Location</th>
+                                <th style="padding-bottom:8px; font-weight:500;">Time</th>
+                            </tr>
+                            <tr style="border-bottom:1px solid var(--border);">
+                                <td style="padding:12px 0;"><div style="width:40px; height:6px; background:#e5e7eb; border-radius:3px;"></div></td>
+                                <td style="padding:12px 0;"><div style="width:60px; height:6px; background:#e5e7eb; border-radius:3px;"></div></td>
+                                <td style="padding:12px 0;">Today 10:15 AM</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid var(--border);">
+                                <td style="padding:12px 0;"><div style="width:40px; height:6px; background:#e5e7eb; border-radius:3px;"></div></td>
+                                <td style="padding:12px 0;"><div style="width:60px; height:6px; background:#e5e7eb; border-radius:3px;"></div></td>
+                                <td style="padding:12px 0;">Today 10:15 AM</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px 0;"><div style="width:40px; height:6px; background:#e5e7eb; border-radius:3px;"></div></td>
+                                <td style="padding:12px 0;"><div style="width:60px; height:6px; background:#e5e7eb; border-radius:3px;"></div></td>
+                                <td style="padding:12px 0;">Today 10:15 AM</td>
+                            </tr>
+                        </table>
+                        <div style="text-align:right; margin-top:16px;">
+                            <a href="#" style="font-size:12px; color:var(--primary); text-decoration:none; font-weight:500;">View Full Security Audit Log</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).style.display = 'block';
+            document.getElementById('link-' + tabId).classList.add('active');
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-preview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function toggleDarkMode(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initialize Theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeToggle').checked = true;
+        } else {
+            document.getElementById('darkModeToggle').checked = false;
+        }
+    </script>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('collapsed');
+                var icon = document.getElementById('collapseIcon');
+                if (icon) {
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                        localStorage.setItem('sidebarCollapsed', 'true');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                        localStorage.setItem('sidebarCollapsed', 'false');
+                    }
+                }
+            }
+        }
+        
+        function toggleProfileMenu(e) {
+            e.stopPropagation();
+            var menu = document.getElementById('topProfileMenu');
+            if (menu) {
+                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            }
+        }
+        
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
+
+        // Initialize Theme & Sidebar for all pages
+        if (localStorage.getItem('theme') === 'dark' && !document.body.classList.contains('dark-mode')) {
+            document.body.classList.add('dark-mode');
+        }
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            var sidebar = document.querySelector('.sidebar');
+            if(sidebar) {
+                sidebar.classList.add('collapsed');
+                var icon = document.getElementById('collapseIcon');
+                if(icon) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
