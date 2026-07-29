@@ -5,10 +5,11 @@
 'use strict';
 
 (function () {
-    // Already logged in — go straight to patients
+    // If the user navigates to the login page, ensure any old session is cleared
+    // so they can log in to a different account if they want to.
     if (localStorage.getItem('hcrm_token')) {
-        window.location.replace('/Patient');
-        return;
+        localStorage.removeItem('hcrm_token');
+        document.cookie = 'hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
 
     var form           = document.getElementById('login-form');
@@ -47,8 +48,14 @@
         var valid = true;
 
         var emailError = document.getElementById('email-error');
-        if (!emailInput.value.trim() || !EMAIL_REGEX.test(emailInput.value.trim())) {
+        if (!emailInput.value.trim()) {
             emailInput.setAttribute('aria-invalid', 'true');
+            emailError.innerText = 'Email is required.';
+            emailError.style.display = 'flex';
+            valid = false;
+        } else if (!EMAIL_REGEX.test(emailInput.value.trim())) {
+            emailInput.setAttribute('aria-invalid', 'true');
+            emailError.innerText = 'Please enter a valid email address.';
             emailError.style.display = 'flex';
             valid = false;
         } else {
@@ -59,6 +66,7 @@
         var pwError = document.getElementById('password-error');
         if (!passwordInput.value) {
             passwordInput.setAttribute('aria-invalid', 'true');
+            pwError.innerText = 'Password is required.';
             pwError.style.display = 'flex';
             valid = false;
         } else {
@@ -76,12 +84,14 @@
 
         setLoading(true);
         try {
+            var selectedRole = document.querySelector('input[name="role"]:checked').value;
             var response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email:    emailInput.value.trim(),
-                    password: passwordInput.value
+                    password: passwordInput.value,
+                    role:     selectedRole
                 })
             });
 
@@ -89,7 +99,27 @@
 
             if (result.success && result.data && result.data.token) {
                 localStorage.setItem('hcrm_token', result.data.token);
-                window.location.replace('/Patient');
+                document.cookie = 'hcrm_token=' + result.data.token + '; path=/; SameSite=Lax';
+                
+                var base64Url = result.data.token.split('.')[1];
+                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                var payload = JSON.parse(jsonPayload);
+                var actualRole = payload.role || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+                if (actualRole === 'Doctor') {
+                    window.location.replace('/Doctor');
+                } else if (actualRole === 'SuperAdmin') {
+                    window.location.replace('/SuperAdmin');
+                } else if (actualRole === 'Admin') {
+                    window.location.replace('/Patient');
+                } else if (actualRole === 'User') {
+                    window.location.replace('/User');
+                } else {
+                    window.location.replace('/User');
+                }
             } else {
                 showAlert(result.message || 'Login failed. Please check your credentials.', 'danger');
             }
@@ -124,5 +154,19 @@
             passwordInput.focus();
         });
     }
+
+    // Role selector: toggle the selected pill
+    var rolePills = document.querySelectorAll('.role-pill');
+    rolePills.forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        rolePills.forEach(function(p) { p.classList.remove('selected'); });
+        pill.classList.add('selected');
+        var rInput = pill.querySelector('input');
+        if (rInput) {
+            rInput.checked = true;
+            rInput.dispatchEvent(new Event('change'));
+        }
+      });
+    });
 
 })();

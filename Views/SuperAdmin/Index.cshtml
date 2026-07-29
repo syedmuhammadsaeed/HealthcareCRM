@@ -1,0 +1,802 @@
+@model IEnumerable<HealthcareCRM.Models.User>
+@{
+    ViewData["Title"] = "Super Admin Dashboard";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --cream: #FAF7F1;
+            --forest: #1B4332;
+            --forest-dark: #122E22;
+            --sage: #6E9C7D;
+            --sage-light: #E4EFE3;
+            --ink: #26301F;
+            --muted: #7C8873;
+            --line: #E7E0D2;
+            
+            --warning-text: #B3672B;
+            --warning-bg: #FBEADB;
+            --error-text: #C0392B;
+            --error-bg: #FBE3DC;
+            --success-text: #3E7C4A;
+            --success-bg: #E4EFE3;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--cream);
+            border-right: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            padding: 32px 24px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--forest);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-family: 'Fraunces', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--forest);
+            line-height: 1.2;
+        }
+
+        .brand-slogan {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(27, 67, 50, 0.05);
+            color: var(--forest);
+        }
+
+        .nav-item.active {
+            background: var(--forest);
+            color: #fff;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--sage);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 40px 60px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--forest-dark);
+            margin: 0 0 8px 0;
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--sage-light);
+            color: var(--forest);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-icon.warning {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 12px;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-trend.positive { color: var(--success-text); }
+        .stat-trend.warning { color: var(--warning-text); }
+        
+        .stat-trend span {
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        /* Generic Card */
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0 0 4px 0;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Form */
+        .form-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.two-col > .form-group {
+            flex: 1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--ink);
+            background: #fff;
+            appearance: none;
+        }
+        
+        select.form-control {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .form-control::placeholder {
+            color: #A0AAB2;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            padding-right: 40px;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--forest);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--forest-dark);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--sage-light);
+            color: var(--forest);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0 0 8px 0;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 16px 24px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px;
+            color: var(--muted);
+            vertical-align: middle;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar-sm {
+            width: 32px;
+            height: 32px;
+            background: var(--sage-light);
+            color: var(--forest);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .user-cell span {
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: var(--success-bg); color: var(--success-text); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning-text); }
+        .badge-error { background: var(--error-bg); color: var(--error-text); }
+
+        .btn-outline-small {
+            background: var(--cream);
+            border: 1px solid var(--line);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .card-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+
+        .card-footer span {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .pagination-buttons button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 6px;
+            color: var(--ink);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination-buttons button.active {
+            background: var(--forest);
+            color: #fff;
+            border-color: var(--forest);
+        }
+    
+        .password-checklist { margin-top: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+        .password-checklist div { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; font-weight: 400; transition: all 0.2s; }
+        .password-checklist div.valid { color: var(--forest); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">HealthcareCRM</span>
+                <span class="brand-slogan">Better care. Every day.</span>
+            </div>
+        </a>
+
+                <nav class="sidebar-nav">
+            <a href="javascript:void(0)" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="javascript:void(0)" onclick="switchTab('add-user')" id="nav-add-user" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
+            <a href="/SuperAdmin/LoginHistory" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
+            <a href="/SuperAdmin/Reports" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
+            <a href="/SuperAdmin/Profile" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+        </nav>
+
+        </aside>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+                <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h1>Welcome back, @(ViewBag.UserName ?? "Super Admin") 👋</h1>
+                <p>Here's what's happening with your system today.</p>
+            </div>
+            
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="document.getElementById('topProfileMenu').style.display = document.getElementById('topProfileMenu').style.display === 'flex' ? 'none' : 'flex'; event.stopPropagation();" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:#fff; border:1px solid var(--line); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=Super+Admin&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2; color:var(--ink);">@(ViewBag.UserName ?? "Super Admin")</span>
+                        <span style="font-size:11px; color:var(--muted); line-height:1.2;">@(ViewBag.UserEmail ?? "superadmin@medicare.com")</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token'); document.cookie='hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';" style="padding:10px 14px; color:var(--error-text); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+
+                <div id="dashboard-section">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <span class="stat-label">Total Users</span>
+                </div>
+                <div class="stat-value">@ViewBag.TotalUsers</div>
+                <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 12% <span>from last month</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fa-regular fa-user"></i></div>
+                    <span class="stat-label">Doctors</span>
+                </div>
+                <div class="stat-value">@ViewBag.TotalDoctors</div>
+                <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 8% <span>from last month</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fa-regular fa-file-lines"></i></div>
+                    <span class="stat-label">Admins</span>
+                </div>
+                <div class="stat-value">@ViewBag.TotalAdmins</div>
+                <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 5% <span>from last month</span></div>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- Add Admin / Doctor Card -->
+        <div class="card" id="add-user" style="display:none;">
+            <div class="card-header">
+                <h2>Add Admin / Doctor</h2>
+                <p>Create a new admin or doctor account.</p>
+            </div>
+            <div class="card-body">
+                <form action="/SuperAdmin/CreateStaff" method="POST">
+                    <div class="form-row">
+                        <div class="form-group" style="width: 250px;">
+                            <label>Role</label>
+                            <select class="form-control" name="role" id="roleSelect" onchange="toggleDoctorFields()">
+                                <option value="Admin">Admin</option>
+                                <option value="Doctor">Doctor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Enter full name" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="Enter email address" required />
+                        </div>
+                    </div>
+                    <div class="form-row two-col">
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" name="password" id="pwd" class="form-control" placeholder="Enter password" required />
+                                <i class="fa-regular fa-eye-slash" onclick="togglePwd('pwd', this)"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" id="cpwd" class="form-control" placeholder="Confirm password" required />
+                                <i class="fa-regular fa-eye-slash" onclick="togglePwd('cpwd', this)"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="password-checklist">
+                        <div id="req-length"><i class="fa-solid fa-check"></i> Minimum 8 characters</div>
+                        <div id="req-upper"><i class="fa-solid fa-check"></i> At least one uppercase letter</div>
+                        <div id="req-number"><i class="fa-solid fa-check"></i> At least one number</div>
+                        <div id="req-special"><i class="fa-solid fa-check"></i> At least one special character</div>
+                    </div>
+                    
+                    <div id="doctor-fields" style="display: none;">
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="text" name="phone" class="form-control" placeholder="Enter phone number" />
+                            </div>
+                        </div>
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label>Specialization</label>
+                                <input type="text" name="specialization" class="form-control" placeholder="e.g. Cardiologist" />
+                            </div>
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input type="text" name="address" class="form-control" placeholder="Enter address" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions text-right">
+                        <button type="submit" class="btn-primary">Create Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        </main></main>
+
+    
+    
+    <script>
+        // Dropdown Logic
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
+
+        function switchTab(tabId) {
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('add-user').style.display = 'none';
+            
+            document.getElementById('nav-dashboard').classList.remove('active');
+            document.getElementById('nav-add-user').classList.remove('active');
+
+            if (tabId === 'dashboard') {
+                document.getElementById('dashboard-section').style.display = 'block';
+                document.getElementById('nav-dashboard').classList.add('active');
+            } else if (tabId === 'add-user') {
+                document.getElementById('add-user').style.display = 'block';
+                document.getElementById('nav-add-user').classList.add('active');
+            }
+        }
+
+        function toggleDoctorFields() {
+            var role = document.getElementById('roleSelect').value;
+            var docFields = document.getElementById('doctor-fields');
+            if (role === 'Doctor') {
+                docFields.style.display = 'block';
+            } else {
+                docFields.style.display = 'none';
+            }
+        }
+
+        function togglePwd(inputId, icon) {
+            var input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+        
+        document.getElementById('pwd').addEventListener('input', function(e) {
+            const val = e.target.value;
+            
+            // Length
+            if (val.length >= 8) document.getElementById('req-length').classList.add('valid');
+            else document.getElementById('req-length').classList.remove('valid');
+
+            // Uppercase
+            if (/[A-Z]/.test(val)) document.getElementById('req-upper').classList.add('valid');
+            else document.getElementById('req-upper').classList.remove('valid');
+
+            // Number
+            if (/[0-9]/.test(val)) document.getElementById('req-number').classList.add('valid');
+            else document.getElementById('req-number').classList.remove('valid');
+
+            // Special char
+            if (/[^A-Za-z0-9]/.test(val)) document.getElementById('req-special').classList.add('valid');
+            else document.getElementById('req-special').classList.remove('valid');
+        });
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var pwd = document.getElementById('pwd').value;
+            var cpwd = document.getElementById('cpwd').value;
+            if (pwd !== cpwd) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
+    <script src="/js/site.js"></script>
+</body>
+</html>
