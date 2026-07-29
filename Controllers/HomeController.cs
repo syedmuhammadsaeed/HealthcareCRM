@@ -54,7 +54,7 @@ public class HomeController : Controller
         {
             var id = p.Id ?? "";
             var name = p.Name?.Replace(",", " ") ?? "";
-            var age = p.Age;
+            var age = (DateTime.Now - p.DateOfBirth).Days / 365;
             var gender = p.Gender ?? "";
             var phone = p.Phone ?? "";
             var address = p.Address?.Replace(",", " ") ?? "";

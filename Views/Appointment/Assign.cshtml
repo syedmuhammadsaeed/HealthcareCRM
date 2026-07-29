@@ -1,0 +1,148 @@
+@{
+    ViewData["Title"] = "Assign Doctor";
+}
+
+<div class="page" style="max-width:800px; margin:0 auto; padding:26px 28px;">
+    <div class="breadcrumb" style="margin-bottom:16px;">
+        <a href="/Appointment" style="color:var(--muted); text-decoration:none;">Appointments</a>
+        <span class="sep" style="color:var(--muted); margin:0 8px;">/</span>
+        <span class="current" style="color:var(--ink); font-weight:600;">Assign Doctor</span>
+    </div>
+
+    <div class="page-head" style="margin-bottom:24px;">
+        <h1 style="font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:30px; margin:0 0 6px; color:var(--forest);">Assign Doctor</h1>
+        <p style="margin:0; color:var(--muted); font-size:13.5px;">Schedule an appointment for an existing patient</p>
+    </div>
+
+    <div class="panel" style="background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px;">
+        <div id="assign-alert" style="display:none; padding:12px; border-radius:8px; margin-bottom:16px;"></div>
+
+        <form id="standalone-assign-form">
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Select Patient</label>
+                <select id="patient-select" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+                    <option value="">Loading patients...</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Select Doctor</label>
+                <select id="doctor-select" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+                    <option value="">Loading doctors...</option>
+                </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+                <div>
+                    <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Appointment Date</label>
+                    <input type="date" id="assign-date" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+                </div>
+                <div>
+                    <label style="display:block; font-weight:500; margin-bottom:8px; font-size:14px;">Appointment Time</label>
+                    <input type="time" id="assign-time" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btn-assign" style="width:100%; padding:12px; border-radius:8px; font-weight:700; background:var(--forest); color:#fff; border:none; cursor:pointer;">Schedule Appointment</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            requireAuth();
+
+            try {
+                // We use pageSize=1000 to just load a bunch of patients into the select dropdown
+                var [patResp, docResp] = await Promise.all([
+                    authFetch('/api/patients?pageSize=1000'),
+                    authFetch('/api/doctors')
+                ]);
+                
+                var patBody = await patResp.json();
+                var docBody = await docResp.json();
+                
+                var patSelect = document.getElementById('patient-select');
+                if (patBody.success && patBody.data && patBody.data.items) {
+                    var patients = patBody.data.items;
+                    patSelect.innerHTML = '<option value="">-- Select a Patient --</option>';
+                    patients.forEach(function(p) {
+                        var dobStr = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString('en-GB') : 'Unknown DOB';
+                        patSelect.innerHTML += '<option value="' + p.id + '">' + esc(p.name) + ' (DOB: ' + dobStr + ')</option>';
+                    });
+                } else {
+                    patSelect.innerHTML = '<option value="">Failed to load patients</option>';
+                }
+
+                var docSelect = document.getElementById('doctor-select');
+                if (docBody.success && docBody.data) {
+                    var doctors = docBody.data;
+                    docSelect.innerHTML = '<option value="">-- Select a Doctor --</option>';
+                    doctors.forEach(function(d) {
+                        var spec = d.specialization ? ' - ' + d.specialization : '';
+                        var feeInfo = d.fee != null ? ' | Fee: ' + d.fee + ' ' + (d.currency || 'Rs') : ' | Fee: Not Set';
+                        docSelect.innerHTML += '<option value="' + d.id + '">Dr. ' + esc(d.name) + spec + feeInfo + '</option>';
+                    });
+                } else {
+                    docSelect.innerHTML = '<option value="">Failed to load doctors</option>';
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+
+            document.getElementById('standalone-assign-form').onsubmit = async function(e) {
+                e.preventDefault();
+                var btn = document.getElementById('btn-assign');
+                btn.disabled = true;
+                btn.textContent = 'Scheduling...';
+                
+                var alertBox = document.getElementById('assign-alert');
+                alertBox.style.display = 'none';
+
+                var patientId = document.getElementById('patient-select').value;
+                var payload = {
+                    doctorId: document.getElementById('doctor-select').value,
+                    appointmentDate: document.getElementById('assign-date').value,
+                    appointmentTime: document.getElementById('assign-time').value
+                };
+
+                try {
+                    var assignResp = await authFetch('/api/patients/' + encodeURIComponent(patientId) + '/assign', {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    var assignBody = await assignResp.json();
+                    if (assignBody.success) {
+                        alertBox.textContent = 'Appointment scheduled successfully!';
+                        alertBox.style.background = 'var(--sage-light)';
+                        alertBox.style.color = 'var(--forest-dark)';
+                        alertBox.style.display = 'block';
+                        setTimeout(function() { window.location.href = '/Appointment'; }, 1500);
+                    } else {
+                        alertBox.textContent = assignBody.message || 'Failed to assign.';
+                        alertBox.style.background = 'var(--coral-light)';
+                        alertBox.style.color = 'var(--error)';
+                        alertBox.style.display = 'block';
+                    }
+                } catch (ex) {
+                    alertBox.textContent = 'Network error.';
+                    alertBox.style.background = 'var(--coral-light)';
+                    alertBox.style.color = 'var(--error)';
+                    alertBox.style.display = 'block';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Schedule Appointment';
+                }
+            };
+
+            function esc(text) {
+                if (!text) return '';
+                var d = document.createElement('div');
+                d.appendChild(document.createTextNode(String(text)));
+                return d.innerHTML;
+            }
+        });
+    </script>
+}

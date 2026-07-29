@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td>@patient.Age</td>
+                        <td>@((DateTime.Now - patient.DateOfBirth).Days / 365)</td>
                         <td>@patient.Gender</td>
                         <td>@patient.Phone</td>
                         <td>@patient.Address</td>

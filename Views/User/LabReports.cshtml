@@ -1,0 +1,378 @@
+@model List<HealthcareCRM.Models.LabReport>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Reports - Zenith Health</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --bg-color: #f2f7f4;
+            --sidebar-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --primary: #2b7a4b;
+            --primary-light: #e8f3ec;
+            --border: #e5e7eb;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --neutral: #374151;
+            --neutral-light: #e5e7eb;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; font-weight: 700; font-size: 20px; }
+        .brand i { color: var(--primary); font-size: 26px; }
+        
+        .nav-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 16px; padding: 0 8px; }
+        
+        .nav-items { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 8px; text-decoration: none; color: var(--text-main); font-weight: 500; font-size: 14px; transition: all 0.2s; }
+        .nav-item i { width: 20px; text-align: center; color: var(--text-muted); font-size: 16px; }
+        .nav-item:hover { background: #f3f4f6; }
+        .nav-item.active { background: var(--primary-light); color: var(--primary); border-left: 4px solid var(--primary); border-radius: 4px 8px 8px 4px; padding-left: 10px; }
+        .nav-item.active i { color: var(--primary); }
+        
+        .nav-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+        
+        /* Main Content */
+        .main-content { flex: 1; padding: 32px 40px; overflow-y: auto; }
+        
+        /* Header */
+        .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 24px; }
+        
+        /* Top Filters */
+        .filters-row { display: flex; gap: 12px; margin-bottom: 30px; align-items: flex-start; position: relative; z-index: 10; }
+        .search-box { flex: 1; position: relative; max-width: 800px; }
+        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--primary); }
+        .search-box input { width: 100%; padding: 10px 14px 10px 36px; border: 1.5px solid var(--primary); border-radius: 6px; font-size: 14px; outline: none; background: white; }
+        
+        .filter-btn { padding: 10px 14px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: white; color: var(--text-main); }
+        .filter-btn-green { background: #c6ebd4; border-color: #c6ebd4; color: #1f5a36; }
+        .filter-btn i { font-size: 12px; }
+        
+        .status-dropdown { position: relative; }
+        .dropdown-menu { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--border); border-radius: 0 0 6px 6px; border-top: none; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; flex-direction: column; padding: 4px; }
+        .dropdown-menu.show { display: flex; }
+        .dropdown-item { padding: 8px 12px; font-size: 13px; color: var(--text-main); cursor: pointer; border-radius: 4px; }
+        .dropdown-item:hover { background: #f3f4f6; }
+        .dropdown-item.active { background: #e8f3ec; }
+        
+        /* Panel & Table */
+        .panel { background: var(--card-bg); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; margin-bottom: 20px; overflow: hidden; }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; font-size: 13px; font-weight: 600; color: #000; padding: 14px 20px; background: #f9fafb; border-bottom: 1px solid var(--border); }
+        td { padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+        
+        .doctor-cell { display: flex; align-items: center; gap: 12px; }
+        .doctor-cell img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        
+        .status-badge { padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; display: inline-block; }
+        .status-completed { background: var(--success-light); color: var(--success); }
+        .status-pending { background: #e5e7eb; color: var(--text-main); }
+        
+        .actions-cell { display: flex; gap: 8px; }
+        .btn-action { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); }
+        .btn-action:hover { background: #f9fafb; border-color: #d1d5db; }
+        
+        /* Panel Footer */
+        .panel-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; }
+        .pagination { display: flex; gap: 6px; align-items: center; }
+        .page-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-main); }
+        .page-btn:hover { background: #f9fafb; }
+        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .page-dots { color: var(--text-muted); font-weight: 600; margin: 0 4px; }
+        
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+        .btn-primary:hover { background: #236c43; }
+        
+        /* Bottom Grid */
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #f0f0f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-header h3 { font-size: 16px; font-weight: 600; margin: 0; }
+        .card-header i { color: var(--text-muted); cursor: pointer; font-size: 14px; }
+        
+        .trend-content { display: flex; justify-content: space-between; align-items: center; }
+        .trend-text { font-size: 14px; color: var(--text-main); max-width: 200px; text-align: right; }
+        
+        .chart-placeholder { height: 60px; position: relative; margin-bottom: -10px; margin-top: -10px;}
+        .chart-placeholder svg { width: 100%; height: 100%; display: block; }
+        .chart-content { display: flex; justify-content: space-between; align-items: flex-end; }
+        
+        /* Decorative skeletons */
+        .deco-lines { position: absolute; top: calc(100% + 8px); left: 0; width: 100%; }
+        .deco-line { height: 4px; background: #c6ebd4; border-radius: 2px; margin-bottom: 6px; }
+        .deco-line:first-child { width: 100%; }
+        .deco-line:last-child { width: 60%; }
+
+    </style>
+    <style>
+        body.dark-mode { --bg-color: #111827; --sidebar-bg: #1f2937; --text-main: #f9fafb; --text-muted: #9ca3af; --primary: #34d399; --primary-light: rgba(52, 211, 153, 0.15); --border: #374151; --card-bg: #1f2937; }
+        body.dark-mode .panel { border: 1px solid var(--border); box-shadow: none; }
+        body.dark-mode .form-control, body.dark-mode .search-box input, body.dark-mode .phone-prefix, body.dark-mode .select-icon, body.dark-mode .filter-select { background-color: #374151 !important; border-color: var(--border) !important; color: var(--text-main) !important; }
+        body.dark-mode .nav-item:hover { background: rgba(255,255,255,0.05); }
+        body.dark-mode table th { background: #1f2937; color: #f9fafb; border-bottom-color: var(--border); }
+        body.dark-mode table td { border-bottom-color: var(--border); }
+        body.dark-mode .btn-outline { border-color: var(--border); color: var(--text-main); }
+        body.dark-mode .btn-outline:hover { background: #374151; }
+        body.dark-mode .dropdown-menu, body.dark-mode .profile-dropdown-menu { background: #1f2937; border-color: var(--border); }
+        body.dark-mode .dropdown-item, body.dark-mode .profile-dropdown-menu a { color: var(--text-main) !important; }
+        body.dark-mode .dropdown-item:hover, body.dark-mode .profile-dropdown-menu a:hover { background: #374151; }
+        body.dark-mode .profile-dropdown-btn { background: #1f2937 !important; border-color: var(--border) !important; }
+        /* Fix invisible words (white text on white background) */
+        body.dark-mode .btn-action, body.dark-mode .page-btn, body.dark-mode .upload-area, body.dark-mode .file-item, body.dark-mode .time-slot, body.dark-mode .doc-card, body.dark-mode .timeline-item::before { background: #1f2937 !important; border-color: var(--border) !important; color: var(--text-main) !important; }
+        body.dark-mode .btn-action:hover, body.dark-mode .page-btn:hover, body.dark-mode .time-slot:hover { background: #374151 !important; }
+        body.dark-mode .icon, body.dark-mode .pt-avatar, body.dark-mode .feature-icon, body.dark-mode .skeleton-line { background: #374151 !important; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6, body.dark-mode p, body.dark-mode label { color: inherit; }
+        body.dark-mode .text-muted, body.dark-mode .patient-id, body.dark-mode .sub-text { color: var(--text-muted) !important; }
+        body.dark-mode .tab { color: var(--text-muted); }
+        body.dark-mode .tab.active { color: var(--text-main); }
+
+        .sidebar { transition: width 0.3s ease; }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed .brand span { display: none; }
+        .sidebar.collapsed .brand { justify-content: center; padding: 0; }
+        .sidebar.collapsed .nav-label { display: none; }
+        .sidebar.collapsed .nav-item span { display: none; }
+        .sidebar.collapsed .nav-item { justify-content: center; padding: 12px; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-square-plus"></i>
+            <span>MediCare</span>
+        </div>
+        
+        <div class="nav-label">Nav items</div>
+        <div class="nav-items">
+            <a href="/User" class="nav-item"><i class="fa-solid fa-border-all"></i> <span>Dashboard</span></a>
+            <a href="/User/BookAppointment" class="nav-item"><i class="fa-regular fa-calendar-check"></i> <span>Book Appointment</span></a>
+            <a href="/User/AppointmentHistory" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> <span>Appointment History</span></a>
+            <a href="/User/LabReports" class="nav-item active"><i class="fa-solid fa-file-waveform"></i> <span>Lab Reports</span></a>
+        </div>
+        
+        <div class="nav-bottom">
+            <div class="nav-item" onclick="toggleSidebar()" style="cursor:pointer; color:var(--text-muted);">
+                <i class="fa-solid fa-chevron-left" id="collapseIcon"></i>
+                <span>Collapse Menu</span>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+
+        <div style="display:flex; justify-content: flex-end; align-items: flex-start; margin-bottom: 20px; width: 100%;">
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="toggleProfileMenu(event)" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:var(--card-bg); border:1px solid var(--border); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString((string)ViewBag.UserName ?? "User") + "&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2;">@(ViewBag.UserName ?? "User")</span>
+                        <span style="font-size:11px; color:var(--text-muted); line-height:1.2;">Patient</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--text-muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/User/Settings" style="padding:10px 14px; color:var(--text-main); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-gear"></i> Settings</a>
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token');" style="padding:10px 14px; color:#ef4444; text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header">
+            <h1>Lab Reports</h1>
+        </div>
+        
+        <form method="get" action="/User/LabReports" class="filters-row" id="filterForm">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" onclick="document.getElementById('filterForm').submit()" style="cursor:pointer"></i>
+                <input type="text" name="searchTerm" placeholder="Search by report name" value="@ViewBag.SearchTerm" onkeypress="if(event.keyCode == 13) document.getElementById('filterForm').submit();" oninput="if(this.value === '') document.getElementById('filterForm').submit();" />
+            </div>
+            
+            <div style="position: relative;">
+                <div class="filter-btn filter-btn-green">
+                    <i class="fa-regular fa-calendar"></i> Date Range <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="deco-lines">
+                    <div class="deco-line"></div>
+                    <div class="deco-line"></div>
+                </div>
+            </div>
+            
+            <input type="hidden" name="status" id="statusInput" value="@ViewBag.Status" />
+            
+            <div class="status-dropdown">
+                <div class="filter-btn filter-btn-green" onclick="toggleDropdown(event)" style="border-radius: 6px; min-width: 140px; justify-content: space-between; cursor: pointer;">
+                    @(string.IsNullOrEmpty(ViewBag.Status) ? "Status" : ViewBag.Status) <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="statusDropdown">
+                    <div class="dropdown-item @(string.IsNullOrEmpty(ViewBag.Status) || ViewBag.Status == "All" ? "active" : "")" onclick="setStatus('')">All</div>
+                    <div class="dropdown-item @(ViewBag.Status == "Pending" ? "active" : "")" onclick="setStatus('Pending')">Pending</div>
+                    <div class="dropdown-item @(ViewBag.Status == "Completed" ? "active" : "")" onclick="setStatus('Completed')">Completed</div>
+                    <div class="dropdown-item @(ViewBag.Status == "In Progress" ? "active" : "")" onclick="setStatus('In Progress')">In Progress</div>
+                </div>
+            </div>
+        </form>
+        
+        <div class="panel">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Report Name</th>
+                            <th>Date Ordered</th>
+                            <th>Order Doctor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(Model != null && Model.Any())
+                        {
+                            foreach(var report in Model)
+                            {
+                                var statusClass = report.Status == "Completed" ? "status-completed" : "status-pending";
+                                <tr>
+                                    <td>@report.ReportName</td>
+                                    <td>@report.DateOrdered.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <div class="doctor-cell">
+                                            <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(report.OrderDoctor ?? "Unknown")&background=random" alt="@report.OrderDoctor" />
+                                            <span>Dr. @report.OrderDoctor</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="status-badge @statusClass">@report.Status</span></td>
+                                    <td>
+                                        <div class="actions-cell">
+                                            @if(!string.IsNullOrEmpty(report.FileUrl))
+                                            {
+                                                <button type="button" onclick="previewReport('@report.FileUrl')" class="btn-action" style="text-decoration:none; display:inline-block;">View Report</button>
+                                                <a href="@report.FileUrl" download class="btn-action" style="text-decoration:none; display:inline-block;">Download PDF</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="btn-action" style="opacity:0.5; cursor:not-allowed;">No File</span>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" style="text-align:center; padding: 20px; color:var(--text-muted);">No lab reports found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="panel-footer">
+                <div class="pagination">
+                    <button class="page-btn">Previous</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <span class="page-dots">...</span>
+                    <button class="page-btn">Next</button>
+                </div>
+                <button class="btn-primary">Download All Reports (ZIP)</button>
+            </div>
+        </div>
+        
+    </main>
+    <script>
+        function toggleDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('statusDropdown').classList.toggle('show');
+        }
+        
+        function setStatus(status) {
+            document.getElementById('statusInput').value = status;
+            document.getElementById('filterForm').submit();
+        }
+        
+        function previewReport(url) {
+            // Using the server-side inline preview endpoint bypasses IDM and fixes the blank white blob issue
+            window.open('/User/PreviewReport?fileUrl=' + encodeURIComponent(url), '_blank');
+        }
+        
+        window.onclick = function(event) {
+            if (!event.target.closest('.status-dropdown')) {
+                var dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('collapsed');
+                var icon = document.getElementById('collapseIcon');
+                if (icon) {
+                    if (sidebar.classList.contains('collapsed')) {
+                        icon.classList.remove('fa-chevron-left');
+                        icon.classList.add('fa-chevron-right');
+                        localStorage.setItem('sidebarCollapsed', 'true');
+                    } else {
+                        icon.classList.remove('fa-chevron-right');
+                        icon.classList.add('fa-chevron-left');
+                        localStorage.setItem('sidebarCollapsed', 'false');
+                    }
+                }
+            }
+        }
+        
+        function toggleProfileMenu(e) {
+            e.stopPropagation();
+            var menu = document.getElementById('topProfileMenu');
+            if (menu) {
+                menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            }
+        }
+        
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
+
+        // Initialize Theme & Sidebar for all pages
+        if (localStorage.getItem('theme') === 'dark' && !document.body.classList.contains('dark-mode')) {
+            document.body.classList.add('dark-mode');
+        }
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            var sidebar = document.querySelector('.sidebar');
+            if(sidebar) {
+                sidebar.classList.add('collapsed');
+                var icon = document.getElementById('collapseIcon');
+                if(icon) {
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

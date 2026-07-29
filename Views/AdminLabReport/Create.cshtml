@@ -1,0 +1,275 @@
+@model IEnumerable<HealthcareCRM.Models.Patient>
+@{
+    ViewData["Title"] = "Upload Lab Report";
+}
+
+<style>
+    .upload-container {
+        padding: 40px; 
+        max-width: 900px; 
+        margin: 0 auto; 
+        position: relative;
+        font-family: 'Inter', sans-serif;
+    }
+    .page-head {
+        margin-bottom: 30px; 
+        position: relative; 
+        z-index: 2;
+    }
+    .back-link {
+        text-decoration:none; 
+        color:#146c43; 
+        font-weight:600; 
+        display:inline-flex; 
+        align-items:center; 
+        gap: 8px; 
+        margin-bottom:16px; 
+        font-size: 14px;
+        transition: opacity 0.2s;
+    }
+    .back-link:hover {
+        opacity: 0.8;
+        color:#146c43;
+    }
+    .page-title {
+        font-weight: 700; 
+        margin-bottom: 8px; 
+        font-size: 32px; 
+        color: #1e293b;
+    }
+    .page-subtitle {
+        color: #64748b; 
+        font-size: 15px;
+    }
+    .form-card {
+        background: white; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
+        padding: 40px; 
+        position: relative; 
+        z-index: 2;
+        border: 1px solid #f1f5f9;
+    }
+    .form-row {
+        display: flex; 
+        gap: 24px; 
+        margin-bottom: 30px;
+    }
+    .icon-box {
+        width: 56px; 
+        height: 56px; 
+        background: #f0fdf4; 
+        border-radius: 12px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #146c43; 
+        font-size: 22px; 
+        flex-shrink: 0;
+    }
+    .input-container {
+        flex-grow: 1;
+    }
+    .input-label {
+        display:block; 
+        margin-bottom: 10px; 
+        font-weight: 600; 
+        color: #1e293b; 
+        font-size: 15px;
+    }
+    .custom-input {
+        width: 100%; 
+        padding: 12px 16px; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 8px; 
+        font-size: 15px; 
+        color: #334155; 
+        outline: none; 
+        transition: all 0.2s;
+        background: #fff;
+    }
+    .custom-input:focus {
+        border-color: #146c43;
+        box-shadow: 0 0 0 3px rgba(20, 108, 67, 0.1);
+    }
+    .file-drop-area {
+        border: 1px dashed #cbd5e1; 
+        border-radius: 8px; 
+        padding: 24px; 
+        position: relative; 
+        background: #f8fafc; 
+        transition: all 0.2s ease;
+    }
+    .file-drop-area:hover {
+        border-color: #146c43;
+        background: #f0fdf4;
+    }
+    .file-btn {
+        background: white; 
+        border: 1px solid #146c43; 
+        color: #146c43; 
+        padding: 8px 20px; 
+        border-radius: 6px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    .file-btn:hover {
+        background: #f0fdf4;
+    }
+    .btn-cancel {
+        text-decoration: none; 
+        padding: 12px 24px; 
+        border-radius: 8px; 
+        border: 1px solid #cbd5e1; 
+        color: #1e293b; 
+        font-weight: 600; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        min-width: 120px; 
+        background: white; 
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-cancel:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+    .btn-submit {
+        background: #146c43; 
+        color: white; 
+        border: none; 
+        padding: 12px 24px; 
+        border-radius: 8px; 
+        font-weight: 600; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 8px; 
+        min-width: 160px; 
+        cursor: pointer; 
+        transition: background 0.2s;
+    }
+    .btn-submit:hover {
+        background: #105936;
+    }
+    
+    .illustration {
+        position: absolute; 
+        top: 20px; 
+        right: 40px; 
+        z-index: 1;
+        pointer-events: none;
+    }
+</style>
+
+<div class="upload-container">
+    <div class="page-head">
+        <a href="/AdminLabReport" class="back-link">
+            <i class="fa-solid fa-arrow-left-long"></i> Back to Lab Reports
+        </a>
+        <h1 class="page-title">Upload Lab Report</h1>
+        <p class="page-subtitle">Upload a new lab report for an online patient</p>
+    </div>
+
+    <!-- Right Side Illustration -->
+    <div class="illustration">
+        <svg width="220" height="180" viewBox="0 0 220 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity="0.6">
+                <path d="M140 160C140 160 120 130 90 140C60 150 40 120 40 120" stroke="#d1fae5" stroke-width="20" stroke-linecap="round"/>
+                <circle cx="170" cy="50" r="15" fill="#d1fae5" />
+                <path d="M180 80C190 90 210 80 210 60" stroke="#d1fae5" stroke-width="12" stroke-linecap="round"/>
+                <path d="M50 80C40 70 20 70 20 90" stroke="#d1fae5" stroke-width="12" stroke-linecap="round"/>
+            </g>
+            <rect x="80" y="20" width="80" height="100" rx="8" fill="white" stroke="#146c43" stroke-width="4"/>
+            <rect x="100" y="10" width="40" height="20" rx="4" fill="#146c43"/>
+            <circle cx="120" cy="20" r="4" fill="white"/>
+            <path d="M95 50h50M95 70h50M95 90h30" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="100" cy="50" r="3" fill="#146c43"/>
+            <circle cx="100" cy="70" r="3" fill="#146c43"/>
+            <circle cx="100" cy="90" r="3" fill="#146c43"/>
+            
+            <path d="M130 110 L145 150 L170 150 L155 110 Z" fill="#146c43"/>
+            <circle cx="145" cy="110" r="10" fill="#146c43"/>
+            <rect x="150" y="140" width="20" height="10" fill="#d1fae5"/>
+        </svg>
+    </div>
+
+    <div class="form-card">
+        <form method="post" action="/AdminLabReport/Create" enctype="multipart/form-data">
+            
+            <!-- Field: Patient -->
+            <div class="form-row">
+                <div class="icon-box">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <div class="input-container">
+                    <label class="input-label">Select Online Patient</label>
+                    <select name="patientId" required class="custom-input">
+                        <option value="">-- Select Patient --</option>
+                        @foreach(var patient in Model)
+                        {
+                            <option value="@patient.Id">@patient.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Field: Report Name -->
+            <div class="form-row">
+                <div class="icon-box">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+                <div class="input-container">
+                    <label class="input-label">Report Name</label>
+                    <input type="text" name="reportName" required placeholder="e.g. Complete Blood Count" class="custom-input" />
+                </div>
+            </div>
+
+            <!-- Field: Status -->
+            <div class="form-row">
+                <div class="icon-box">
+                    <i class="fa-regular fa-clipboard"></i>
+                </div>
+                <div class="input-container">
+                    <label class="input-label">Status</label>
+                    <select name="status" class="custom-input">
+                        <option value="Completed">Completed</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Field: Upload -->
+            <div class="form-row" style="margin-bottom: 40px;">
+                <div class="icon-box">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="input-container">
+                    <label class="input-label">Upload PDF Report</label>
+                    <div class="file-drop-area">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button type="button" onclick="document.getElementById('fileUpload').click()" class="file-btn">
+                                <i class="fa-solid fa-arrow-up-from-bracket"></i> Choose File
+                            </button>
+                            <span id="fileNameDisplay" style="color: #64748b; font-size: 14px;">No file chosen</span>
+                        </div>
+                        <input type="file" id="fileUpload" name="reportFile" accept=".pdf,.jpg,.png" required style="display: none;" onchange="document.getElementById('fileNameDisplay').textContent = this.files[0] ? this.files[0].name : 'No file chosen';" />
+                        <p style="margin-top: 12px; margin-bottom: 0; color: #94a3b8; font-size: 13px;">Upload PDF file only. Max size 10MB.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 16px;">
+                <a href="/AdminLabReport" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

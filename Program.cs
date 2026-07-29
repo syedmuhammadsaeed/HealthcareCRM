@@ -25,8 +25,10 @@ builder.Services.Configure<JwtSettings>(
 // ── Repository / Service DI ──────────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PatientService>();
+builder.Services.AddScoped<DoctorService>();
 builder.Services.AddSingleton<PasswordHasher>();
 
 // ── JWT Authentication ───────────────────────────────────────────────
@@ -49,6 +51,17 @@ builder.Services.AddAuthentication(options =>
         ValidAudience            = builder.Configuration["JwtSettings:Audience"],
         IssuerSigningKey         = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("hcrm_token"))
+            {
+                context.Token = context.Request.Cookies["hcrm_token"];
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -115,6 +128,23 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Landing}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
+    await authService.SeedSuperAdminAsync();
+
+    // TEMPORARY PASSWORD RESET
+    var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+    var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
+    var targetDoctor = await userRepo.GetByEmailAsync("Drreza12@gmail.com");
+    if (targetDoctor != null)
+    {
+        targetDoctor.PasswordHash = hasher.HashPassword("Doctor123!");
+        targetDoctor.Status = "Approved"; // ensure approved
+        await userRepo.UpdateAsync(targetDoctor);
+    }
+}
 
 app.Run();
