@@ -220,7 +220,7 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-bottom: 32px;
         }
@@ -545,6 +545,10 @@
             color: #fff;
             border-color: var(--forest);
         }
+    
+        .password-checklist { margin-top: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+        .password-checklist div { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; font-weight: 400; transition: all 0.2s; }
+        .password-checklist div.valid { color: var(--forest); font-weight: 700; }
     </style>
 </head>
 <body>
@@ -561,37 +565,40 @@
             </div>
         </a>
 
-        <nav class="sidebar-nav">
-            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
-            <a href="#" class="nav-item"><i class="fa-regular fa-circle-check"></i> Approvals</a>
-            <a href="#" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+                <nav class="sidebar-nav">
+            <a href="javascript:void(0)" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="javascript:void(0)" onclick="switchTab('add-user')" id="nav-add-user" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
+            <a href="/SuperAdmin/LoginHistory" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
+            <a href="/SuperAdmin/Reports" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
+            <a href="/SuperAdmin/Profile" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
         </nav>
 
-        <div class="sidebar-footer">
-            <div class="user-profile">
-                <div class="user-avatar">SA</div>
-                <div class="user-info">
-                    <div class="user-name">Super Admin</div>
-                    <div class="user-role">Super Administrator</div>
-                </div>
-                <i class="fa-solid fa-chevron-down" style="color: var(--muted); font-size: 12px;"></i>
-            </div>
-            <a href="#" class="logout-btn" onclick="logout(); return false;">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-            </a>
-        </div>
-    </aside>
+        </aside>
 
     <!-- Main Content -->
     <main class="main-wrapper">
-        <div class="page-header">
-            <h1>Welcome back, Super Admin 👋</h1>
-            <p>Here's what's happening with your system today.</p>
+                <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h1>Welcome back, @(ViewBag.UserName ?? "Super Admin") 👋</h1>
+                <p>Here's what's happening with your system today.</p>
+            </div>
+            
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="document.getElementById('topProfileMenu').style.display = document.getElementById('topProfileMenu').style.display === 'flex' ? 'none' : 'flex'; event.stopPropagation();" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:#fff; border:1px solid var(--line); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=Super+Admin&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2; color:var(--ink);">@(ViewBag.UserName ?? "Super Admin")</span>
+                        <span style="font-size:11px; color:var(--muted); line-height:1.2;">@(ViewBag.UserEmail ?? "superadmin@medicare.com")</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token'); document.cookie='hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';" style="padding:10px 14px; color:var(--error-text); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
         </div>
 
+                <div id="dashboard-section">
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -599,17 +606,8 @@
                     <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
                     <span class="stat-label">Total Users</span>
                 </div>
-                <div class="stat-value">128</div>
+                <div class="stat-value">@ViewBag.TotalUsers</div>
                 <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 12% <span>from last month</span></div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-header">
-                    <div class="stat-icon warning"><i class="fa-solid fa-shield-halved"></i></div>
-                    <span class="stat-label">Pending Approvals</span>
-                </div>
-                <div class="stat-value">8</div>
-                <div class="stat-trend warning"><i class="fa-solid fa-arrow-trend-up"></i> 33% <span>from last week</span></div>
             </div>
 
             <div class="stat-card">
@@ -617,7 +615,7 @@
                     <div class="stat-icon"><i class="fa-regular fa-user"></i></div>
                     <span class="stat-label">Doctors</span>
                 </div>
-                <div class="stat-value">64</div>
+                <div class="stat-value">@ViewBag.TotalDoctors</div>
                 <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 8% <span>from last month</span></div>
             </div>
 
@@ -626,171 +624,179 @@
                     <div class="stat-icon"><i class="fa-regular fa-file-lines"></i></div>
                     <span class="stat-label">Admins</span>
                 </div>
-                <div class="stat-value">32</div>
+                <div class="stat-value">@ViewBag.TotalAdmins</div>
                 <div class="stat-trend positive"><i class="fa-solid fa-arrow-trend-up"></i> 5% <span>from last month</span></div>
             </div>
         </div>
 
+        </div>
+
         <!-- Add Admin / Doctor Card -->
-        <div class="card">
+        <div class="card" id="add-user" style="display:none;">
             <div class="card-header">
                 <h2>Add Admin / Doctor</h2>
                 <p>Create a new admin or doctor account.</p>
             </div>
             <div class="card-body">
-                <form>
+                <form action="/SuperAdmin/CreateStaff" method="POST">
                     <div class="form-row">
                         <div class="form-group" style="width: 250px;">
                             <label>Role</label>
-                            <select class="form-control">
-                                <option>Admin</option>
-                                <option>Doctor</option>
+                            <select class="form-control" name="role" id="roleSelect" onchange="toggleDoctorFields()">
+                                <option value="Admin">Admin</option>
+                                <option value="Doctor">Doctor</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row two-col">
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" placeholder="Enter full name" />
+                            <input type="text" name="name" class="form-control" placeholder="Enter full name" required />
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <input type="email" class="form-control" placeholder="Enter email address" />
+                            <input type="email" name="email" class="form-control" placeholder="Enter email address" required />
                         </div>
                     </div>
                     <div class="form-row two-col">
                         <div class="form-group">
                             <label>Password</label>
                             <div class="input-with-icon">
-                                <input type="password" class="form-control" placeholder="Enter password" />
-                                <i class="fa-regular fa-eye"></i>
+                                <input type="password" name="password" id="pwd" class="form-control" placeholder="Enter password" required />
+                                <i class="fa-regular fa-eye-slash" onclick="togglePwd('pwd', this)"></i>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Confirm Password</label>
                             <div class="input-with-icon">
-                                <input type="password" class="form-control" placeholder="Confirm password" />
-                                <i class="fa-regular fa-eye"></i>
+                                <input type="password" id="cpwd" class="form-control" placeholder="Confirm password" required />
+                                <i class="fa-regular fa-eye-slash" onclick="togglePwd('cpwd', this)"></i>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="password-checklist">
+                        <div id="req-length"><i class="fa-solid fa-check"></i> Minimum 8 characters</div>
+                        <div id="req-upper"><i class="fa-solid fa-check"></i> At least one uppercase letter</div>
+                        <div id="req-number"><i class="fa-solid fa-check"></i> At least one number</div>
+                        <div id="req-special"><i class="fa-solid fa-check"></i> At least one special character</div>
+                    </div>
+                    
+                    <div id="doctor-fields" style="display: none;">
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="text" name="phone" class="form-control" placeholder="Enter phone number" />
+                            </div>
+                        </div>
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label>Specialization</label>
+                                <input type="text" name="specialization" class="form-control" placeholder="e.g. Cardiologist" />
+                            </div>
+                            <div class="form-group">
+                                <label>Address</label>
+                                <input type="text" name="address" class="form-control" placeholder="Enter address" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-actions text-right">
-                        <button type="button" class="btn-primary">Create Account</button>
+                        <button type="submit" class="btn-primary">Create Account</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Registration Queue Card -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Registration Queue</h2>
-            </div>
-            <div class="card-body empty-state">
-                <div class="empty-icon"><i class="fa-regular fa-circle-check"></i></div>
-                <h3>All Caught Up!</h3>
-                <p>There are no pending registrations requiring approval.</p>
-            </div>
-        </div>
+        </main></main>
 
-        <!-- Recent Registration Activity Card -->
-        <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="margin: 0;">Recent Registration Activity</h2>
-                <button class="btn-outline-small">View all</button>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Role</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Registered On</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-sm">D</div>
-                                <span>Dr. Ahmed Khan</span>
-                            </div>
-                        </td>
-                        <td>Doctor</td>
-                        <td>ahmed.khan@hospital.com</td>
-                        <td><span class="badge badge-success">Approved</span></td>
-                        <td>09 Jul 2026, 10:30 AM</td>
-                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-sm" style="background:#FBE3DC; color:var(--error-text);">M</div>
-                                <span>Maryam Fatima</span>
-                            </div>
-                        </td>
-                        <td>Admin</td>
-                        <td>maryam.fatima@hospital.com</td>
-                        <td><span class="badge badge-warning">Pending</span></td>
-                        <td>09 Jul 2026, 09:15 AM</td>
-                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-sm">D</div>
-                                <span>Dr. Ali Raza</span>
-                            </div>
-                        </td>
-                        <td>Doctor</td>
-                        <td>ali.raza@hospital.com</td>
-                        <td><span class="badge badge-success">Approved</span></td>
-                        <td>08 Jul 2026, 04:45 PM</td>
-                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-sm" style="background:#F0F0F0; color:#333;">U</div>
-                                <span>Usman Ahmed</span>
-                            </div>
-                        </td>
-                        <td>Admin</td>
-                        <td>usman.ahmed@hospital.com</td>
-                        <td><span class="badge badge-error">Rejected</span></td>
-                        <td>08 Jul 2026, 03:20 PM</td>
-                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-sm">S</div>
-                                <span>Dr. Sara Malik</span>
-                            </div>
-                        </td>
-                        <td>Doctor</td>
-                        <td>sara.malik@hospital.com</td>
-                        <td><span class="badge badge-warning">Pending</span></td>
-                        <td>08 Jul 2026, 11:05 AM</td>
-                        <td><i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted); cursor:pointer;"></i></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="card-footer">
-                <span>Showing 1 to 5 of 12 results</span>
-                <div class="pagination-buttons">
-                    <button>&lt;</button>
-                    <button class="active">1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button>&gt;</button>
-                </div>
-            </div>
-        </div>
-    </main>
+    
+    
+    <script>
+        // Dropdown Logic
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
 
+        function switchTab(tabId) {
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('add-user').style.display = 'none';
+            
+            document.getElementById('nav-dashboard').classList.remove('active');
+            document.getElementById('nav-add-user').classList.remove('active');
+
+            if (tabId === 'dashboard') {
+                document.getElementById('dashboard-section').style.display = 'block';
+                document.getElementById('nav-dashboard').classList.add('active');
+            } else if (tabId === 'add-user') {
+                document.getElementById('add-user').style.display = 'block';
+                document.getElementById('nav-add-user').classList.add('active');
+            }
+        }
+
+        function toggleDoctorFields() {
+            var role = document.getElementById('roleSelect').value;
+            var docFields = document.getElementById('doctor-fields');
+            if (role === 'Doctor') {
+                docFields.style.display = 'block';
+            } else {
+                docFields.style.display = 'none';
+            }
+        }
+
+        function togglePwd(inputId, icon) {
+            var input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+        
+        document.getElementById('pwd').addEventListener('input', function(e) {
+            const val = e.target.value;
+            
+            // Length
+            if (val.length >= 8) document.getElementById('req-length').classList.add('valid');
+            else document.getElementById('req-length').classList.remove('valid');
+
+            // Uppercase
+            if (/[A-Z]/.test(val)) document.getElementById('req-upper').classList.add('valid');
+            else document.getElementById('req-upper').classList.remove('valid');
+
+            // Number
+            if (/[0-9]/.test(val)) document.getElementById('req-number').classList.add('valid');
+            else document.getElementById('req-number').classList.remove('valid');
+
+            // Special char
+            if (/[^A-Za-z0-9]/.test(val)) document.getElementById('req-special').classList.add('valid');
+            else document.getElementById('req-special').classList.remove('valid');
+        });
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            var pwd = document.getElementById('pwd').value;
+            var cpwd = document.getElementById('cpwd').value;
+            if (pwd !== cpwd) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
     <script src="/js/site.js"></script>
 </body>
 </html>

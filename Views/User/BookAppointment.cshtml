@@ -210,26 +210,39 @@
                             <h3>1. Select Specialty</h3>
                         </div>
                         <div class="specialties-grid">
-                            <label class="specialty-card" onclick="document.querySelectorAll('.specialty-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-1').disabled = false;">
-                                <input type="radio" name="specialty" value="Cardiology" style="display:none;" />
-                                <div class="icon"><i class="fa-solid fa-heart-pulse"></i></div>
-                                <div class="specialty-title">Cardiology</div>
-                            </label>
-                            <label class="specialty-card" onclick="document.querySelectorAll('.specialty-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-1').disabled = false;">
-                                <input type="radio" name="specialty" value="Primary Care" style="display:none;" />
-                                <div class="icon"><i class="fa-solid fa-briefcase-medical"></i></div>
-                                <div class="specialty-title">Primary Care</div>
-                            </label>
-                            <label class="specialty-card" onclick="document.querySelectorAll('.specialty-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-1').disabled = false;">
-                                <input type="radio" name="specialty" value="Pediatrics" style="display:none;" />
-                                <div class="icon"><i class="fa-solid fa-baby"></i></div>
-                                <div class="specialty-title">Pediatrics</div>
-                            </label>
-                            <label class="specialty-card" onclick="document.querySelectorAll('.specialty-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-1').disabled = false;">
-                                <input type="radio" name="specialty" value="Dermatology" style="display:none;" />
-                                <div class="icon"><i class="fa-solid fa-face-smile"></i></div>
-                                <div class="specialty-title">Dermatology</div>
-                            </label>
+                            @{
+                                var specialties = Model != null ? Model.Select(d => d.Specialization).Where(s => !string.IsNullOrEmpty(s)).Distinct().ToList() : new List<string>();
+                                
+                                if (specialties.Any())
+                                {
+                                    foreach(var spec in specialties)
+                                    {
+                                        string icon = "fa-user-doctor";
+                                        var lower = spec.ToLower();
+                                        if (lower.Contains("cardio")) icon = "fa-heart-pulse";
+                                        else if (lower.Contains("primary") || lower.Contains("general")) icon = "fa-briefcase-medical";
+                                        else if (lower.Contains("pediatric") || lower.Contains("child")) icon = "fa-baby";
+                                        else if (lower.Contains("derm")) icon = "fa-hand-dots";
+                                        else if (lower.Contains("neuro")) icon = "fa-brain";
+                                        else if (lower.Contains("ortho") || lower.Contains("bone")) icon = "fa-bone";
+                                        else if (lower.Contains("eye") || lower.Contains("opht")) icon = "fa-eye";
+                                        else if (lower.Contains("tooth") || lower.Contains("dent")) icon = "fa-tooth";
+                                        else if (lower.Contains("gyn") || lower.Contains("obs")) icon = "fa-person-pregnant";
+                                        else if (lower.Contains("lung") || lower.Contains("pulm")) icon = "fa-lungs";
+                                        else if (lower.Contains("surg")) icon = "fa-scalpel";
+
+                                        <label class="specialty-card" onclick="document.querySelectorAll('.specialty-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-1').disabled = false;">
+                                            <input type="radio" name="specialty" value="@spec" style="display:none;" />
+                                            <div class="icon"><i class="fa-solid @icon"></i></div>
+                                            <div class="specialty-title">@spec</div>
+                                        </label>
+                                    }
+                                }
+                                else
+                                {
+                                    <p style="color:var(--text-muted); font-size:14px; grid-column:1/-1;">No specialties available at the moment.</p>
+                                }
+                            }
                         </div>
                         <div class="clearfix" style="margin-top:20px;">
                             <button type="button" class="btn btn-primary next-step-btn" id="btn-next-1" disabled onclick="nextStep(2)">Next Step</button>
@@ -246,7 +259,7 @@
                             {
                                 foreach(var doc in Model)
                                 {
-                                    <label class="doctor-card" onclick="document.querySelectorAll('.doctor-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-2').disabled = false;">
+                                    <label class="doctor-card" data-specialty="@doc.Specialization" onclick="document.querySelectorAll('.doctor-card').forEach(c=>c.classList.remove('selected')); this.classList.add('selected'); document.getElementById('btn-next-2').disabled = false;">
                                         <input type="radio" name="doctorId" value="@doc.Id" required style="display:none;" />
                                         <div class="doc-header">
                                             <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(doc.Name)&background=random" alt="@doc.Name" />
@@ -304,6 +317,41 @@
                 document.getElementById('step-1').style.display = 'block';
             } else if(step === 2) {
                 document.getElementById('step-2').style.display = 'block';
+                const selectedSpec = document.querySelector('input[name="specialty"]:checked')?.value;
+                if(selectedSpec) {
+                    const cards = document.querySelectorAll('.doctor-card');
+                    let hasVisible = false;
+                    cards.forEach(c => {
+                        if (c.getAttribute('data-specialty') === selectedSpec) {
+                            c.style.display = 'flex';
+                            hasVisible = true;
+                        } else {
+                            c.style.display = 'none';
+                        }
+                    });
+                    
+                    const checkedDoc = document.querySelector('input[name="doctorId"]:checked');
+                    if(checkedDoc && checkedDoc.closest('.doctor-card').style.display === 'none') {
+                        checkedDoc.checked = false;
+                        checkedDoc.closest('.doctor-card').classList.remove('selected');
+                        document.getElementById('btn-next-2').disabled = true;
+                    }
+
+                    let noDocMsg = document.getElementById('no-doc-msg');
+                    if (!noDocMsg) {
+                        noDocMsg = document.createElement('p');
+                        noDocMsg.id = 'no-doc-msg';
+                        noDocMsg.style.color = 'var(--text-muted)';
+                        noDocMsg.style.gridColumn = '1 / -1';
+                        document.getElementById('doctors-container').appendChild(noDocMsg);
+                    }
+                    if (!hasVisible) {
+                        noDocMsg.textContent = 'No doctors available for ' + selectedSpec + '.';
+                        noDocMsg.style.display = 'block';
+                    } else {
+                        noDocMsg.style.display = 'none';
+                    }
+                }
             } else if(step === 3) {
                 document.getElementById('step-3').style.display = 'block';
             }

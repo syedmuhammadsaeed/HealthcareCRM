@@ -85,6 +85,10 @@ namespace HealthcareCRM.Models
         [BsonIgnoreIfNull]
         public string? ProfilePictureUrl { get; set; }
 
+                [BsonElement("lastLogin")]
+        [BsonIgnoreIfNull]
+        public DateTime? LastLogin { get; set; }
+
         [BsonElement("dateOfBirth")]
         [BsonIgnoreIfNull]
         public DateTime? DateOfBirth { get; set; }

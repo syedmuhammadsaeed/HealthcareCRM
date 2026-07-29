@@ -1,179 +1,419 @@
 @{
-    ViewData["Title"] = "Profile Settings — Super Admin";
+    ViewData["Title"] = "Profile Settings - Super Admin";
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@ViewData["Title"]</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --cream:#FAF7F1;
-    --forest:#1B4332;
-    --forest-dark:#122E22;
-    --sage:#6E9C7D;
-    --sage-light:#E4EFE3;
-    --coral:#E76F51;
-    --coral-light:#FBE3DC;
-    --amber:#B3672B;
-    --amber-light:#FBEADB;
-    --ink:#26301F;
-    --muted:#7C8873;
-    --line:#E7E0D2;
-    --ok:#3E7C4A;
-    --error:#C0392B;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:'Inter',sans-serif;
-    background:var(--cream);
-    color:var(--ink);
-    min-height:100vh;
-    padding-bottom:60px;
-  }
-  .topbar {
-    background: #fff;
-    border-bottom: 1px solid var(--line);
-    padding: 0 24px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .brand {
-    font-family: 'Fraunces', serif;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--forest);
-    text-decoration: none;
-  }
-  .nav-links {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-  }
-  .nav-links a {
-    text-decoration: none;
-    color: var(--muted);
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover, .nav-links a.active {
-    color: var(--forest);
-  }
-  .main-content {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 0 24px;
-  }
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 32px;
-    border: 1px solid var(--line);
-  }
-  h2 { font-family: 'Fraunces', serif; margin-top:0; color:var(--forest); }
-  .form-group { margin-bottom: 20px; }
-  label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px; }
-  input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 15px; }
-  button {
-    background: var(--forest);
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    font-size: 15px;
-  }
-  .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
-  .alert.success { background: var(--sage-light); color: var(--forest-dark); border: 1px solid var(--sage); }
-  .alert.error { background: var(--coral-light); color: var(--error); border: 1px solid var(--coral); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --cream: #FAF7F1;
+            --forest: #1B4332;
+            --forest-dark: #122E22;
+            --sage: #6E9C7D;
+            --sage-light: #E4EFE3;
+            --ink: #26301F;
+            --muted: #7C8873;
+            --line: #E7E0D2;
+            --success-text: #3E7C4A;
+            --success-bg: #E4EFE3;
+            --error-text: #C0392B;
+            --error-bg: #FBE3DC;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--cream); border-right: 1px solid var(--line); display: flex; flex-direction: column; position: fixed; height: 100vh; padding: 32px 24px; }
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; text-decoration: none; }
+        .brand-icon { width: 36px; height: 36px; background: var(--forest); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--forest); line-height: 1.2; }
+        .brand-slogan { font-size: 11px; color: var(--muted); }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--muted); font-weight: 500; font-size: 14px; border-radius: 8px; transition: all 0.2s; }
+        .nav-item i { font-size: 16px; width: 20px; text-align: center; }
+        .nav-item:hover { background: rgba(27, 67, 50, 0.05); color: var(--forest); }
+        .nav-item.active { background: var(--forest); color: #fff; }
+        
+        .main-wrapper { margin-left: 280px; flex-grow: 1; padding: 40px 60px; }
+        .page-header h1 { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: var(--ink); margin: 0 0 8px 0; }
+        .page-header p { color: var(--muted); font-size: 14px; margin: 0; }
+        
+        .settings-grid { display: grid; grid-template-columns: 240px 1fr; gap: 24px; margin-top: 32px; align-items: start; }
+        .settings-menu { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px 0; position: sticky; top: 24px; }
+        .menu-item { display: block; padding: 12px 24px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .menu-item.active { color: var(--forest); background: var(--sage-light); border-left-color: var(--forest); }
+        
+        .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .card-header h2 { font-size: 18px; font-weight: 600; color: var(--ink); margin: 0 0 4px 0; display:flex; align-items:center; gap:8px;}
+        .card-header p { font-size: 13px; color: var(--muted); margin: 0; }
+        
+        .btn-outline { background: #fff; border: 1px solid var(--forest); color: var(--forest); padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--forest); color: #fff; padding: 10px 24px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        
+        /* Profile Details Layout */
+        .profile-info-grid { display: grid; grid-template-columns: 200px 1fr; gap: 32px; }
+        .avatar-section { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+        .avatar-wrapper { position: relative; width: 140px; height: 140px; border-radius: 50%; padding: 4px; border: 2px solid var(--line); }
+        .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .completion-bar { width: 100%; }
+        .completion-bar p { font-size: 12px; font-weight: 600; color: var(--ink); margin: 0 0 8px 0; display: flex; justify-content: space-between; }
+        .completion-bar p span { color: var(--forest); }
+        .progress-track { height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--forest); width: 100%; border-radius: 4px; }
+        .verified-badge { background: var(--success-bg); padding: 12px; border-radius: 8px; display: flex; gap: 12px; align-items: flex-start; width: 100%; margin-top: 16px; }
+        .verified-badge i { color: var(--success-text); font-size: 16px; margin-top: 2px; }
+        .verified-badge div h4 { margin: 0 0 4px 0; font-size: 13px; color: var(--success-text); }
+        .verified-badge div p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
+        .info-list { display: flex; flex-direction: column; gap: 24px; }
+        .info-row { display: grid; grid-template-columns: 140px 1fr; align-items: center; }
+        .info-label { font-size: 13px; color: var(--muted); font-weight: 500; }
+        .info-value { font-size: 14px; color: var(--ink); font-weight: 500; }
+        .status-pill { background: var(--sage-light); color: var(--forest); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--forest); }
+        
+        .security-card { background: var(--sage-light); border: 1px solid var(--sage-light); display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; }
+        .security-info { display: flex; gap: 16px; align-items: flex-start; }
+        
+        /* Change Password Layout */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+        .input-with-icon { position: relative; }
+        .input-with-icon input { width: 100%; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .input-with-icon i { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); cursor: pointer; }
+        
+        .password-checklist { margin-top: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 8px; }
+        .password-checklist div { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; font-weight: 400; transition: all 0.2s; }
+        .password-checklist div.valid { color: var(--forest); font-weight: 700; }
+        
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; font-size:14px; font-weight:500;}
+        .alert.success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-text); }
+        .alert.error { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-text); }
+    </style>
 </head>
 <body>
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <div class="brand-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div class="brand-text">
+                <span class="brand-name">HealthcareCRM</span>
+                <span class="brand-slogan">Better care. Every day.</span>
+            </div>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="/SuperAdmin" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="/SuperAdmin#add-user" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
+            <a href="/SuperAdmin/LoginHistory" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
+            <a href="/SuperAdmin/Reports" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
+            <a href="/SuperAdmin/Profile" class="nav-item active"><i class="fa-solid fa-gear"></i> Settings</a>
+        </nav>
+    </aside>
 
-  <header class="topbar">
-    <a href="/" class="brand">HealthcareCRM</a>
-    <div class="nav-links">
-      <a href="/SuperAdmin">Approvals</a>
-      <a href="/SuperAdmin/Profile" class="active">Profile</a>
-    </div>
-  </header>
-
-  <main class="main-content">
-    <div class="card">
-      <h2>Change Password</h2>
-      <div id="alertBox" class="alert"></div>
-      
-      <form id="passwordForm">
-        <div class="form-group">
-          <label>Current Password</label>
-          <input type="password" id="currentPassword" required>
+    <main class="main-wrapper">
+        <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h1>Profile Settings</h1>
+                <p>Manage your personal information and account settings.</p>
+            </div>
+            
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="document.getElementById('topProfileMenu').style.display = document.getElementById('topProfileMenu').style.display === 'flex' ? 'none' : 'flex'; event.stopPropagation();" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:#fff; border:1px solid var(--line); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img id="topProfileImg" src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=Super+Admin&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2; color:var(--ink);">@(ViewBag.UserName ?? "Super Admin")</span>
+                        <span style="font-size:11px; color:var(--muted); line-height:1.2;">@(ViewBag.UserEmail ?? "superadmin@medicare.com")</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token'); document.cookie='hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';" style="padding:10px 14px; color:var(--error-text); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-          <label>New Password</label>
-          <input type="password" id="newPassword" required>
+
+        <div class="settings-grid">
+            <div class="settings-menu">
+                <a onclick="switchTab('profile')" id="tab-profile" class="menu-item active"><i class="fa-regular fa-user"></i> Profile Information</a>
+                <a onclick="switchTab('security')" id="tab-security" class="menu-item"><i class="fa-solid fa-shield-halved"></i> Account & Security</a>
+            </div>
+
+            <div class="settings-content" id="content-profile">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2>Profile Information</h2>
+                            <p>Update your personal details and profile information.</p>
+                        </div>
+                        <button type="button" class="btn-outline" id="toggleEditBtn" onclick="toggleEditMode()"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+                    </div>
+
+                    <form id="profileEditForm" action="/SuperAdmin/UpdateProfile" method="POST" enctype="multipart/form-data">
+                        <div class="profile-info-grid">
+                        <div class="avatar-section">
+                            <div class="avatar-wrapper">
+                                <img id="profilePreview" src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=Super+Admin&background=random")" alt="Profile" />
+                                <div class="avatar-edit" id="avatarEditBtn" style="display:none; position:absolute; bottom:4px; right:4px; width:32px; height:32px; background:var(--forest); color:#fff; border-radius:50%; align-items:center; justify-content:center; cursor:pointer; border:2px solid #fff;">
+                                    <i class="fa-solid fa-camera" style="font-size:12px;"></i>
+                                </div>
+                                <div class="avatar-delete edit-mode" id="avatarDeleteBtn" onclick="removeAvatar()" style="display:none; position:absolute; bottom:4px; left:4px; width:32px; height:32px; background:var(--error-text); color:#fff; border-radius:50%; align-items:center; justify-content:center; cursor:pointer; border:2px solid #fff;">
+                                    <i class="fa-solid fa-trash" style="font-size:12px;"></i>
+                                </div>
+                                <input type="file" id="profilePictureInput" name="profilePicture" style="display:none;" accept="image/*" onchange="previewImage(event)" />
+                                <input type="hidden" name="removePicture" id="removePicture" value="false" />
+                            </div>
+                            <div class="completion-bar">
+                                @{ var comp = ViewBag.UserProfilePic != null ? "100" : "80"; }
+                                <p>Profile Completion <span id="compText">@comp% Completed</span></p>
+                                <div class="progress-track"><div id="compFill" class="progress-fill" style="width: @comp%;"></div></div>
+                            </div>
+                            <div class="verified-badge">
+                                <i class="fa-regular fa-circle-check"></i>
+                                <div><h4>Account Verified</h4><p>Your account is secure and verified.</p></div>
+                            </div>
+                        </div>
+
+                        <div class="info-list">
+                            <div class="info-row">
+                                <div class="info-label">Full Name</div>
+                                <div class="info-value">
+                                    <span class="view-mode">@(ViewBag.UserName ?? "Super Admin")</span>
+                                    <input type="text" name="name" id="editName" class="form-control edit-mode" style="display:none; padding:8px; border:1px solid var(--line); border-radius:6px; font-family:inherit;" value="@(ViewBag.UserName)" required />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Email Address</div>
+                                <div class="info-value">
+                                    <span class="view-mode">@(ViewBag.UserEmail ?? "superadmin@medicare.com")</span>
+                                    <input type="email" name="email" id="editEmail" class="form-control edit-mode" style="display:none; padding:8px; border:1px solid var(--line); border-radius:6px; font-family:inherit;" value="@(ViewBag.UserEmail)" required />
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Phone Number</div>
+                                <div class="info-value">
+                                    <span class="view-mode">@(ViewBag.UserPhone ?? "+1 (555) 123-4567")</span>
+                                    <input type="text" name="phone" id="editPhone" class="form-control edit-mode" style="display:none; padding:8px; border:1px solid var(--line); border-radius:6px; font-family:inherit;" value="@(ViewBag.UserPhone)" required />
+                                </div>
+                            </div>
+                            <div class="info-row"><div class="info-label">Role</div><div class="info-value"><span class="status-pill" style="background:#E4EFE3; color:#3E7C4A;">Super Admin</span></div></div>
+                            <div class="info-row"><div class="info-label">Last Login</div><div class="info-value">Today, 09:42 AM</div></div>
+                            <div class="info-row"><div class="info-label">Status</div><div class="info-value"><span class="status-pill">Active</span></div></div>
+                            
+                            <div class="edit-mode" style="display:none; margin-top:20px;">
+                                <button type="submit" class="btn-primary">Save Changes</button>
+                                <button type="button" class="btn-outline" onclick="toggleEditMode()" style="display:inline-block; margin-left:12px; padding:10px 24px;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="settings-content" id="content-security" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2><i class="fa-solid fa-lock" style="color:var(--forest); background:var(--sage-light); padding:8px; border-radius:8px; font-size:14px;"></i> Change Password</h2>
+                            <p>Update your password regularly to keep your account secure.</p>
+                        </div>
+                    </div>
+
+                    <div id="alertBox" class="alert"></div>
+
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" id="currentPassword" required placeholder="••••••••">
+                                <i class="fa-regular fa-eye-slash" onclick="togglePassword(this, 'currentPassword')"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" id="newPassword" required placeholder="••••••••">
+                                <i class="fa-regular fa-eye-slash" onclick="togglePassword(this, 'newPassword')"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <div class="input-with-icon">
+                                <input type="password" id="confirmPassword" required placeholder="••••••••">
+                                <i class="fa-regular fa-eye-slash" onclick="togglePassword(this, 'confirmPassword')"></i>
+                            </div>
+                        </div>
+
+                        <div class="password-checklist">
+                            <div id="req-length"><i class="fa-solid fa-check"></i> Minimum 8 characters</div>
+                            <div id="req-upper"><i class="fa-solid fa-check"></i> At least one uppercase letter</div>
+                            <div id="req-number"><i class="fa-solid fa-check"></i> At least one number</div>
+                            <div id="req-special"><i class="fa-solid fa-check"></i> At least one special character</div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Update Password</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-          <label>Confirm New Password</label>
-          <input type="password" id="confirmPassword" required>
-        </div>
-        <button type="submit">Update Password</button>
-      </form>
-    </div>
-  </main>
+    </main>
 
-  <script src="/js/site.js"></script>
-  <script>
-    requireAuth();
-
-    document.getElementById('passwordForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const current = document.getElementById('currentPassword').value;
-      const newPass = document.getElementById('newPassword').value;
-      const confirm = document.getElementById('confirmPassword').value;
-      const alertBox = document.getElementById('alertBox');
-
-      if (newPass !== confirm) {
-        alertBox.textContent = "New passwords do not match!";
-        alertBox.className = "alert error";
-        alertBox.style.display = "block";
-        return;
-      }
-
-      try {
-        const res = await authFetch('/api/auth/change-password', {
-          method: 'POST',
-          body: JSON.stringify({ currentPassword: current, newPassword: newPass, confirmPassword: confirm })
-        });
-        const data = await res.json();
+    <script src="/js/site.js"></script>
+    <script>
         
-        alertBox.style.display = "block";
-        if (data.success) {
-            alertBox.textContent = data.message;
-            alertBox.className = "alert success";
-            document.getElementById('passwordForm').reset();
-        } else {
-            alertBox.textContent = data.message || "Failed to update password.";
-            alertBox.className = "alert error";
+        function toggleEditMode() {
+            const viewEls = document.querySelectorAll('.view-mode');
+            const editEls = document.querySelectorAll('.edit-mode');
+            const toggleBtn = document.getElementById('toggleEditBtn');
+            const avatarEditBtn = document.getElementById('avatarEditBtn');
+            
+            let isEditing = toggleBtn.style.display === 'none';
+            const avatarDelBtn = document.getElementById('avatarDeleteBtn');
+            
+            if (!isEditing) {
+                // Enter edit mode
+                viewEls.forEach(el => el.style.display = 'none');
+                editEls.forEach(el => el.style.display = 'block');
+                toggleBtn.style.display = 'none';
+                avatarEditBtn.style.display = 'flex';
+                if(avatarDelBtn) avatarDelBtn.style.display = 'flex';
+            } else {
+                // Exit edit mode
+                viewEls.forEach(el => el.style.display = 'inline');
+                editEls.forEach(el => el.style.display = 'none');
+                toggleBtn.style.display = 'flex';
+                avatarEditBtn.style.display = 'none';
+                if(avatarDelBtn) avatarDelBtn.style.display = 'none';
+            }
         }
-      } catch (err) {
-          alertBox.textContent = "A network error occurred.";
-          alertBox.className = "alert error";
-          alertBox.style.display = "block";
-      }
-    });
-  </script>
+
+        document.getElementById('avatarEditBtn')?.addEventListener('click', function() {
+            document.getElementById('profilePictureInput').click();
+        });
+
+        
+        function removeAvatar() {
+            const defaultAvatar = 'https://ui-avatars.com/api/?name=Super+Admin&background=random';
+            document.getElementById('profilePreview').src = defaultAvatar;
+            document.getElementById('topProfileImg').src = defaultAvatar;
+            document.getElementById('removePicture').value = 'true';
+            document.getElementById('profilePictureInput').value = '';
+            document.getElementById('compText').textContent = '80% Completed';
+            document.getElementById('compFill').style.width = '80%';
+        }
+
+        function previewImage(event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const result = e.target.result;
+                    document.getElementById('profilePreview').src = result;
+                    document.getElementById('topProfileImg').src = result;
+                    document.getElementById('compText').textContent = '100% Completed';
+                    document.getElementById('compFill').style.width = '100%';
+                }
+                reader.readAsDataURL(input.files[0]);
+                document.getElementById('removePicture').value = 'false';
+            }
+        }
+
+        
+
+        function switchTab(tab) {
+            document.getElementById('tab-profile').classList.remove('active');
+            document.getElementById('tab-security').classList.remove('active');
+            document.getElementById('content-profile').style.display = 'none';
+            document.getElementById('content-security').style.display = 'none';
+            
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('content-' + tab).style.display = 'flex';
+        }
+
+        function togglePassword(icon, inputId) {
+            var input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        }
+
+        document.getElementById('newPassword').addEventListener('input', function(e) {
+            const val = e.target.value;
+            
+            // Length
+            if (val.length >= 8) document.getElementById('req-length').classList.add('valid');
+            else document.getElementById('req-length').classList.remove('valid');
+
+            // Uppercase
+            if (/[A-Z]/.test(val)) document.getElementById('req-upper').classList.add('valid');
+            else document.getElementById('req-upper').classList.remove('valid');
+
+            // Number
+            if (/[0-9]/.test(val)) document.getElementById('req-number').classList.add('valid');
+            else document.getElementById('req-number').classList.remove('valid');
+
+            // Special char
+            if (/[^A-Za-z0-9]/.test(val)) document.getElementById('req-special').classList.add('valid');
+            else document.getElementById('req-special').classList.remove('valid');
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const alertBox = document.getElementById('alertBox');
+
+            if (newPass !== confirm) {
+                alertBox.textContent = "New passwords do not match!";
+                alertBox.className = "alert error";
+                alertBox.style.display = "block";
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('hcrm_token')
+                    },
+                    body: JSON.stringify({ currentPassword: current, newPassword: newPass, confirmPassword: confirm })
+                });
+                const data = await res.json();
+                
+                alertBox.style.display = "block";
+                if (data.success) {
+                    alertBox.textContent = data.message;
+                    alertBox.className = "alert success";
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    alertBox.textContent = data.message || "Failed to update password.";
+                    alertBox.className = "alert error";
+                }
+            } catch (err) {
+                alertBox.textContent = "A network error occurred.";
+                alertBox.className = "alert error";
+                alertBox.style.display = "block";
+            }
+        });
+
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

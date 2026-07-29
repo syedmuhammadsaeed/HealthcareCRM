@@ -417,7 +417,7 @@
     <div class="stats-grid">
       <div class="stat-card c1">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-        <div class="stat-val" id="stat-appt-num">4</div>
+        <div class="stat-val" id="stat-appt-num">-</div>
         <div class="stat-labels">
           <div class="stat-title">Appointments today</div>
           <div class="stat-subtitle">Assigned to you</div>
@@ -426,7 +426,7 @@
       
       <div class="stat-card c2">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-        <div class="stat-val" id="stat-pat-num">4</div>
+        <div class="stat-val" id="stat-pat-num">-</div>
         <div class="stat-labels">
           <div class="stat-title">Total patients</div>
           <div class="stat-subtitle">Under your care</div>
@@ -435,16 +435,16 @@
       
       <div class="stat-card c3">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-        <div class="stat-val" id="stat-next-time" style="font-size:28px;">11:26</div>
+        <div class="stat-val" id="stat-next-time" style="font-size:28px;">--:--</div>
         <div class="stat-labels">
           <div class="stat-title">Next appointment</div>
-          <div class="stat-subtitle" id="stat-next-name">Tskjsj</div>
+          <div class="stat-subtitle" id="stat-next-name">...</div>
         </div>
       </div>
       
       <div class="stat-card c4">
         <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
-        <div class="stat-val">2</div>
+        <div class="stat-val" id="stat-critical-num">-</div>
         <div class="stat-labels">
           <div class="stat-title">Critical patients</div>
           <div class="stat-subtitle">Need review today</div>
@@ -558,14 +558,11 @@
               <label class="form-label">Phone Number</label>
               <input type="text" id="prof-phone" class="input-control" value="+92 300 1234567">
             </div>
-            <div class="input-group">
+            <div class="input-group full-width">
               <label class="form-label">Specialization</label>
               <input type="text" id="prof-spec" class="input-control" value="Cardiologist">
             </div>
-            <div class="input-group full-width">
-              <label class="form-label">Qualification</label>
-              <input type="text" id="prof-qual" class="input-control" value="MBBS, FCPS (Cardiology)">
-            </div>
+            
           </div>
         </div>
         <div class="panel-footer-right">
@@ -704,9 +701,9 @@
         var email = document.getElementById('prof-email').value;
         var phone = document.getElementById('prof-phone').value;
         var spec = document.getElementById('prof-spec').value;
-        var qual = document.getElementById('prof-qual').value;
+        var qual = ''; // removed
         
-        if (!name.trim() || !email.trim() || !phone.trim() || !spec.trim() || !qual.trim()) {
+        if (!name.trim() || !email.trim() || !phone.trim() || !spec.trim()) {
             err.textContent = 'Please fill in all required fields.';
             err.style.color = 'var(--coral)';
             err.style.display = 'inline-block';
@@ -726,7 +723,7 @@
                     email: email,
                     phone: phone,
                     specialization: spec,
-                    qualification: qual,
+                    
                     profilePictureBase64: _profilePicBase64
                 })
             });
@@ -879,7 +876,7 @@
                     if (me.email) document.getElementById('prof-email').value = me.email;
                     if (me.phone) document.getElementById('prof-phone').value = me.phone;
                     if (me.specialization) document.getElementById('prof-spec').value = me.specialization;
-                    if (me.qualification) document.getElementById('prof-qual').value = me.qualification;
+                    
                     if (me.profilePictureUrl) {
                         var pv = document.getElementById('prof-avatar-preview');
                         pv.textContent = '';
@@ -942,6 +939,9 @@
             
             if (body.success && body.data && body.data.items) {
                 var patients = body.data.items;
+                if (myId) {
+                    patients = patients.filter(p => p.assignedDoctorId === myId);
+                }
                 
                 patients.forEach(function(p) {
                     p._dateObj = new Date(0);
@@ -964,6 +964,12 @@
                 
                 if (patients.length === 0) {
                     listEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--muted);">No patients assigned to you yet.</div>';
+                    document.getElementById('stat-appt-num').textContent = '0';
+                    document.getElementById('stat-pat-num').textContent = '0';
+                    document.getElementById('stat-next-time').textContent = '--:--';
+                    document.getElementById('stat-next-name').textContent = 'None';
+                    var criNum = document.getElementById('stat-critical-num');
+                    if (criNum) criNum.textContent = '0';
                 } else {
                     var html = '';
                     var now = new Date();
@@ -1000,6 +1006,8 @@
                     // Update stats
                     document.getElementById('stat-appt-num').textContent = patients.length;
                     document.getElementById('stat-pat-num').textContent = patients.length;
+                    var criNum = document.getElementById('stat-critical-num');
+                    if (criNum) criNum.textContent = patients.filter(p => p.status === 'Critical' || p.status === 'critical').length;
                     
                     if (nextApptIndex !== -1) {
                         var nt = patients[nextApptIndex].appointmentTime || '--:--';
