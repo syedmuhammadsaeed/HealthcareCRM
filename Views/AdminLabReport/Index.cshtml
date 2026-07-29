@@ -1,0 +1,55 @@
+@model IEnumerable<HealthcareCRM.Models.LabReport>
+@{
+    ViewData["Title"] = "Lab Reports";
+}
+
+<div class="page" style="padding: 30px;">
+    <div class="page-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+        <div>
+            <h1>Lab Reports</h1>
+            <p style="color:var(--muted);">Manage lab reports for online patients</p>
+        </div>
+        <a href="/AdminLabReport/Create" class="btn btn-primary" style="background-color: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; text-decoration: none;">+ Upload Report</a>
+    </div>
+
+    <div class="panel" style="background: white; border-radius: 12px; border: 1px solid var(--border); overflow:hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f9fafb; border-bottom: 1px solid var(--border); text-align: left;">
+                    <th style="padding: 16px;">Report Name</th>
+                    <th style="padding: 16px;">User ID</th>
+                    <th style="padding: 16px;">Date Ordered</th>
+                    <th style="padding: 16px;">Doctor</th>
+                    <th style="padding: 16px;">Status</th>
+                    <th style="padding: 16px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model.OrderByDescending(r => r.DateOrdered))
+                {
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 16px; font-weight: 500;">@report.ReportName</td>
+                        <td style="padding: 16px; color: var(--muted);">@report.UserId</td>
+                        <td style="padding: 16px;">@report.DateOrdered.ToString("MM/dd/yyyy")</td>
+                        <td style="padding: 16px;">@report.OrderDoctor</td>
+                        <td style="padding: 16px;">
+                            <span style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; background: @(report.Status == "Completed" ? "var(--sage-light)" : "var(--sand-light)"); color: @(report.Status == "Completed" ? "var(--forest-dark)" : "var(--earth-dark)");">@report.Status</span>
+                        </td>
+                        <td style="padding: 16px;">
+                            @if (!string.IsNullOrEmpty(report.FileUrl))
+                            {
+                                <a href="@report.FileUrl" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 500;">View</a>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">No lab reports found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

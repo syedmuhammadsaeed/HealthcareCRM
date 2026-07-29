@@ -1,0 +1,177 @@
+@model IEnumerable<HealthcareCRM.Models.User>
+@{
+    ViewData["Title"] = "Admin / Doctor Login History";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --cream: #FAF7F1;
+            --forest: #1B4332;
+            --forest-dark: #122E22;
+            --sage: #6E9C7D;
+            --sage-light: #E4EFE3;
+            --ink: #26301F;
+            --muted: #7C8873;
+            --line: #E7E0D2;
+            --success-text: #3E7C4A;
+            --success-bg: #E4EFE3;
+            --error-text: #C0392B;
+            --error-bg: #FBE3DC;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 280px; background: var(--cream); border-right: 1px solid var(--line); display: flex; flex-direction: column; position: fixed; height: 100vh; padding: 32px 24px; }
+        .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; text-decoration: none; }
+        .brand-icon { width: 36px; height: 36px; background: var(--forest); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--forest); line-height: 1.2; }
+        .brand-slogan { font-size: 11px; color: var(--muted); }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-decoration: none; color: var(--muted); font-weight: 500; font-size: 14px; border-radius: 8px; transition: all 0.2s; }
+        .nav-item i { font-size: 16px; width: 20px; text-align: center; }
+        .nav-item:hover { background: rgba(27, 67, 50, 0.05); color: var(--forest); }
+        .nav-item.active { background: var(--forest); color: #fff; }
+        
+        .main-wrapper { margin-left: 280px; flex-grow: 1; padding: 40px 60px; }
+        .page-header h1 { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: var(--ink); margin: 0 0 8px 0; }
+        .page-header p { color: var(--muted); font-size: 14px; margin: 0; }
+        
+        .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-top: 32px; overflow: hidden; }
+        .card-header { padding: 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { font-size: 16px; font-weight: 600; color: var(--ink); margin: 0; }
+        
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { text-align: left; padding: 16px 24px; font-size: 12px; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--line); background: #fafafa; }
+        .table td { padding: 16px 24px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); vertical-align: middle; }
+        .table tr:last-child td { border-bottom: none; }
+        .table tr:hover { background: #fdfdfd; }
+        
+        .user-cell { display: flex; align-items: center; gap: 12px; }
+        .user-avatar-sm { width: 32px; height: 32px; background: var(--sage-light); color: var(--forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; }
+        .user-cell span { font-weight: 600; color: var(--ink); }
+        .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--cream); color: var(--muted); border: 1px solid var(--line); }
+        .role-badge.doctor { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .role-badge.admin { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; }
+        .empty-icon { width: 64px; height: 64px; background: var(--sage-light); color: var(--forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 20px; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--ink); margin: 0 0 8px 0; }
+        .empty-state p { font-size: 14px; color: var(--muted); margin: 0; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <a href="/" class="sidebar-brand">
+            <div class="brand-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div class="brand-text">
+                <span class="brand-name">HealthcareCRM</span>
+                <span class="brand-slogan">Better care. Every day.</span>
+            </div>
+        </a>
+        <nav class="sidebar-nav">
+            <a href="/SuperAdmin" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="/SuperAdmin#add-user" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
+            <a href="/SuperAdmin/LoginHistory" class="nav-item active"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
+            <a href="/SuperAdmin/Reports" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
+            <a href="/SuperAdmin/Profile" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-wrapper">
+        <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+                <h1>Login History</h1>
+                <p>Audit trail of Admin and Doctor access.</p>
+            </div>
+            
+            <div class="profile-dropdown-container" style="position:relative; z-index:50;">
+                <div class="profile-dropdown-btn" onclick="document.getElementById('topProfileMenu').style.display = document.getElementById('topProfileMenu').style.display === 'flex' ? 'none' : 'flex'; event.stopPropagation();" style="display:flex; align-items:center; gap:12px; cursor:pointer; padding:6px 12px; border-radius:30px; background:#fff; border:1px solid var(--line); box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="@(ViewBag.UserProfilePic ?? "https://ui-avatars.com/api/?name=Super+Admin&background=random")" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" />
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:13px; line-height:1.2; color:var(--ink);">@(ViewBag.UserName ?? "Super Admin")</span>
+                        <span style="font-size:11px; color:var(--muted); line-height:1.2;">@(ViewBag.UserEmail ?? "superadmin@medicare.com")</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down" style="font-size:12px; color:var(--muted); margin-left:4px;"></i>
+                </div>
+                <div class="profile-dropdown-menu" id="topProfileMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:8px; background:#fff; border:1px solid var(--line); border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); min-width:160px; flex-direction:column; padding:6px;">
+                    <a href="/Account/Login" onclick="localStorage.removeItem('hcrm_token'); document.cookie='hcrm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';" style="padding:10px 14px; color:var(--error-text); text-decoration:none; font-size:13px; border-radius:6px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Admin / Doctor Login History</h2>
+            </div>
+            
+            @if(Model != null && Model.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Time (Last Login)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var user in Model)
+                        {
+                            var initial = !string.IsNullOrEmpty(user.Name) ? user.Name.Substring(0, 1).ToUpper() : "U";
+                            var roleClass = user.Role == "Doctor" ? "doctor" : "admin";
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-sm">@initial</div>
+                                        <span>@(user.Role == "Doctor" ? "Dr. " : "")@user.Name</span>
+                                    </div>
+                                </td>
+                                <td><span class="role-badge @roleClass">@user.Role</span></td>
+                                <td>@user.Email</td>
+                                <td>
+                                    @if(user.LastLogin.HasValue)
+                                    {
+                                        @user.LastLogin.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#aaa; font-style:italic;">Never logged in</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fa-regular fa-clock"></i></div>
+                    <h3>No Login Records</h3>
+                    <p>There is no login history available for any Admins or Doctors yet.</p>
+                </div>
+            }
+        </div>
+    </main>
+
+    <script>
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('.profile-dropdown-container')) {
+                var menu = document.getElementById('topProfileMenu');
+                if (menu) menu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

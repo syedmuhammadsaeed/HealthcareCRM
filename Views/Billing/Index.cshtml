@@ -1,0 +1,227 @@
+@{
+    ViewData["Title"] = "Billings";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/billing.css" asp-append-version="true" />
+}
+
+<div class="page">
+    <div class="page-head">
+        <div>
+            <h1>Billings</h1>
+            <p>Revenue generated from doctor-assigned appointments</p>
+        </div>
+        <button class="btn-ghost"><i class="fa-solid fa-download"></i> Export statement</button>
+    </div>
+
+    <div class="revenue-row">
+      <div class="rev-card today">
+        <span class="reset-pill">Resets at midnight</span>
+        <div class="lbl">◈ Today's revenue</div>
+        <div class="amount" id="daily-revenue-amt">Rs 0</div>
+        <div class="sub" id="daily-revenue-sub">0 billable assignments today</div>
+        <div class="sparkline">
+          <div class="b" style="height:20%; background:rgba(255,255,255,.12);"></div>
+          <div class="b" style="height:35%; background:rgba(255,255,255,.12);"></div>
+          <div class="b" style="height:15%; background:rgba(255,255,255,.12);"></div>
+          <div class="b" style="height:60%; background:rgba(255,255,255,.12);"></div>
+          <div class="b" style="height:100%; background:#fff;"></div>
+        </div>
+      </div>
+
+      <div class="rev-card month">
+        <div class="lbl">▤ This month's revenue</div>
+        <div class="amount" id="monthly-revenue-amt">Rs 0</div>
+        <div class="sub" id="monthly-revenue-sub">0 billable assignments</div>
+        <div class="sparkline">
+          <div class="b" style="height:0%"></div>
+          <div class="b" style="height:0%"></div>
+          <div class="b" style="height:0%"></div>
+          <div class="b" style="height:0%"></div>
+          <div class="b" style="height:0%"></div>
+          <div class="b hi" style="height:0%"></div>
+          <div class="b hi" style="height:100%"></div>
+        </div>
+      </div>
+
+      <div class="rev-card count">
+        <div class="lbl">🩺 Avg. fee per assignment</div>
+        <div class="amount" id="avg-fee-amt">Rs 0</div>
+        <div class="sub" id="avg-fee-sub">Across 0 billed assignments this month</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Revenue log</h3>
+        <div class="filter-row">
+          <button class="on">This month</button>
+          <button>Last month</button>
+          <button>All time</button>
+        </div>
+      </div>
+      
+      <div id="billing-table-body">
+         <div style="text-align:center; padding: 40px; color: var(--muted);">Loading data...</div>
+      </div>
+
+      <div class="panel-footer">
+        <span class="lbl" id="footer-lbl">Total revenue — This Month</span>
+        <span class="val" id="footer-val">Rs 0</span>
+      </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            requireAuth();
+
+            try {
+                var [apptResp, docResp] = await Promise.all([
+                    authFetch('/api/patients/appointments'),
+                    authFetch('/api/doctors')
+                ]);
+                
+                var apptBody = await apptResp.json();
+                var docBody = await docResp.json();
+                
+                var container = document.getElementById('billing-table-body');
+                var dailyRevAmt = document.getElementById('daily-revenue-amt');
+                var dailyRevSub = document.getElementById('daily-revenue-sub');
+                var monthlyRevAmt = document.getElementById('monthly-revenue-amt');
+                var monthlyRevSub = document.getElementById('monthly-revenue-sub');
+                var avgFeeAmt = document.getElementById('avg-fee-amt');
+                var avgFeeSub = document.getElementById('avg-fee-sub');
+                var footerLbl = document.getElementById('footer-lbl');
+                var footerVal = document.getElementById('footer-val');
+                
+                if (apptBody.success && apptBody.data && docBody.success && docBody.data) {
+                    var patients = apptBody.data;
+                    var doctors = docBody.data;
+                    
+                    function getLocalDateStr(d) {
+                        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                    }
+                    
+                    var today = new Date();
+                    var todayDateStr = getLocalDateStr(today);
+                    var currentMonth = today.getMonth();
+                    var currentYear = today.getFullYear();
+                    
+                    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    var monthStr = monthNames[currentMonth] + " " + currentYear;
+                    
+                    var dailyTotal = 0;
+                    var dailyCount = 0;
+                    var monthlyTotal = 0;
+                    var monthlyCount = 0;
+                    var defaultCurrency = 'Rs';
+                    
+                    var groupedByDate = {};
+                    
+                    patients.forEach(function(p) {
+                        if (!p.appointmentDate) return;
+                        
+                        var apptDate = new Date(p.appointmentDate);
+                        var dateKey = getLocalDateStr(apptDate);
+                        
+                        var isToday = dateKey === todayDateStr;
+                        var isThisMonth = apptDate.getMonth() === currentMonth && apptDate.getFullYear() === currentYear;
+                        
+                        var fee = p.appointmentFee || 0;
+                        if (p.appointmentCurrency) defaultCurrency = p.appointmentCurrency;
+
+                        if (isToday) {
+                            dailyTotal += fee;
+                            if (fee > 0) dailyCount++;
+                        }
+                        if (isThisMonth) {
+                            monthlyTotal += fee;
+                            if (fee > 0) monthlyCount++;
+                            
+                            if (!groupedByDate[dateKey]) {
+                                groupedByDate[dateKey] = { date: apptDate, total: 0, items: [] };
+                            }
+                            groupedByDate[dateKey].total += fee;
+                            groupedByDate[dateKey].items.push(p);
+                        }
+                    });
+                    
+                    // Update Hero Cards
+                    var avgFee = monthlyCount > 0 ? (monthlyTotal / monthlyCount) : 0;
+                    
+                    dailyRevAmt.textContent = defaultCurrency + ' ' + dailyTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    dailyRevSub.textContent = dailyCount + (dailyCount === 1 ? ' billable assignment today' : ' billable assignments today');
+                    
+                    monthlyRevAmt.textContent = defaultCurrency + ' ' + monthlyTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    monthlyRevSub.textContent = monthStr + ' · ' + monthlyCount + (monthlyCount === 1 ? ' billable assignment' : ' billable assignments');
+                    
+                    avgFeeAmt.textContent = defaultCurrency + ' ' + Math.round(avgFee).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    avgFeeSub.textContent = 'Across ' + monthlyCount + (monthlyCount === 1 ? ' billed assignment this month' : ' billed assignments this month');
+                    
+                    footerLbl.textContent = 'Total revenue — ' + monthStr;
+                    footerVal.textContent = defaultCurrency + ' ' + monthlyTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                    
+                    // Build HTML
+                    var dates = Object.keys(groupedByDate).sort((a,b) => b.localeCompare(a)); // desc
+                    
+                    if (dates.length === 0) {
+                        container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--muted);">No revenue recorded for this month.</div>';
+                    } else {
+                        var html = '';
+                        dates.forEach(function(dKey) {
+                            var group = groupedByDate[dKey];
+                            var isToday = dKey === todayDateStr;
+                            
+                            var dateObj = group.date;
+                            var displayDate = String(dateObj.getDate()).padStart(2, '0') + ' ' + monthNames[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+                            
+                            html += '<div class="day-group">';
+                            html += '  <div class="day-heading">';
+                            html += '    <span class="d">' + displayDate + (isToday ? ' <span class="badge-today">Today</span>' : '') + '</span>';
+                            html += '    <span class="total">Day total: ' + defaultCurrency + ' ' + group.total.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + '</span>';
+                            html += '  </div>';
+                            html += '  <table class="rt"><tbody>';
+                            
+                            group.items.forEach(function(p) {
+                                var doc = doctors.find(d => d.id === p.assignedDoctorId);
+                                var docName = doc ? esc(doc.name) : 'Unknown';
+                                var initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
+                                var feeStr = p.appointmentFee > 0 ? (defaultCurrency + ' ' + p.appointmentFee.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })) : 'N/A';
+                                var feeClass = p.appointmentFee > 0 ? 'fee-cell' : 'fee-cell na';
+                                var statusStr = p.appointmentStatus || 'Scheduled';
+                                var statusClass = statusStr.toLowerCase() === 'completed' ? 'completed' : 'scheduled';
+                                
+                                html += '<tr>';
+                                html += '  <td><div class="rt-cell"><div class="rt-avatar">' + initial + '</div><div class="rt-name">' + esc(p.name) + '</div></div></td>';
+                                html += '  <td class="gender-tag">' + esc(p.gender || 'Unknown') + '</td>';
+                                html += '  <td class="doctor-cell">Dr. ' + docName + '</td>';
+                                html += '  <td><span class="status-tag ' + statusClass + '">' + statusStr + '</span></td>';
+                                html += '  <td class="' + feeClass + '">' + feeStr + '</td>';
+                                html += '</tr>';
+                            });
+                            
+                            html += '  </tbody></table>';
+                            html += '</div>';
+                        });
+                        
+                        container.innerHTML = html;
+                    }
+                } else {
+                    container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--coral);">Failed to load billing data.</div>';
+                }
+            } catch (e) {
+                document.getElementById('billing-table-body').innerHTML = '<div style="text-align:center; padding: 40px; color: var(--coral);">Network error.</div>';
+            }
+
+            function esc(text) {
+                if (!text) return '';
+                var d = document.createElement('div');
+                d.appendChild(document.createTextNode(String(text)));
+                return d.innerHTML;
+            }
+        });
+    </script>
+}
