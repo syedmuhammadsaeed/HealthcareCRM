@@ -145,5 +145,31 @@ namespace HealthcareCRM.Controllers
             TempData["Success"] = $"{role} account created successfully.";
             return RedirectToAction("Index");
         }
+        public async Task<IActionResult> ManageAccess()
+        {
+            SetLayoutData();
+            var users = await _context.Users.Find(u => u.Role == "Admin" || u.Role == "Doctor").ToListAsync();
+            return View(users);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleUserStatus(string id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user != null)
+            {
+                if (user.Status == "Approved")
+                {
+                    user.Status = "Deactivated";
+                }
+                else if (user.Status == "Deactivated")
+                {
+                    user.Status = "Approved";
+                }
+                await _userRepository.UpdateAsync(user);
+                TempData["Success"] = $"Account status updated to {user.Status}.";
+            }
+            return RedirectToAction("ManageAccess");
+        }
     }
 }

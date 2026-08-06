@@ -84,7 +84,14 @@ namespace HealthcareCRM.Services
                 {
                     return (false, string.Empty, "Your account registration was rejected.");
                 }
+                if (user.Status == "Deactivated")
+                {
+                    return (false, string.Empty, "Your account is deactivated by Super admin.");
+                }
             }
+
+            user.LastLogin = DateTime.UtcNow;
+            await _userRepository.UpdateAsync(user);
 
             var token = generateJwtToken(user);
             return (true, token, "Login successful.");

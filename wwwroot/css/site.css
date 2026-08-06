@@ -79,15 +79,15 @@ body.auth-page-body {
     padding-left: 10px;
 }
 .brand .logo-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--forest-dark);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--forest);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
 }
 .brand .brand-text {
     display: flex;

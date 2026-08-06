@@ -30,7 +30,7 @@
         body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); display: flex; min-height: 100vh; }
         .sidebar { width: 280px; background: var(--cream); border-right: 1px solid var(--line); display: flex; flex-direction: column; position: fixed; height: 100vh; padding: 32px 24px; }
         .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; text-decoration: none; }
-        .brand-icon { width: 36px; height: 36px; background: var(--forest); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .brand-icon { width: 32px; height: 32px; background: var(--forest); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .brand-text { display: flex; flex-direction: column; }
         .brand-name { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: var(--forest); line-height: 1.2; }
         .brand-slogan { font-size: 11px; color: var(--muted); }
@@ -109,6 +109,7 @@
         <nav class="sidebar-nav">
             <a href="/SuperAdmin" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a href="/SuperAdmin#add-user" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
+            <a href="/SuperAdmin/ManageAccess" class="nav-item"><i class="fa-solid fa-user-shield"></i> Active/Deactivate</a>
             <a href="/SuperAdmin/LoginHistory" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
             <a href="/SuperAdmin/Reports" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
             <a href="/SuperAdmin/Profile" class="nav-item active"><i class="fa-solid fa-gear"></i> Settings</a>
