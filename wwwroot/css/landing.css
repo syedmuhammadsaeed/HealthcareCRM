@@ -71,13 +71,16 @@ body {
 }
 
 .nav-links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    padding: 12px 30px;
+    padding: 10px 32px;
     border-radius: 30px;
     display: flex;
-    gap: 24px;
+    gap: 32px;
 }
 
 .nav-links a {
@@ -85,7 +88,10 @@ body {
     color: var(--ink);
     font-weight: 600;
     font-size: 14px;
-    transition: color 0.2s;
+    padding: 6px 12px;
+    border-radius: 16px;
+    transition: all 0.2s;
+    display: inline-block;
 }
 
 .nav-links a:hover {
@@ -170,29 +176,30 @@ body {
 }
 
 .hero-content {
-    max-width: 500px;
+    max-width: 360px;
+    width: fit-content;
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 50px 40px;
-    border-radius: 24px;
+    padding: 32px 32px;
+    border-radius: 20px;
     margin-left: 60px;
 }
 
 .hero-content h2 {
     font-family: var(--font-serif);
-    font-size: 48px;
+    font-size: 42px;
     font-weight: 700;
     color: var(--forest-dark);
-    line-height: 1.1;
-    margin: 0 0 20px 0;
+    line-height: 1.15;
+    margin: 0 0 16px 0;
 }
 
 .hero-content p {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--ink);
     line-height: 1.5;
-    margin: 0 0 30px 0;
+    margin: 0 0 24px 0;
 }
 
 /* Features */
@@ -487,8 +494,6 @@ body {
 .nav-links a.active {
     background: var(--sage-light);
     color: var(--forest);
-    padding: 6px 12px;
-    border-radius: 16px;
 }
 
 /* About Us Page Specifics */

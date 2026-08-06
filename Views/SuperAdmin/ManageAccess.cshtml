@@ -1,6 +1,6 @@
 @model IEnumerable<HealthcareCRM.Models.User>
 @{
-    ViewData["Title"] = "Admin / Doctor Login History";
+    ViewData["Title"] = "Manage Access";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -63,10 +63,22 @@
         .role-badge.doctor { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
         .role-badge.admin { background: #fef3c7; color: #b45309; border-color: #fde68a; }
 
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-badge.active { background: var(--success-bg); color: var(--success-text); }
+        .status-badge.deactivated { background: var(--error-bg); color: var(--error-text); }
+        
+        .btn-action { border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-deactivate { background: #fee2e2; color: #b91c1c; }
+        .btn-deactivate:hover { background: #fecaca; }
+        .btn-activate { background: #dcfce7; color: #15803d; }
+        .btn-activate:hover { background: #bbf7d0; }
+
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; }
         .empty-icon { width: 64px; height: 64px; background: var(--sage-light); color: var(--forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 20px; }
         .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--ink); margin: 0 0 8px 0; }
         .empty-state p { font-size: 14px; color: var(--muted); margin: 0; }
+
+        .alert-success { background: var(--success-bg); color: var(--success-text); padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; margin-top: 16px; }
     </style>
 </head>
 <body>
@@ -81,8 +93,8 @@
         <nav class="sidebar-nav">
             <a href="/SuperAdmin" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
             <a href="/SuperAdmin#add-user" class="nav-item"><i class="fa-solid fa-user-plus"></i> Add Admin / Doctor</a>
-            <a href="/SuperAdmin/ManageAccess" class="nav-item"><i class="fa-solid fa-user-shield"></i> Active/Deactivate</a>
-            <a href="/SuperAdmin/LoginHistory" class="nav-item active"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
+            <a href="/SuperAdmin/ManageAccess" class="nav-item active"><i class="fa-solid fa-user-shield"></i> Active/Deactivate</a>
+            <a href="/SuperAdmin/LoginHistory" class="nav-item"><i class="fa-regular fa-clock"></i> Admin / Doctor Login History</a>
             <a href="/SuperAdmin/Reports" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reports</a>
             <a href="/SuperAdmin/Profile" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
         </nav>
@@ -91,8 +103,8 @@
     <main class="main-wrapper">
         <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div>
-                <h1>Login History</h1>
-                <p>Audit trail of Admin and Doctor access.</p>
+                <h1>Manage Access</h1>
+                <p>Activate or Deactivate Admins and Doctors accounts.</p>
             </div>
             
             <div class="profile-dropdown-container" style="position:relative; z-index:50;">
@@ -110,9 +122,14 @@
             </div>
         </div>
 
+        @if(TempData["Success"] != null)
+        {
+            <div class="alert-success">@TempData["Success"]</div>
+        }
+
         <div class="card">
             <div class="card-header">
-                <h2>Admin / Doctor Login History</h2>
+                <h2>Admin / Doctor Access Control</h2>
             </div>
             
             @if(Model != null && Model.Any())
@@ -123,7 +140,8 @@
                             <th>Name</th>
                             <th>Role</th>
                             <th>Email</th>
-                            <th>Time (Last Login)</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,6 +149,8 @@
                         {
                             var initial = !string.IsNullOrEmpty(user.Name) ? user.Name.Substring(0, 1).ToUpper() : "U";
                             var roleClass = user.Role == "Doctor" ? "doctor" : "admin";
+                            var isActive = user.Status == "Approved";
+
                             <tr>
                                 <td>
                                     <div class="user-cell">
@@ -141,13 +161,33 @@
                                 <td><span class="role-badge @roleClass">@user.Role</span></td>
                                 <td>@user.Email</td>
                                 <td>
-                                    @if(user.LastLogin.HasValue)
+                                    @if(isActive)
                                     {
-                                        @user.LastLogin.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                        <span class="status-badge active">Active</span>
+                                    }
+                                    else if (user.Status == "Deactivated")
+                                    {
+                                        <span class="status-badge deactivated">Deactivated</span>
                                     }
                                     else
                                     {
-                                        <span style="color:#aaa; font-style:italic;">Never logged in</span>
+                                        <span class="status-badge deactivated">@user.Status</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if(user.Status == "Approved" || user.Status == "Deactivated")
+                                    {
+                                        <form method="post" action="/SuperAdmin/ToggleUserStatus" style="margin:0;">
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            @if(isActive)
+                                            {
+                                                <button type="submit" class="btn-action btn-deactivate">Deactivate</button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn-action btn-activate">Activate</button>
+                                            }
+                                        </form>
                                     }
                                 </td>
                             </tr>
@@ -158,9 +198,9 @@
             else
             {
                 <div class="empty-state">
-                    <div class="empty-icon"><i class="fa-regular fa-clock"></i></div>
-                    <h3>No Login Records</h3>
-                    <p>There is no login history available for any Admins or Doctors yet.</p>
+                    <div class="empty-icon"><i class="fa-solid fa-users-slash"></i></div>
+                    <h3>No Records Found</h3>
+                    <p>There are no Admins or Doctors registered in the system yet.</p>
                 </div>
             }
         </div>

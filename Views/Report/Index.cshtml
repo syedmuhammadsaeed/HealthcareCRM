@@ -1,0 +1,552 @@
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="reports-page">
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Reports</h1>
+            <p>Dashboard Overview</p>
+        </div>
+        <div class="header-right">
+            <form method="get" action="/Report" id="periodForm" style="margin:0;">
+                <div class="btn-outline" style="padding: 0; overflow: hidden; display: flex; align-items: center;">
+                    <i class="fa-regular fa-calendar" style="margin-left: 12px;"></i>
+                    <select name="period" onchange="document.getElementById('periodForm').submit()" style="border: none; background: transparent; outline: none; padding: 10px 8px; font-size: 13.5px; font-weight: 600; color: var(--forest); cursor: pointer; appearance: none; -webkit-appearance: none;">
+                        @if(ViewBag.Period == "month")
+                        {
+                            <option value="year">This Year</option>
+                            <option value="month" selected>This Month</option>
+                        }
+                        else
+                        {
+                            <option value="year" selected>This Year</option>
+                            <option value="month">This Month</option>
+                        }
+                    </select>
+                    <i class="fa-solid fa-chevron-down" style="margin-right: 12px; pointer-events: none;"></i>
+                </div>
+            </form>
+            <a href="/Report/Export" class="btn-outline" style="text-decoration:none;"><i class="fa-solid fa-download"></i> Export Report</a>
+        </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts-grid">
+        
+        <!-- Patients Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="icon-box"><i class="fa-solid fa-user-group"></i></div>
+                    <h3>Patient Monthly Graph</h3>
+                </div>
+                <div class="dropdown-mock">@ViewBag.PeriodLabel <i class="fa-solid fa-chevron-down ms-1"></i></div>
+            </div>
+            <div class="card-stats">
+                <div class="stats-left">
+                    <p>Total Patients</p>
+                    <h4>@ViewBag.TotalPatientsCount.ToString("N0")</h4>
+                </div>
+                <div class="stats-right text-green">
+                    <span class="pct"><i class="fa-solid fa-arrow-up"></i> 12.5%</span>
+                    <span class="vs">vs Last Year</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="patientsChart"></canvas>
+            </div>
+            <div class="chart-legend">
+                <span class="legend-dot"></span> Total Patients
+            </div>
+        </div>
+
+        <!-- Revenue Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="icon-box"><i class="fa-solid fa-dollar-sign"></i></div>
+                    <h3>Monthly Revenue Graph</h3>
+                </div>
+                <div class="dropdown-mock">@ViewBag.PeriodLabel <i class="fa-solid fa-chevron-down ms-1"></i></div>
+            </div>
+            <div class="card-stats">
+                <div class="stats-left">
+                    <p>Total Revenue</p>
+                    <h4>PKR @ViewBag.TotalRevenue.ToString("N0")</h4>
+                </div>
+                <div class="stats-right text-green">
+                    <span class="pct"><i class="fa-solid fa-arrow-up"></i> 18.7%</span>
+                    <span class="vs">vs Last Year</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="chart-legend">
+                <span class="legend-dot"></span> Revenue (PKR)
+            </div>
+        </div>
+
+        <!-- Online Patients Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="icon-box"><i class="fa-solid fa-globe"></i></div>
+                    <h3>Online Patients Monthly Graph</h3>
+                </div>
+                <div class="dropdown-mock">@ViewBag.PeriodLabel <i class="fa-solid fa-chevron-down ms-1"></i></div>
+            </div>
+            <div class="card-stats">
+                <div class="stats-left">
+                    <p>Total Online Patients</p>
+                    <h4>@ViewBag.OnlinePatientsCount.ToString("N0")</h4>
+                </div>
+                <div class="stats-right text-green">
+                    <span class="pct"><i class="fa-solid fa-arrow-up"></i> 15.3%</span>
+                    <span class="vs">vs Last Year</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="onlinePatientsChart"></canvas>
+            </div>
+            <div class="chart-legend">
+                <span class="legend-dot"></span> Online Patients
+            </div>
+        </div>
+
+        <!-- Appointments Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="icon-box"><i class="fa-regular fa-calendar-check"></i></div>
+                    <h3>Monthly No. of Appointments Graph</h3>
+                </div>
+                <div class="dropdown-mock">@ViewBag.PeriodLabel <i class="fa-solid fa-chevron-down ms-1"></i></div>
+            </div>
+            <div class="card-stats">
+                <div class="stats-left">
+                    <p>Total Appointments</p>
+                    <h4>@ViewBag.TotalAppointmentsCount.ToString("N0")</h4>
+                </div>
+                <div class="stats-right text-green">
+                    <span class="pct"><i class="fa-solid fa-arrow-up"></i> 10.2%</span>
+                    <span class="vs">vs Last Year</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="appointmentsChart"></canvas>
+            </div>
+            <div class="chart-legend">
+                <span class="legend-dot"></span> Appointments
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Summary Bottom Cards -->
+    <div class="summary-cards">
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-user-group"></i></div>
+            <div class="sum-info">
+                <p>Total Patients</p>
+                <h4>@ViewBag.TotalPatientsCount.ToString("N0")</h4>
+                <div class="sum-trend text-green"><i class="fa-solid fa-arrow-up"></i> 12.5% <span>vs Last Year</span></div>
+            </div>
+        </div>
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-globe"></i></div>
+            <div class="sum-info">
+                <p>Online Patients</p>
+                <h4>@ViewBag.OnlinePatientsCount.ToString("N0")</h4>
+                <div class="sum-trend text-green"><i class="fa-solid fa-arrow-up"></i> 15.3% <span>vs Last Year</span></div>
+            </div>
+        </div>
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-regular fa-calendar-check"></i></div>
+            <div class="sum-info">
+                <p>Total Appointments</p>
+                <h4>@ViewBag.TotalAppointmentsCount.ToString("N0")</h4>
+                <div class="sum-trend text-green"><i class="fa-solid fa-arrow-up"></i> 10.2% <span>vs Last Year</span></div>
+            </div>
+        </div>
+        <div class="sum-card">
+            <div class="sum-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+            <div class="sum-info">
+                <p>Total Revenue</p>
+                <h4>PKR @ViewBag.TotalRevenue.ToString("N0")</h4>
+                <div class="sum-trend text-green"><i class="fa-solid fa-arrow-up"></i> 18.7% <span>vs Last Year</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .reports-page {
+        padding: 32px 40px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 32px;
+    }
+    
+    .header-left h1 {
+        font-family: 'Fraunces', serif;
+        font-style: italic;
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--forest);
+        margin: 0 0 6px;
+    }
+    
+    .header-left p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14.5px;
+    }
+    
+    .header-right {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .btn-outline {
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--forest);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    .btn-outline:hover { background: #f9fafa; }
+    
+    .ms-1 { margin-left: 4px; }
+    .ms-2 { margin-left: 8px; }
+    
+    /* Grid */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .chart-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .icon-box {
+        width: 32px;
+        height: 32px;
+        background: var(--sage-light);
+        color: var(--forest);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+    
+    .card-title h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    
+    .dropdown-mock {
+        border: 1px solid var(--line);
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+    }
+    
+    .card-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 20px;
+    }
+    
+    .stats-left p {
+        margin: 0 0 6px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+    
+    .stats-left h4 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    
+    .stats-right {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    
+    .text-green { color: #16a34a; }
+    
+    .stats-right .pct {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+    
+    .stats-right .vs {
+        font-size: 11px;
+        color: var(--muted);
+    }
+    
+    .chart-container {
+        flex: 1;
+        position: relative;
+        height: 180px;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+    
+    .chart-legend {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+    }
+    
+    .legend-dot {
+        display: inline-block;
+        width: 12px;
+        height: 4px;
+        background: #16a34a;
+        border-radius: 2px;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+    /* Summary Cards */
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 24px;
+    }
+    
+    .sum-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-right: 1px solid var(--line);
+    }
+    
+    .sum-card:last-child {
+        border-right: none;
+    }
+    
+    .sum-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--sage-light);
+        color: var(--forest);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    .sum-info p {
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+    
+    .sum-info h4 {
+        margin: 0 0 4px;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--ink);
+    }
+    
+    .sum-trend {
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .sum-trend span {
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // Shared Chart.js options
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1C2621',
+                        padding: 10,
+                        titleFont: { family: 'Inter', size: 13 },
+                        bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                        displayColors: false,
+                        cornerRadius: 6
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        ticks: { font: { family: 'Inter', size: 11 }, color: '#7C8873' }
+                    },
+                    y: {
+                        grid: { color: '#EBE5D9', drawBorder: false, borderDash: [4, 4] },
+                        ticks: { font: { family: 'Inter', size: 11 }, color: '#7C8873', maxTicksLimit: 6 }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                elements: {
+                    line: { tension: 0.4 },
+                    point: { radius: 4, hoverRadius: 6, backgroundColor: '#16a34a', borderWidth: 2, borderColor: '#fff' }
+                }
+            };
+
+            const labels = [@Html.Raw(ViewBag.ChartLabels)];
+            
+            // 1. Patients Chart
+            const patientsData = [@ViewBag.ChartDataPatients];
+            new Chart(document.getElementById('patientsChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Patients',
+                        data: patientsData,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // 2. Revenue Chart
+            const revenueData = [@ViewBag.ChartDataRevenue];
+            new Chart(document.getElementById('revenueChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (PKR)',
+                        data: revenueData,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: Object.assign({}, commonOptions, {
+                    scales: {
+                        x: commonOptions.scales.x,
+                        y: {
+                            grid: { color: '#EBE5D9', drawBorder: false, borderDash: [4, 4] },
+                            ticks: { 
+                                font: { family: 'Inter', size: 11 }, 
+                                color: '#7C8873', 
+                                maxTicksLimit: 6,
+                                callback: function(value) {
+                                    if(value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                                    if(value >= 1000) return (value / 1000).toFixed(1) + 'k';
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                })
+            });
+
+            // 3. Online Patients Chart
+            const onlinePatientsData = [@ViewBag.ChartDataOnlinePatients];
+            new Chart(document.getElementById('onlinePatientsChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Online Patients',
+                        data: onlinePatientsData,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // 4. Appointments Chart
+            const appointmentsData = [@ViewBag.ChartDataAppointments];
+            new Chart(document.getElementById('appointmentsChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Appointments',
+                        data: appointmentsData,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: commonOptions
+            });
+
+        });
+    </script>
+}

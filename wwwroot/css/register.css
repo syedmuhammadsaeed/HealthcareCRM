@@ -68,12 +68,12 @@ body, html {
 .brand-icon {
     width: 32px;
     height: 32px;
-    background: #0d703b;
+    background: #1B4332;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 16px;
 }
 .brand-text {

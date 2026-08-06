@@ -41,15 +41,15 @@ body {
     margin-bottom: 24px; /* Reduced from 40px */
 }
 .brand-icon {
-    width: 24px;
-    height: 24px;
-    background: #407b5e;
+    width: 32px;
+    height: 32px;
+    background: #1B4332;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
-    font-size: 12px;
+    border-radius: 8px;
+    font-size: 16px;
 }
 .brand-logo h2 {
     margin: 0;
